@@ -1,15 +1,119 @@
-const SAVE_KEY = 'star_spire_save';
+const SAVE_PREFIX = 'star_spire_slot_';
+const SAVE_INDEX_KEY = 'star_spire_slot_index';
+const OLD_SAVE_KEY = 'star_spire_save';
+
+const SaveManager = {
+    getNextId() {
+        return parseInt(localStorage.getItem(SAVE_INDEX_KEY) || '0', 10);
+    },
+
+    setNextId(id) {
+        localStorage.setItem(SAVE_INDEX_KEY, String(id));
+    },
+
+    getAllSaves() {
+        const saves = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(SAVE_PREFIX)) {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    data._key = key;
+                    saves.push(data);
+                } catch (e) {}
+            }
+        }
+        saves.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        return saves;
+    },
+
+    saveGame(name) {
+        if (!Game.state || !Map.data) return false;
+        const id = this.getNextId();
+        this.setNextId(id + 1);
+        const saveData = {
+            slotId: id,
+            name: name || ('存档 ' + (id + 1)),
+            timestamp: Date.now(),
+            player: Utils.deepClone(Game.state.player),
+            currentFloor: Game.state.currentFloor,
+            currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
+            stats: Utils.deepClone(Game.state.stats),
+            mapData: Utils.deepClone(Map.data)
+        };
+        try {
+            localStorage.setItem(SAVE_PREFIX + id, JSON.stringify(saveData));
+            return true;
+        } catch (e) {
+            console.warn('存档失败:', e);
+            return false;
+        }
+    },
+
+    loadGame(key) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return false;
+            const d = JSON.parse(raw);
+            Game.state = {
+                player: d.player,
+                currentFloor: d.currentFloor,
+                currentNode: d.currentNode,
+                stats: d.stats
+            };
+            Map.data = d.mapData;
+            Game.currentSaveKey = key;
+            Game.currentSaveName = d.name;
+            return true;
+        } catch (e) {
+            console.warn('读档失败:', e);
+            return false;
+        }
+    },
+
+    deleteSave(key) {
+        localStorage.removeItem(key);
+    },
+
+    deleteOldSave() {
+        localStorage.removeItem(OLD_SAVE_KEY);
+    },
+
+    getSlotSummary(save) {
+        const date = new Date(save.timestamp);
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+        const hp = save.player ? save.player.hp : '?';
+        const maxHp = save.player ? save.player.maxHp : '?';
+        const gold = save.player ? save.player.gold : 0;
+        const deckSize = save.player && save.player.deck ? save.player.deck.length : 0;
+        const relicCount = save.player && save.player.relics ? save.player.relics.length : 0;
+        return {
+            name: save.name,
+            date: dateStr,
+            floor: save.currentFloor,
+            hp,
+            maxHp,
+            gold,
+            deckSize,
+            relicCount,
+            key: save._key
+        };
+    }
+};
 
 const Game = {
     state: null,
     currentShopData: null,
+    currentSaveKey: null,
+    currentSaveName: null,
 
     init() {
-        this.updateContinueButton();
+        SaveManager.deleteOldSave();
     },
 
     startNewRun() {
-        this.deleteSave();
+        this.currentSaveKey = null;
+        this.currentSaveName = null;
         this.state = {
             player: {
                 hp: 80,
@@ -30,82 +134,74 @@ const Game = {
         this.showScreen('screen-map');
         Map.render();
         UI.updateMapStats();
-        this.save();
     },
 
-    continueRun() {
-        if (this.load()) {
+    showSaveDialog() {
+        const name = prompt('请输入存档名称：', this.currentSaveName || ('第' + this.state.currentFloor + '层'));
+        if (name === null) return;
+        const ok = SaveManager.saveGame(name || undefined);
+        if (ok) {
+            const indicator = document.getElementById('save-indicator');
+            if (indicator) {
+                indicator.textContent = '✓ 存档成功';
+                indicator.classList.add('show');
+                setTimeout(() => indicator.classList.remove('show'), 2000);
+            }
+        } else {
+            alert('存档失败！');
+        }
+    },
+
+    showLoadScreen() {
+        this.showScreen('screen-load');
+        this.renderSaveSlots();
+    },
+
+    renderSaveSlots() {
+        const container = document.getElementById('save-slots');
+        container.innerHTML = '';
+        const saves = SaveManager.getAllSaves();
+
+        if (saves.length === 0) {
+            container.innerHTML = '<p style="color:#888;text-align:center;padding:40px 0">暂无存档</p>';
+            return;
+        }
+
+        saves.forEach(save => {
+            const s = SaveManager.getSlotSummary(save);
+            const div = document.createElement('div');
+            div.className = 'save-slot';
+            div.innerHTML = `
+                <div class="save-slot-info">
+                    <div class="save-slot-name">${s.name}</div>
+                    <div class="save-slot-detail">
+                        📍 第${s.floor}层 &nbsp; ❤️ ${s.hp}/${s.maxHp} &nbsp; 💰 ${s.gold} &nbsp; 🃏 ${s.deckSize}张 &nbsp; 🔧 ${s.relicCount}个
+                    </div>
+                    <div class="save-slot-date">${s.date}</div>
+                </div>
+                <div class="save-slot-actions">
+                    <button class="btn btn-small btn-primary" onclick="Game.loadFromSlot('${s.key}')">读取</button>
+                    <button class="btn btn-small btn-danger" onclick="Game.deleteSlotConfirm('${s.key}', '${s.name}')">删除</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    },
+
+    loadFromSlot(key) {
+        if (SaveManager.loadGame(key)) {
             this.showScreen('screen-map');
             Map.render();
             UI.updateMapStats();
+        } else {
+            alert('读档失败！');
         }
     },
 
-    save() {
-        if (!this.state) return;
-        const saveData = {
-            player: Utils.deepClone(this.state.player),
-            currentFloor: this.state.currentFloor,
-            currentNode: this.state.currentNode,
-            stats: Utils.deepClone(this.state.stats),
-            mapData: Map.data,
-            timestamp: Date.now()
-        };
-        try {
-            localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-            const indicator = document.getElementById('save-indicator');
-            if (indicator) {
-                indicator.textContent = '✓ 已保存';
-                indicator.classList.add('show');
-                setTimeout(() => indicator.classList.remove('show'), 1500);
-            }
-        } catch (e) {
-            console.warn('存档失败:', e);
-        }
-    },
-
-    load() {
-        try {
-            const raw = localStorage.getItem(SAVE_KEY);
-            if (!raw) return false;
-            const saveData = JSON.parse(raw);
-            this.state = {
-                player: saveData.player,
-                currentFloor: saveData.currentFloor,
-                currentNode: saveData.currentNode,
-                stats: saveData.stats
-            };
-            Map.data = saveData.mapData;
-            return true;
-        } catch (e) {
-            console.warn('读档失败:', e);
-            return false;
-        }
-    },
-
-    hasSave() {
-        return !!localStorage.getItem(SAVE_KEY);
-    },
-
-    deleteSave() {
-        localStorage.removeItem(SAVE_KEY);
-    },
-
-    updateContinueButton() {
-        const btn = document.getElementById('continue-btn');
-        if (btn) {
-            if (this.hasSave()) {
-                btn.style.display = 'block';
-                try {
-                    const saveData = JSON.parse(localStorage.getItem(SAVE_KEY));
-                    const date = new Date(saveData.timestamp);
-                    btn.textContent = `继续征程 (${saveData.currentFloor}层 ${date.toLocaleDateString()})`;
-                } catch (e) {
-                    btn.textContent = '继续征程';
-                }
-            } else {
-                btn.style.display = 'none';
-            }
+    deleteSlotConfirm(key, name) {
+        if (confirm('确定要删除存档「' + name + '」吗？')) {
+            SaveManager.deleteSave(key);
+            this.renderSaveSlots();
         }
     },
 
@@ -197,7 +293,6 @@ const Game = {
     returnToMap() {
         if (this.state.currentNode && this.state.currentNode.type === 'boss') {
             if (this.state.currentFloor >= 3) {
-                this.deleteSave();
                 this.showVictory();
                 return;
             }
@@ -209,7 +304,6 @@ const Game = {
         this.showScreen('screen-map');
         Map.render();
         UI.updateMapStats();
-        this.save();
     },
 
     showVictory() {
@@ -225,7 +319,6 @@ const Game = {
 
     toTitle() {
         this.showScreen('screen-title');
-        this.updateContinueButton();
     }
 };
 

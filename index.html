@@ -14,8 +14,8 @@
                 <h1 class="game-title">星际尖塔</h1>
                 <p class="game-subtitle">STAR SPIRE</p>
                 <div class="title-buttons">
-                    <button id="continue-btn" class="btn btn-primary btn-large" onclick="Game.continueRun()" style="display:none">继续征程</button>
                     <button class="btn btn-primary btn-large" onclick="Game.startNewRun()">开始征程</button>
+                    <button class="btn btn-secondary btn-large" onclick="Game.showLoadScreen()">📂 读取存档</button>
                 </div>
                 <p class="title-hint">穿越飞船 · 击败AI · 夺回方舟</p>
             </div>
@@ -30,6 +30,7 @@
                 </div>
                 <div class="map-actions">
                     <span id="save-indicator" class="save-indicator"></span>
+                    <button class="btn btn-small" onclick="Game.showSaveDialog()">💾 存档</button>
                     <button class="btn btn-small" onclick="UI.showDeck()">🃏 卡组</button>
                     <button class="btn btn-small" onclick="UI.showRelics()">🔧 模块</button>
                 </div>
@@ -146,6 +147,14 @@
                 <div id="victory-stats"></div>
                 <button class="btn btn-primary" onclick="Game.startNewRun()">再来一局</button>
                 <button class="btn btn-secondary" onclick="Game.toTitle()">返回标题</button>
+            </div>
+        </div>
+
+        <div id="screen-load" class="screen">
+            <div class="load-content">
+                <h2>📂 读取存档</h2>
+                <div id="save-slots"></div>
+                <button class="btn btn-secondary" onclick="Game.toTitle()">返回</button>
             </div>
         </div>
 
