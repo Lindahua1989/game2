@@ -373,15 +373,28 @@ const UI = {
         setTimeout(() => num.remove(), 800);
     },
 
-    showEnemyDamage(enemyUid, value) {
+    showEnemyDamage(enemyUid, value, hitLevel) {
         const el = document.querySelector(`[data-enemy-uid="${enemyUid}"]`);
         if (el) {
             this.showDamageNumber(el, value, 'damage');
             const sprite = el.querySelector('.enemy-sprite');
             if (sprite) {
-                sprite.classList.remove('hit');
+                const level = hitLevel || 'light';
+                const allHits = ['hit', 'hit-light', 'hit-medium', 'hit-heavy', 'hit-poison', 'hit-aoe'];
+                allHits.forEach(c => sprite.classList.remove(c));
                 void sprite.offsetWidth;
-                sprite.classList.add('hit');
+                sprite.classList.add('hit-' + level);
+
+                const overlay = document.createElement('div');
+                overlay.className = `hit-flash-overlay hit-flash-${level === 'poison' || level === 'aoe' ? 'medium' : level}`;
+                sprite.appendChild(overlay);
+                setTimeout(() => overlay.remove(), 700);
+
+                if (level === 'heavy') {
+                    const combat = document.getElementById('screen-combat');
+                    combat.classList.add('screen-heavy-hit');
+                    setTimeout(() => combat.classList.remove('screen-heavy-hit'), 500);
+                }
             }
         }
     },
@@ -434,12 +447,18 @@ const UI = {
         }
     },
 
-    showCombatLog(text) {
+    showCombatLog(text, type) {
         const log = document.getElementById('combat-log');
-        log.textContent = text;
-        log.classList.remove('combat-log-fade');
-        void log.offsetWidth;
-        log.classList.add('combat-log-fade');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry log-new';
+        if (type) entry.classList.add('log-' + type);
+        entry.textContent = text;
+        log.insertBefore(entry, log.firstChild);
+        const entries = log.querySelectorAll('.log-entry');
+        entries.forEach((e, i) => {
+            if (i > 0) e.classList.remove('log-new');
+            if (i > 30) e.remove();
+        });
     },
 
     animateCardPlay(cardIndex) {

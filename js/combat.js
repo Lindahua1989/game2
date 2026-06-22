@@ -2,6 +2,7 @@ const Combat = {
     state: null,
 
     startCombat(enemies) {
+        document.getElementById('combat-log').innerHTML = '';
         this.state = {
             enemies: enemies,
             drawPile: Utils.shuffle([...Game.state.player.deck]),
@@ -65,6 +66,7 @@ const Combat = {
         this.state.extraDraw = 0;
         this.drawCards(drawCount);
 
+        UI.showCombatLog(`--- 第 ${this.state.turn} 回合 ---`, 'system');
         UI.renderCombat();
     },
 
@@ -105,6 +107,7 @@ const Combat = {
 
         this.state.targetingCard = null;
         UI.animateCardPlay(cardIndex);
+        UI.showCombatLog(`使用 ${card.name}`, 'system');
         await Utils.delay(250);
         this.state.energy -= cost;
         this.state.hand.splice(cardIndex, 1);
@@ -131,25 +134,42 @@ const Combat = {
             let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0);
             if (dmg < 0) dmg = 0;
             const hits = card.hits || 1;
+            const totalDmg = dmg * hits;
+
+            let hitLevel;
+            if (card.poison) {
+                hitLevel = 'poison';
+            } else if (card.target === 'all' || card.target === 'random') {
+                hitLevel = 'aoe';
+            } else if (totalDmg >= 20) {
+                hitLevel = 'heavy';
+            } else if (totalDmg >= 10) {
+                hitLevel = 'medium';
+            } else {
+                hitLevel = 'light';
+            }
 
             if (card.target === 'all') {
                 for (const enemy of this.state.enemies) {
                     for (let h = 0; h < hits; h++) {
-                        this.dealDamageToEnemy(enemy, dmg, card.ignoreBlock);
+                        this.dealDamageToEnemy(enemy, dmg, card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
                     }
                 }
             } else if (card.target === 'random') {
                 for (let h = 0; h < hits; h++) {
                     const alive = this.state.enemies.filter(e => e.hp > 0);
                     if (alive.length > 0) {
-                        this.dealDamageToEnemy(Utils.randomChoice(alive), dmg, card.ignoreBlock);
+                        this.dealDamageToEnemy(Utils.randomChoice(alive), dmg, card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
                     }
                 }
             } else {
                 const target = this.state.enemies[targetIndex];
                 if (target) {
                     for (let h = 0; h < hits; h++) {
-                        this.dealDamageToEnemy(target, dmg, card.ignoreBlock);
+                        this.dealDamageToEnemy(target, dmg, card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
                     }
                 }
             }
@@ -159,7 +179,7 @@ const Combat = {
             const spentEnergy = this.state.maxEnergy;
             const dmg = spentEnergy * (card.damagePerEnergy || 5) + bonusDmg;
             const target = this.state.enemies[targetIndex];
-            if (target) this.dealDamageToEnemy(target, dmg);
+            if (target) this.dealDamageToEnemy(target, dmg, false, 'heavy');
         }
 
         if (card.block) {
@@ -254,7 +274,7 @@ const Combat = {
         this.state.firstAttackBonus = 0;
     },
 
-    dealDamageToEnemy(enemy, damage, ignoreBlock = false) {
+    dealDamageToEnemy(enemy, damage, ignoreBlock = false, hitLevel) {
         let remaining = damage;
 
         if (!ignoreBlock && enemy.block > 0) {
@@ -270,14 +290,14 @@ const Combat = {
         enemy.hp -= remaining;
 
         if (remaining > 0) {
-            UI.showEnemyDamage(enemy.uid, remaining);
-            UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`);
+            UI.showEnemyDamage(enemy.uid, remaining, hitLevel || 'light');
+            UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`, 'damage');
         }
 
         if (enemy.hp <= 0) {
             enemy.hp = 0;
             UI.showEnemyDeath(enemy.uid);
-            UI.showCombatLog(`${enemy.name} 被消灭了！`);
+            UI.showCombatLog(`${enemy.name} 被消灭了！`, 'system');
         }
     },
 
@@ -304,7 +324,7 @@ const Combat = {
                 enemy.hp -= poisonDmg;
                 enemy.status.poison = Math.max(0, enemy.status.poison - 1);
                 UI.showEnemyDamage(enemy.uid, poisonDmg);
-                UI.showCombatLog(`${enemy.name} 受到 ${poisonDmg} 腐蚀伤害`);
+                UI.showCombatLog(`${enemy.name} 受到 ${poisonDmg} 腐蚀伤害`, 'damage');
                 if (enemy.hp <= 0) {
                     enemy.hp = 0;
                     UI.showEnemyDeath(enemy.uid);
@@ -372,7 +392,7 @@ const Combat = {
             case 'attack_poison':
                 this.dealDamageToPlayer(atkValue);
                 Game.state.player.poison = (Game.state.player.poison || 0) + (intent.poison || 0);
-                UI.showCombatLog(`${enemy.name} 施加了 ${intent.poison} 腐蚀`);
+                UI.showCombatLog(`${enemy.name} 施加了 ${intent.poison} 腐蚀`, 'enemy');
                 break;
 
             case 'attack_weak':
@@ -385,7 +405,7 @@ const Combat = {
 
             case 'block':
                 enemy.block += intent.value;
-                UI.showCombatLog(`${enemy.name} 获得了 ${intent.value} 护甲`);
+                UI.showCombatLog(`${enemy.name} 获得了 ${intent.value} 护甲`, 'block');
                 break;
 
             case 'block_attack':
@@ -398,12 +418,12 @@ const Combat = {
                 break;
 
             case 'charge':
-                UI.showCombatLog(`${enemy.name} 正在蓄力...`);
+                UI.showCombatLog(`${enemy.name} 正在蓄力...`, 'enemy');
                 break;
 
             case 'heal':
                 enemy.hp = Math.min(enemy.maxHp, enemy.hp + intent.value);
-                UI.showCombatLog(`${enemy.name} 回复了 ${intent.value} HP`);
+                UI.showCombatLog(`${enemy.name} 回复了 ${intent.value} HP`, 'heal');
                 break;
 
             case 'summon':
@@ -412,7 +432,7 @@ const Combat = {
                     const minion = Enemies.createEnemy('nano_swarm_enemy');
                     if (minion) this.state.enemies.push(minion);
                 }
-                UI.showCombatLog(`${enemy.name} 召唤了增援！`);
+                UI.showCombatLog(`${enemy.name} 召唤了增援！`, 'enemy');
                 break;
         }
     },
@@ -439,9 +459,9 @@ const Combat = {
             UI.showPlayerHit();
             const playerArea = document.getElementById('player-area');
             UI.showDamageNumber(playerArea, remaining, 'damage');
-            UI.showCombatLog(`你受到了 ${remaining} 点伤害`);
+            UI.showCombatLog(`你受到了 ${remaining} 点伤害`, 'damage');
         } else if (blocked > 0) {
-            UI.showCombatLog(`护甲抵挡了 ${blocked} 点伤害`);
+            UI.showCombatLog(`护甲抵挡了 ${blocked} 点伤害`, 'block');
         }
 
         if (Game.state.player.hp <= 0) {
