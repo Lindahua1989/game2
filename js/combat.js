@@ -77,6 +77,7 @@ const Combat = {
             }
             this.state.hand.push(this.state.drawPile.pop());
         }
+        setTimeout(() => UI.animateCardDraw(), 50);
     },
 
     cancelTargeting() {
@@ -103,6 +104,8 @@ const Combat = {
         }
 
         this.state.targetingCard = null;
+        UI.animateCardPlay(cardIndex);
+        await Utils.delay(250);
         this.state.energy -= cost;
         this.state.hand.splice(cardIndex, 1);
 
@@ -161,10 +164,12 @@ const Combat = {
 
         if (card.block) {
             this.state.playerBlock += card.block;
+            UI.showBlockGain(card.block);
         }
 
         if (card.heal) {
             Game.state.player.hp = Math.min(Game.state.player.maxHp, Game.state.player.hp + card.heal);
+            UI.showPlayerHeal(card.heal);
         }
 
         if (card.draw) {
@@ -173,6 +178,7 @@ const Combat = {
 
         if (card.energy) {
             this.state.energy += card.energy;
+            UI.showEnergyPulse();
         }
 
         if (card.selfDamage) {
@@ -249,9 +255,6 @@ const Combat = {
     },
 
     dealDamageToEnemy(enemy, damage, ignoreBlock = false) {
-        if (enemy.status.weak > 0 && false) {
-        }
-
         let remaining = damage;
 
         if (!ignoreBlock && enemy.block > 0) {
@@ -266,11 +269,15 @@ const Combat = {
 
         enemy.hp -= remaining;
 
-        if (enemy.status.poison > 0) {
+        if (remaining > 0) {
+            UI.showEnemyDamage(enemy.uid, remaining);
+            UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`);
         }
 
         if (enemy.hp <= 0) {
             enemy.hp = 0;
+            UI.showEnemyDeath(enemy.uid);
+            UI.showCombatLog(`${enemy.name} 被消灭了！`);
         }
     },
 
@@ -293,12 +300,18 @@ const Combat = {
             if (enemy.hp <= 0) continue;
 
             if (enemy.status.poison > 0) {
-                enemy.hp -= enemy.status.poison;
+                const poisonDmg = enemy.status.poison;
+                enemy.hp -= poisonDmg;
                 enemy.status.poison = Math.max(0, enemy.status.poison - 1);
+                UI.showEnemyDamage(enemy.uid, poisonDmg);
+                UI.showCombatLog(`${enemy.name} 受到 ${poisonDmg} 腐蚀伤害`);
                 if (enemy.hp <= 0) {
                     enemy.hp = 0;
+                    UI.showEnemyDeath(enemy.uid);
+                    await Utils.delay(400);
                     continue;
                 }
+                await Utils.delay(300);
             }
 
             if (this.state.playerPowers.damagePerTurn > 0) {
@@ -337,20 +350,29 @@ const Combat = {
     },
 
     async executeEnemyAction(enemy, intent, atkValue) {
+        const isAttack = ['attack', 'attack_poison', 'attack_weak', 'attack_all', 'block_attack'].includes(intent.type);
+        if (isAttack) {
+            UI.showEnemyAttack(enemy.uid);
+            await Utils.delay(200);
+        }
+
         switch (intent.type) {
             case 'attack':
                 const hits = intent.hits || 1;
                 for (let i = 0; i < hits; i++) {
                     this.dealDamageToPlayer(atkValue);
+                    if (hits > 1) await Utils.delay(150);
                 }
                 if (this.state.playerPowers.thorns > 0) {
                     enemy.hp -= this.state.playerPowers.thorns;
+                    UI.showEnemyDamage(enemy.uid, this.state.playerPowers.thorns);
                 }
                 break;
 
             case 'attack_poison':
                 this.dealDamageToPlayer(atkValue);
                 Game.state.player.poison = (Game.state.player.poison || 0) + (intent.poison || 0);
+                UI.showCombatLog(`${enemy.name} 施加了 ${intent.poison} 腐蚀`);
                 break;
 
             case 'attack_weak':
@@ -363,6 +385,7 @@ const Combat = {
 
             case 'block':
                 enemy.block += intent.value;
+                UI.showCombatLog(`${enemy.name} 获得了 ${intent.value} 护甲`);
                 break;
 
             case 'block_attack':
@@ -370,14 +393,17 @@ const Combat = {
                 this.dealDamageToPlayer(atkValue);
                 if (this.state.playerPowers.thorns > 0) {
                     enemy.hp -= this.state.playerPowers.thorns;
+                    UI.showEnemyDamage(enemy.uid, this.state.playerPowers.thorns);
                 }
                 break;
 
             case 'charge':
+                UI.showCombatLog(`${enemy.name} 正在蓄力...`);
                 break;
 
             case 'heal':
                 enemy.hp = Math.min(enemy.maxHp, enemy.hp + intent.value);
+                UI.showCombatLog(`${enemy.name} 回复了 ${intent.value} HP`);
                 break;
 
             case 'summon':
@@ -386,24 +412,37 @@ const Combat = {
                     const minion = Enemies.createEnemy('nano_swarm_enemy');
                     if (minion) this.state.enemies.push(minion);
                 }
+                UI.showCombatLog(`${enemy.name} 召唤了增援！`);
                 break;
         }
     },
 
     dealDamageToPlayer(damage) {
         let remaining = damage;
+        let blocked = 0;
 
         if (this.state.playerBlock > 0) {
             if (this.state.playerBlock >= remaining) {
                 this.state.playerBlock -= remaining;
+                blocked = remaining;
                 remaining = 0;
             } else {
                 remaining -= this.state.playerBlock;
+                blocked = this.state.playerBlock;
                 this.state.playerBlock = 0;
             }
         }
 
         Game.state.player.hp -= remaining;
+
+        if (remaining > 0) {
+            UI.showPlayerHit();
+            const playerArea = document.getElementById('player-area');
+            UI.showDamageNumber(playerArea, remaining, 'damage');
+            UI.showCombatLog(`你受到了 ${remaining} 点伤害`);
+        } else if (blocked > 0) {
+            UI.showCombatLog(`护甲抵挡了 ${blocked} 点伤害`);
+        }
 
         if (Game.state.player.hp <= 0) {
             Game.state.player.hp = 0;

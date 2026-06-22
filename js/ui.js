@@ -16,6 +16,7 @@ const UI = {
 
             const div = document.createElement('div');
             div.className = 'enemy';
+            div.setAttribute('data-enemy-uid', enemy.uid);
 
             if (state.targetingCard !== null) {
                 div.classList.add('targetable');
@@ -358,5 +359,103 @@ const UI = {
         document.getElementById('map-max-hp').textContent = Game.state.player.maxHp;
         document.getElementById('map-gold').textContent = Game.state.player.gold;
         document.getElementById('map-floor').textContent = Game.state.currentFloor;
+    },
+
+    showDamageNumber(element, value, type) {
+        if (!element) return;
+        const rect = element.getBoundingClientRect();
+        const num = document.createElement('div');
+        num.className = `damage-number ${type}`;
+        num.textContent = type === 'heal' ? `+${value}` : type === 'block' ? `+${value}🛡️` : `-${value}`;
+        num.style.left = (rect.left + rect.width / 2 - 20 + Utils.randomInt(-15, 15)) + 'px';
+        num.style.top = (rect.top + Utils.randomInt(-10, 10)) + 'px';
+        document.body.appendChild(num);
+        setTimeout(() => num.remove(), 800);
+    },
+
+    showEnemyDamage(enemyUid, value) {
+        const el = document.querySelector(`[data-enemy-uid="${enemyUid}"]`);
+        if (el) {
+            this.showDamageNumber(el, value, 'damage');
+            const sprite = el.querySelector('.enemy-sprite');
+            if (sprite) {
+                sprite.classList.remove('hit');
+                void sprite.offsetWidth;
+                sprite.classList.add('hit');
+            }
+        }
+    },
+
+    showEnemyDeath(enemyUid) {
+        const el = document.querySelector(`[data-enemy-uid="${enemyUid}"]`);
+        if (el) {
+            el.classList.add('enemy-dying');
+        }
+    },
+
+    showEnemyAttack(enemyUid) {
+        const el = document.querySelector(`[data-enemy-uid="${enemyUid}"]`);
+        if (el) {
+            el.classList.add('enemy-attacking');
+            setTimeout(() => el.classList.remove('enemy-attacking'), 500);
+        }
+    },
+
+    showPlayerHit() {
+        const combat = document.getElementById('screen-combat');
+        combat.classList.remove('player-hit-flash');
+        void combat.offsetWidth;
+        combat.classList.add('player-hit-flash');
+        setTimeout(() => combat.classList.remove('player-hit-flash'), 400);
+
+        const playerArea = document.getElementById('player-area');
+        this.showDamageNumber(playerArea, 0, 'damage');
+    },
+
+    showPlayerHeal(value) {
+        const playerArea = document.getElementById('player-area');
+        this.showDamageNumber(playerArea, value, 'heal');
+        playerArea.classList.add('heal-glow');
+        setTimeout(() => playerArea.classList.remove('heal-glow'), 500);
+    },
+
+    showBlockGain(value) {
+        const blockEl = document.getElementById('player-block');
+        this.showDamageNumber(document.getElementById('player-area'), value, 'block');
+        blockEl.parentElement.classList.add('block-glow');
+        setTimeout(() => blockEl.parentElement.classList.remove('block-glow'), 500);
+    },
+
+    showEnergyPulse() {
+        const el = document.querySelector('.player-energy');
+        if (el) {
+            el.classList.add('energy-pulse');
+            setTimeout(() => el.classList.remove('energy-pulse'), 400);
+        }
+    },
+
+    showCombatLog(text) {
+        const log = document.getElementById('combat-log');
+        log.textContent = text;
+        log.classList.remove('combat-log-fade');
+        void log.offsetWidth;
+        log.classList.add('combat-log-fade');
+    },
+
+    animateCardPlay(cardIndex) {
+        const handArea = document.getElementById('hand-area');
+        const cards = handArea.querySelectorAll('.card');
+        if (cards[cardIndex]) {
+            cards[cardIndex].classList.add('card-playing');
+        }
+    },
+
+    animateCardDraw() {
+        const handArea = document.getElementById('hand-area');
+        const lastCard = handArea.lastElementChild;
+        if (lastCard) {
+            lastCard.classList.add('card-drawing');
+            setTimeout(() => lastCard.classList.remove('card-drawing'), 300);
+        }
     }
 };
