@@ -15,11 +15,13 @@ const SaveManager = {
         const saves = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key && key.startsWith(SAVE_PREFIX)) {
+            if (key && key.startsWith(SAVE_PREFIX) && key !== SAVE_INDEX_KEY) {
                 try {
                     const data = JSON.parse(localStorage.getItem(key));
-                    data._key = key;
-                    saves.push(data);
+                    if (data && data.slotId !== undefined && data.player) {
+                        data._key = key;
+                        saves.push(data);
+                    }
                 } catch (e) {}
             }
         }
@@ -43,10 +45,33 @@ const SaveManager = {
         };
         try {
             localStorage.setItem(SAVE_PREFIX + id, JSON.stringify(saveData));
+            Game.currentSaveKey = SAVE_PREFIX + id;
+            Game.currentSaveName = saveData.name;
             return true;
         } catch (e) {
             console.warn('存档失败:', e);
             return false;
+        }
+    },
+
+    autoSave() {
+        if (!Game.state || !Map.data) return;
+        if (Game.currentSaveKey) {
+            const saveData = {
+                slotId: parseInt(Game.currentSaveKey.replace(SAVE_PREFIX, ''), 10),
+                name: Game.currentSaveName || '自动存档',
+                timestamp: Date.now(),
+                player: Utils.deepClone(Game.state.player),
+                currentFloor: Game.state.currentFloor,
+                currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
+                stats: Utils.deepClone(Game.state.stats),
+                mapData: Utils.deepClone(Map.data)
+            };
+            try {
+                localStorage.setItem(Game.currentSaveKey, JSON.stringify(saveData));
+            } catch (e) {}
+        } else {
+            this.saveGame('自动存档');
         }
     },
 
@@ -323,3 +348,9 @@ const Game = {
 };
 
 document.addEventListener('DOMContentLoaded', () => Game.init());
+
+window.addEventListener('beforeunload', () => {
+    if (Game.state && Map.data) {
+        SaveManager.autoSave();
+    }
+});
