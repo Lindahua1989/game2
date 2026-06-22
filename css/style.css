@@ -305,6 +305,7 @@ body {
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
+    position: relative;
 }
 
 .map-row {
@@ -312,6 +313,8 @@ body {
     gap: 20px;
     margin: 8px 0;
     justify-content: center;
+    position: relative;
+    z-index: 1;
 }
 
 .map-node {
@@ -367,10 +370,32 @@ body {
     50% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.6); }
 }
 
-.map-line {
-    position: absolute;
-    background: rgba(0, 212, 255, 0.2);
-    z-index: 0;
+.map-lines {
+    overflow: visible;
+}
+
+.map-line-locked {
+    stroke: rgba(0, 212, 255, 0.08);
+    stroke-width: 2;
+}
+
+.map-line-visited {
+    stroke: rgba(180, 74, 255, 0.6);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 4px rgba(180, 74, 255, 0.4));
+}
+
+.map-line-available {
+    stroke: rgba(0, 212, 255, 0.5);
+    stroke-width: 2.5;
+    stroke-dasharray: 8 4;
+    animation: lineFlow 1s linear infinite;
+    filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.3));
+}
+
+@keyframes lineFlow {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -24; }
 }
 
 /* ===== COMBAT SCREEN ===== */

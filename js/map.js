@@ -142,6 +142,7 @@ const Map = {
             row.forEach(node => {
                 const nodeDiv = document.createElement('div');
                 nodeDiv.className = 'map-node';
+                nodeDiv.setAttribute('data-node-id', node.id);
 
                 if (node.type === 'boss') nodeDiv.classList.add('boss');
                 if (node.visited) nodeDiv.classList.add('visited');
@@ -164,5 +165,67 @@ const Map = {
 
             container.appendChild(rowDiv);
         });
+
+        requestAnimationFrame(() => this.drawConnections());
+    },
+
+    drawConnections() {
+        const container = document.getElementById('map-container');
+        const oldSvg = container.querySelector('.map-lines');
+        if (oldSvg) oldSvg.remove();
+
+        const containerRect = container.getBoundingClientRect();
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add('map-lines');
+        svg.setAttribute('width', container.scrollWidth);
+        svg.setAttribute('height', container.scrollHeight);
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.pointerEvents = 'none';
+        svg.style.zIndex = '0';
+
+        this.data.forEach(row => {
+            row.forEach(node => {
+                const fromEl = container.querySelector(`[data-node-id="${node.id}"]`);
+                if (!fromEl) return;
+                const fromRect = fromEl.getBoundingClientRect();
+                const fromX = fromRect.left + fromRect.width / 2 - containerRect.left + container.scrollLeft;
+                const fromY = fromRect.top + fromRect.height / 2 - containerRect.top + container.scrollTop;
+
+                node.connections.forEach(connId => {
+                    const toEl = container.querySelector(`[data-node-id="${connId}"]`);
+                    if (!toEl) return;
+                    const toRect = toEl.getBoundingClientRect();
+                    const toX = toRect.left + toRect.width / 2 - containerRect.left + container.scrollLeft;
+                    const toY = toRect.top + toRect.height / 2 - containerRect.top + container.scrollTop;
+
+                    const [toRow] = connId.split('-').map(Number);
+                    const toNode = this.data[toRow] && this.data[toRow].find(n => n.id === connId);
+
+                    let lineClass = 'map-line-locked';
+                    if (node.visited && toNode && toNode.visited) {
+                        lineClass = 'map-line-visited';
+                    } else if (node.visited && toNode && toNode.available) {
+                        lineClass = 'map-line-available';
+                    }
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fromX);
+                    line.setAttribute('y1', fromY);
+                    line.setAttribute('x2', toX);
+                    line.setAttribute('y2', toY);
+                    line.classList.add(lineClass);
+                    svg.appendChild(line);
+                });
+            });
+        });
+
+        container.insertBefore(svg, container.firstChild);
+
+        const currentEl = container.querySelector('.map-node.current') || container.querySelector('.map-node.available');
+        if (currentEl) {
+            currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 };
