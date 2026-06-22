@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星际尖塔 Star Spire</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="screen-title" class="screen active">
+            <div class="title-bg"></div>
+            <div class="title-content">
+                <h1 class="game-title">星际尖塔</h1>
+                <p class="game-subtitle">STAR SPIRE</p>
+                <div class="title-buttons">
+                    <button id="continue-btn" class="btn btn-primary btn-large" onclick="Game.continueRun()" style="display:none">继续征程</button>
+                    <button class="btn btn-primary btn-large" onclick="Game.startNewRun()">开始征程</button>
+                </div>
+                <p class="title-hint">穿越飞船 · 击败AI · 夺回方舟</p>
+            </div>
+        </div>
+
+        <div id="screen-map" class="screen">
+            <div class="map-header">
+                <div class="player-stats">
+                    <span class="stat hp">❤️ <span id="map-hp">80</span>/<span id="map-max-hp">80</span></span>
+                    <span class="stat gold">💰 <span id="map-gold">99</span></span>
+                    <span class="stat floor">📍 第 <span id="map-floor">1</span> 层</span>
+                </div>
+                <div class="map-actions">
+                    <span id="save-indicator" class="save-indicator"></span>
+                    <button class="btn btn-small" onclick="UI.showDeck()">🃏 卡组</button>
+                    <button class="btn btn-small" onclick="UI.showRelics()">🔧 模块</button>
+                </div>
+            </div>
+            <div id="map-container"></div>
+        </div>
+
+        <div id="screen-combat" class="screen" onclick="Combat.cancelTargeting()">
+            <div class="combat-top" onclick="event.stopPropagation()">
+                <div class="player-stats">
+                    <span class="stat hp">❤️ <span id="combat-hp">80</span>/<span id="combat-max-hp">80</span></span>
+                    <span class="stat gold">💰 <span id="combat-gold">0</span></span>
+                </div>
+                <div class="combat-info">
+                    <span id="combat-floor-info"></span>
+                </div>
+            </div>
+            <div id="enemy-area"></div>
+            <div id="combat-log"></div>
+            <div id="player-area">
+                <div class="player-block-display">
+                    <span id="player-block">0</span> 🛡️
+                </div>
+                <div class="player-energy">
+                    <span id="energy-current">3</span>/<span id="energy-max">3</span> ⚡
+                </div>
+            </div>
+            <div id="hand-area" onclick="event.stopPropagation()"></div>
+            <div class="combat-bottom" onclick="event.stopPropagation()">
+                <div class="pile-info">
+                    <button class="btn btn-small" onclick="UI.showPile('draw')">抽牌堆 (<span id="draw-count">0</span>)</button>
+                    <button class="btn btn-small" onclick="UI.showPile('discard')">弃牌堆 (<span id="discard-count">0</span>)</button>
+                </div>
+                <button id="end-turn-btn" class="btn btn-end-turn" onclick="Combat.endTurn()">结束回合</button>
+            </div>
+        </div>
+
+        <div id="screen-reward" class="screen">
+            <div class="reward-content">
+                <h2>🏆 战斗胜利</h2>
+                <div id="reward-gold" class="reward-gold"></div>
+                <h3>选择一张卡牌加入卡组：</h3>
+                <div id="reward-cards"></div>
+                <button class="btn btn-secondary" onclick="Game.skipReward()">跳过</button>
+            </div>
+        </div>
+
+        <div id="screen-event" class="screen">
+            <div class="event-content">
+                <div id="event-icon" class="event-icon"></div>
+                <h2 id="event-title"></h2>
+                <p id="event-description"></p>
+                <div id="event-choices"></div>
+            </div>
+        </div>
+
+        <div id="screen-shop" class="screen">
+            <div class="shop-content">
+                <h2>🏪 黑市商人</h2>
+                <p class="shop-gold">💰 <span id="shop-gold">0</span></p>
+                <div class="shop-section">
+                    <h3>购买卡牌</h3>
+                    <div id="shop-cards"></div>
+                </div>
+                <div class="shop-section">
+                    <h3>科技模块</h3>
+                    <div id="shop-relics"></div>
+                </div>
+                <div class="shop-section">
+                    <h3>服务</h3>
+                    <div id="shop-services"></div>
+                </div>
+                <button class="btn btn-secondary" onclick="Game.leaveShop()">离开商店</button>
+            </div>
+        </div>
+
+        <div id="screen-rest" class="screen">
+            <div class="rest-content">
+                <h2>⛺ 能量节点</h2>
+                <p>在此处稍作休息...</p>
+                <div class="rest-choices">
+                    <button class="btn btn-primary" onclick="Game.restHeal()">
+                        🔋 充能<br><small>回复 30% 最大HP</small>
+                    </button>
+                    <button class="btn btn-secondary" onclick="Game.restUpgrade()">
+                        ⬆️ 升级<br><small>升级一张卡牌</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-upgrade" class="screen">
+            <div class="upgrade-content">
+                <h2>⬆️ 选择要升级的卡牌</h2>
+                <div id="upgrade-cards"></div>
+                <button class="btn btn-secondary" onclick="Game.cancelUpgrade()">取消</button>
+            </div>
+        </div>
+
+        <div id="screen-gameover" class="screen">
+            <div class="gameover-content">
+                <h1 class="gameover-title">系统崩溃</h1>
+                <p>你的意识被AI吞噬...</p>
+                <div id="gameover-stats"></div>
+                <button class="btn btn-primary" onclick="Game.startNewRun()">重新开始</button>
+                <button class="btn btn-secondary" onclick="Game.toTitle()">返回标题</button>
+            </div>
+        </div>
+
+        <div id="screen-victory" class="screen">
+            <div class="victory-content">
+                <h1 class="victory-title">🌟 方舟已夺回</h1>
+                <p>你成功击败了主控AI，拯救了人类！</p>
+                <div id="victory-stats"></div>
+                <button class="btn btn-primary" onclick="Game.startNewRun()">再来一局</button>
+                <button class="btn btn-secondary" onclick="Game.toTitle()">返回标题</button>
+            </div>
+        </div>
+
+        <div id="modal-overlay" class="modal-overlay" onclick="UI.closeModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 id="modal-title"></h3>
+                    <button class="btn-close" onclick="UI.closeModal()">✕</button>
+                </div>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
+        <div id="card-tooltip" class="card-tooltip"></div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/relics.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
