@@ -35,7 +35,6 @@ const Game = {
 
     continueRun() {
         if (this.load()) {
-            Map.data = this.state.mapData;
             this.showScreen('screen-map');
             Map.render();
             UI.updateMapStats();
