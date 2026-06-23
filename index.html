@@ -49,6 +49,7 @@
                 <div class="combat-info">
                     <span id="combat-floor-info"></span>
                 </div>
+                <button class="btn btn-small" onclick="Game.togglePause()">⏸️ 暂停</button>
             </div>
             <div id="enemy-area"></div>
             <div id="combat-log"></div>
@@ -172,6 +173,19 @@
             </div>
         </div>
 
+        <div id="screen-pause" class="screen">
+            <div class="pause-content">
+                <h2>⏸️ 游戏暂停</h2>
+                <div class="pause-buttons">
+                    <button class="btn btn-primary" onclick="Game.togglePause()">▶️ 继续游戏</button>
+                    <button class="btn btn-secondary" onclick="UI.showDeck()">🃏 查看卡组</button>
+                    <button class="btn btn-secondary" onclick="UI.showRelics()">🔧 查看模块</button>
+                    <button class="btn btn-secondary" onclick="Game.showSaveDialog()">💾 存档</button>
+                    <button class="btn btn-danger" onclick="Game.confirmAbandon()">🚪 放弃本局</button>
+                </div>
+            </div>
+        </div>
+
         <div id="modal-overlay" class="modal-overlay" onclick="UI.closeModal()">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="modal-header">
@@ -188,6 +202,7 @@
     <script src="js/utils.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/stats.js"></script>
+    <script src="js/particles.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/enemies.js"></script>
     <script src="js/relics.js"></script>

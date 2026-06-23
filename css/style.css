@@ -34,10 +34,13 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .screen.active {
     display: flex;
+    opacity: 1;
 }
 
 .btn {
@@ -1660,4 +1663,91 @@ body {
 @media (max-width: 768px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .achievements-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== PAUSE MENU ===== */
+#screen-pause {
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 90;
+    backdrop-filter: blur(8px);
+}
+
+.pause-content {
+    text-align: center;
+}
+
+.pause-content h2 {
+    font-size: 36px;
+    color: #00d4ff;
+    margin-bottom: 32px;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.pause-buttons .btn {
+    width: 240px;
+    font-size: 16px;
+}
+
+/* ===== SCREEN TRANSITIONS ===== */
+.screen.fade-out {
+    opacity: 0;
+}
+
+.screen.fade-in {
+    opacity: 1;
+}
+
+/* ===== PARTICLES ===== */
+.particle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 100;
+    border-radius: 50%;
+}
+
+.particle-damage {
+    background: radial-gradient(circle, #ff4466, #ff2244);
+    box-shadow: 0 0 6px rgba(255, 68, 102, 0.8);
+}
+
+.particle-heal {
+    background: radial-gradient(circle, #44ff88, #22cc66);
+    box-shadow: 0 0 6px rgba(68, 255, 136, 0.8);
+}
+
+.particle-block {
+    background: radial-gradient(circle, #4488ff, #2266dd);
+    box-shadow: 0 0 6px rgba(68, 136, 255, 0.8);
+}
+
+.particle-energy {
+    background: radial-gradient(circle, #ffcc00, #ffaa00);
+    box-shadow: 0 0 6px rgba(255, 204, 0, 0.8);
+}
+
+.particle-card {
+    background: radial-gradient(circle, #b44aff, #8833cc);
+    box-shadow: 0 0 6px rgba(180, 74, 255, 0.8);
+}
+
+@keyframes particleFly {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+}
+
+.particle-animate {
+    animation: particleFly var(--duration) ease-out forwards;
 }

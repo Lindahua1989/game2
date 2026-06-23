@@ -231,9 +231,40 @@ const Game = {
     },
 
     showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const screen = document.getElementById(screenId);
-        if (screen) screen.classList.add('active');
+        const currentScreen = document.querySelector('.screen.active');
+        const newScreen = document.getElementById(screenId);
+        
+        if (!newScreen) return;
+
+        if (currentScreen && currentScreen !== newScreen) {
+            currentScreen.classList.add('fade-out');
+            setTimeout(() => {
+                currentScreen.classList.remove('active', 'fade-out');
+                newScreen.classList.add('active');
+            }, 200);
+        } else {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-out'));
+            newScreen.classList.add('active');
+        }
+    },
+
+    togglePause() {
+        const pauseScreen = document.getElementById('screen-pause');
+        if (pauseScreen.classList.contains('active')) {
+            pauseScreen.classList.remove('active');
+            Sound.play('click');
+        } else {
+            pauseScreen.classList.add('active');
+            Sound.play('click');
+        }
+    },
+
+    confirmAbandon() {
+        if (confirm('确定要放弃本局游戏吗？当前进度将丢失。')) {
+            this.togglePause();
+            this.state = null;
+            this.toTitle();
+        }
     },
 
     handleNodeEvent(node) {

@@ -385,6 +385,9 @@ const UI = {
                 sprite.appendChild(overlay);
                 setTimeout(() => overlay.remove(), 700);
 
+                const particleCount = level === 'heavy' ? 16 : level === 'medium' ? 12 : 8;
+                Particles.spawn(sprite, 'damage', particleCount);
+
                 if (level === 'heavy') {
                     const combat = document.getElementById('screen-combat');
                     combat.classList.add('screen-heavy-hit');
@@ -418,6 +421,7 @@ const UI = {
 
         const playerArea = document.getElementById('player-area');
         this.showDamageNumber(playerArea, 0, 'damage');
+        Particles.spawn(playerArea, 'damage', 10);
     },
 
     showPlayerHeal(value) {
@@ -425,6 +429,7 @@ const UI = {
         this.showDamageNumber(playerArea, value, 'heal');
         playerArea.classList.add('heal-glow');
         setTimeout(() => playerArea.classList.remove('heal-glow'), 500);
+        Particles.spawn(playerArea, 'heal', 10);
     },
 
     showBlockGain(value) {
@@ -432,6 +437,7 @@ const UI = {
         this.showDamageNumber(document.getElementById('player-area'), value, 'block');
         blockEl.parentElement.classList.add('block-glow');
         setTimeout(() => blockEl.parentElement.classList.remove('block-glow'), 500);
+        Particles.spawn(blockEl.parentElement, 'block', 8);
     },
 
     showEnergyPulse() {
@@ -439,6 +445,7 @@ const UI = {
         if (el) {
             el.classList.add('energy-pulse');
             setTimeout(() => el.classList.remove('energy-pulse'), 400);
+            Particles.spawn(el, 'energy', 8);
         }
     },
 
@@ -460,7 +467,9 @@ const UI = {
         const handArea = document.getElementById('hand-area');
         const cards = handArea.querySelectorAll('.card');
         if (cards[cardIndex]) {
-            cards[cardIndex].classList.add('card-playing');
+            const card = cards[cardIndex];
+            card.classList.add('card-playing');
+            Particles.spawn(card, 'card', 12);
         }
     },
 
