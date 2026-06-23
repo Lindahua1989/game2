@@ -57,6 +57,16 @@ const UI = {
         document.getElementById('energy-current').textContent = state.energy;
         document.getElementById('energy-max').textContent = state.maxEnergy;
 
+        const playerStatus = document.getElementById('player-status');
+        let playerStatusHtml = '';
+        if (state.playerPoison > 0) {
+            playerStatusHtml += `<span class="status-badge status-poison">☢️${state.playerPoison}</span>`;
+        }
+        if (state.playerPowers.strength > 0) {
+            playerStatusHtml += `<span class="status-badge status-strength">💪${state.playerPowers.strength}</span>`;
+        }
+        playerStatus.innerHTML = playerStatusHtml;
+
         const handArea = document.getElementById('hand-area');
         handArea.innerHTML = '';
 
@@ -480,5 +490,46 @@ const UI = {
             lastCard.classList.add('card-drawing');
             setTimeout(() => lastCard.classList.remove('card-drawing'), 300);
         }
+    },
+
+    showBossDialogue(enemyName, text) {
+        const dialogue = document.createElement('div');
+        dialogue.className = 'boss-dialogue';
+        dialogue.innerHTML = `
+            <div class="boss-dialogue-name">${enemyName}</div>
+            <div class="boss-dialogue-text">"${text}"</div>
+        `;
+        document.getElementById('game-container').appendChild(dialogue);
+        
+        setTimeout(() => dialogue.classList.add('show'), 50);
+        setTimeout(() => {
+            dialogue.classList.remove('show');
+            setTimeout(() => dialogue.remove(), 500);
+        }, 3000);
+    },
+
+    showPhaseTransition() {
+        const overlay = document.createElement('div');
+        overlay.className = 'phase-transition-overlay';
+        document.getElementById('game-container').appendChild(overlay);
+        
+        setTimeout(() => overlay.classList.add('active'), 50);
+        setTimeout(() => {
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.remove(), 500);
+        }, 1500);
+    },
+
+    showNotification(text, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `game-notification notification-${type}`;
+        notification.textContent = text;
+        document.getElementById('game-container').appendChild(notification);
+        
+        setTimeout(() => notification.classList.add('show'), 50);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
     }
 };

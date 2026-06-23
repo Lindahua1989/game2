@@ -2,6 +2,9 @@ const Sound = {
     ctx: null,
     enabled: true,
     volume: 0.3,
+    bgmEnabled: true,
+    currentBGM: null,
+    bgmNodes: [],
 
     init() {
         try {
@@ -20,7 +23,18 @@ const Sound = {
 
     toggle() {
         this.enabled = !this.enabled;
+        if (!this.enabled) {
+            this.stopBGM();
+        }
         return this.enabled;
+    },
+
+    toggleBGM() {
+        this.bgmEnabled = !this.bgmEnabled;
+        if (!this.bgmEnabled) {
+            this.stopBGM();
+        }
+        return this.bgmEnabled;
     },
 
     play(type) {
@@ -121,6 +135,121 @@ const Sound = {
     playBuffSound() {
         this.createOscillator(600, 'triangle', 0.2, 0.2);
         setTimeout(() => this.createOscillator(750, 'triangle', 0.25, 0.2), 100);
+    },
+
+    stopBGM() {
+        this.bgmNodes.forEach(node => {
+            try {
+                node.stop();
+            } catch (e) {}
+        });
+        this.bgmNodes = [];
+        this.currentBGM = null;
+    },
+
+    playBGM(type) {
+        if (!this.enabled || !this.bgmEnabled || !this.ctx) return;
+        if (this.currentBGM === type) return;
+        
+        this.stopBGM();
+        this.currentBGM = type;
+        this.resume();
+
+        switch (type) {
+            case 'title': this.playTitleBGM(); break;
+            case 'map': this.playMapBGM(); break;
+            case 'combat': this.playCombatBGM(); break;
+        }
+    },
+
+    playTitleBGM() {
+        const playLoop = () => {
+            if (this.currentBGM !== 'title') return;
+            
+            const notes = [261.63, 329.63, 392.00, 523.25];
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    if (this.currentBGM !== 'title') return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 1.5);
+                    
+                    this.bgmNodes.push(osc);
+                }, i * 800);
+            });
+            
+            setTimeout(playLoop, 3200);
+        };
+        playLoop();
+    },
+
+    playMapBGM() {
+        const playLoop = () => {
+            if (this.currentBGM !== 'map') return;
+            
+            const notes = [196.00, 246.94, 293.66, 349.23, 293.66, 246.94];
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    if (this.currentBGM !== 'map') return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.8);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.8);
+                    
+                    this.bgmNodes.push(osc);
+                }, i * 400);
+            });
+            
+            setTimeout(playLoop, 2400);
+        };
+        playLoop();
+    },
+
+    playCombatBGM() {
+        const playLoop = () => {
+            if (this.currentBGM !== 'combat') return;
+            
+            const bassNotes = [110, 110, 146.83, 130.81];
+            bassNotes.forEach((freq, i) => {
+                setTimeout(() => {
+                    if (this.currentBGM !== 'combat') return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                    
+                    this.bgmNodes.push(osc);
+                }, i * 250);
+            });
+            
+            setTimeout(playLoop, 1000);
+        };
+        playLoop();
     }
 };
 

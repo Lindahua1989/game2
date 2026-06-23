@@ -9,6 +9,7 @@ const Combat = {
             discardPile: [],
             hand: [],
             playerBlock: 0,
+            playerPoison: 0,
             energy: 3 + Relics.getExtraEnergy(Game.state.player.relics),
             maxEnergy: 3 + Relics.getExtraEnergy(Game.state.player.relics),
             turn: 1,
@@ -34,6 +35,12 @@ const Combat = {
         };
 
         Relics.onCombatStart(Game.state.player.relics, this.state);
+        
+        const boss = enemies.find(e => e.tier === 'boss');
+        if (boss && boss.dialogue && boss.dialogue.entry) {
+            UI.showBossDialogue(boss.name, boss.dialogue.entry);
+        }
+        
         this.startPlayerTurn();
     },
 
@@ -55,6 +62,22 @@ const Combat = {
         if (this.state.playerPowers.damagePerTurnSelf > 0) {
             Game.state.player.hp -= this.state.playerPowers.damagePerTurnSelf;
             if (Game.state.player.hp <= 0) {
+                this.onPlayerDeath();
+                return;
+            }
+        }
+
+        if (this.state.playerPoison > 0) {
+            const poisonDmg = this.state.playerPoison;
+            Game.state.player.hp -= poisonDmg;
+            this.state.playerPoison = Math.max(0, this.state.playerPoison - 1);
+            UI.showCombatLog(`你受到 ${poisonDmg} 点腐蚀伤害`, 'damage');
+            const playerArea = document.getElementById('player-area');
+            UI.showDamageNumber(playerArea, poisonDmg, 'damage');
+            Particles.spawn(playerArea, 'damage', 8);
+            Sound.play('damage');
+            if (Game.state.player.hp <= 0) {
+                Game.state.player.hp = 0;
                 this.onPlayerDeath();
                 return;
             }
@@ -402,8 +425,10 @@ const Combat = {
 
             case 'attack_poison':
                 this.dealDamageToPlayer(atkValue);
-                Game.state.player.poison = (Game.state.player.poison || 0) + (intent.poison || 0);
+                this.state.playerPoison = (this.state.playerPoison || 0) + (intent.poison || 0);
                 UI.showCombatLog(`${enemy.name} 施加了 ${intent.poison} 腐蚀`, 'enemy');
+                const playerAreaPoison = document.getElementById('player-area');
+                Particles.spawn(playerAreaPoison, 'damage', 6);
                 break;
 
             case 'attack_weak':
@@ -516,6 +541,7 @@ const Combat = {
     onPlayerDeath() {
         this.state.combatOver = true;
         GameStats.recordRunEnd(Game.state.currentFloor, Game.state.stats.battlesWon || 0, false);
+        DailyChallenge.endDailyChallenge(false);
         Game.showScreen('screen-gameover');
         const stats = document.getElementById('gameover-stats');
         stats.innerHTML = `

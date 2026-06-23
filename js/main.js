@@ -137,6 +137,10 @@ const Game = {
     },
 
     startNewRun() {
+        Unlocks.showDeckSelection();
+    },
+
+    startNewRunWithDeck(deckId) {
         this.currentSaveKey = null;
         this.currentSaveName = null;
         this.state = {
@@ -144,7 +148,7 @@ const Game = {
                 hp: 85,
                 maxHp: 85,
                 gold: 50,
-                deck: Cards.getInitialDeck(),
+                deck: Unlocks.selectDeck(deckId),
                 relics: []
             },
             currentFloor: 1,
@@ -235,6 +239,14 @@ const Game = {
         const newScreen = document.getElementById(screenId);
         
         if (!newScreen) return;
+
+        if (screenId === 'screen-title') {
+            Sound.playBGM('title');
+        } else if (screenId === 'screen-map') {
+            Sound.playBGM('map');
+        } else if (screenId === 'screen-combat') {
+            Sound.playBGM('combat');
+        }
 
         if (currentScreen && currentScreen !== newScreen) {
             currentScreen.classList.add('fade-out');
@@ -365,6 +377,7 @@ const Game = {
 
     showVictory() {
         GameStats.recordRunEnd(this.state.currentFloor, this.state.stats.battlesWon || 0, true);
+        DailyChallenge.endDailyChallenge(true);
         this.showScreen('screen-victory');
         const stats = document.getElementById('victory-stats');
         stats.innerHTML = `

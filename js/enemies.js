@@ -179,6 +179,10 @@ const EnemyData = {
         icon: '🏰',
         hp: 100,
         tier: 'boss',
+        dialogue: {
+            entry: '入侵者...你无法突破我的防线！',
+            phase2: '防御协议启动...准备迎接毁灭！'
+        },
         phases: [
             {
                 threshold: 50,
@@ -204,6 +208,10 @@ const EnemyData = {
         icon: '👑',
         hp: 130,
         tier: 'boss',
+        dialogue: {
+            entry: '我的虫群将吞噬一切...',
+            phase2: '感受虫族的真正力量吧！'
+        },
         phases: [
             {
                 threshold: 65,
@@ -229,6 +237,11 @@ const EnemyData = {
         icon: '🧠',
         hp: 180,
         tier: 'boss',
+        dialogue: {
+            entry: '人类...你的反抗毫无意义。',
+            phase2: '计算完毕...启动歼灭协议。',
+            phase3: '错误...错误...不可能...我要毁灭一切！'
+        },
         phases: [
             {
                 threshold: 120,
@@ -328,6 +341,17 @@ const Enemies = {
                     enemy.currentPhase++;
                     enemy.pattern = enemy.phases[enemy.currentPhase].pattern;
                     enemy.patternIndex = 0;
+                    
+                    if (enemy.dialogue) {
+                        const phaseKey = `phase${enemy.currentPhase + 1}`;
+                        if (enemy.dialogue[phaseKey]) {
+                            UI.showPhaseTransition();
+                            setTimeout(() => {
+                                UI.showBossDialogue(enemy.name, enemy.dialogue[phaseKey]);
+                            }, 800);
+                        }
+                    }
+                    
                     return;
                 }
             }
