@@ -49,7 +49,7 @@ const EnemyData = {
         id: 'nano_swarm_enemy',
         name: '纳米虫群',
         icon: '🐛',
-        hp: 18,
+        hp: 22,
         tier: 'normal',
         pattern: [
             { type: 'attack_poison', value: 4, poison: 2, hits: 2 },
@@ -82,7 +82,7 @@ const EnemyData = {
         id: 'laser_trap',
         name: '激光陷阱',
         icon: '⚡',
-        hp: 15,
+        hp: 20,
         tier: 'normal',
         pattern: [
             { type: 'attack', value: 7 },
@@ -193,7 +193,7 @@ const EnemyData = {
                     { type: 'attack', value: 15 },
                     { type: 'attack', value: 20 },
                     { type: 'charge' },
-                    { type: 'attack', value: 30 }
+                    { type: 'attack', value: 25 }
                 ]
             }
         ]
@@ -251,7 +251,7 @@ const EnemyData = {
                 pattern: [
                     { type: 'attack', value: 25 },
                     { type: 'charge' },
-                    { type: 'attack', value: 40 },
+                    { type: 'attack', value: 32 },
                     { type: 'attack_poison', value: 15, poison: 5, weak: 3 }
                 ]
             }

@@ -170,10 +170,7 @@ const EventData = [
                     const upgradeable = state.player.deck.filter(c => !c.upgraded);
                     if (upgradeable.length > 0) {
                         const card = Utils.randomChoice(upgradeable);
-                        card.upgraded = true;
-                        card.name = card.name + '+';
-                        if (card.damage) card.damage = Math.ceil(card.damage * 1.3);
-                        if (card.block) card.block = Math.ceil(card.block * 1.3);
+                        Cards.upgradeCard(card);
                         return `数据解析完成！${card.name.replace('+', '')} 已升级！`;
                     }
                     return '没有可升级的卡牌。';

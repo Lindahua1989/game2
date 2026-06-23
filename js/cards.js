@@ -5,8 +5,8 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🔫',
-        description: '造成 6 点伤害',
-        damage: 6,
+        description: '造成 7 点伤害',
+        damage: 7,
         target: 'single'
     },
     energy_shield: {
@@ -15,8 +15,8 @@ const CardData = {
         type: 'skill',
         cost: 1,
         icon: '🛡️',
-        description: '获得 5 点护甲',
-        block: 5,
+        description: '获得 6 点护甲',
+        block: 6,
         target: 'self'
     },
     plasma_cannon: {
@@ -25,8 +25,8 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '💥',
-        description: '造成 14 点伤害',
-        damage: 14,
+        description: '造成 16 点伤害',
+        damage: 16,
         target: 'single'
     },
     emp_pulse: {
@@ -45,8 +45,8 @@ const CardData = {
         type: 'skill',
         cost: 2,
         icon: '🔰',
-        description: '获得 15 点护甲',
-        block: 15,
+        description: '获得 18 点护甲',
+        block: 18,
         target: 'self'
     },
     overclock: {
@@ -108,8 +108,8 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '🌩️',
-        description: '造成 18 点伤害',
-        damage: 18,
+        description: '造成 20 点伤害',
+        damage: 20,
         target: 'single'
     },
     quantum_dodge: {
@@ -181,8 +181,8 @@ const CardData = {
         type: 'attack',
         cost: 3,
         icon: '🎯',
-        description: '造成 32 点伤害',
-        damage: 32,
+        description: '造成 35 点伤害',
+        damage: 35,
         target: 'single'
     },
     nano_swarm: {
@@ -434,8 +434,8 @@ const CardData = {
         type: 'skill',
         cost: 2,
         icon: '☀️',
-        description: '获得 20 点护甲',
-        block: 20,
+        description: '获得 22 点护甲',
+        block: 22,
         target: 'self'
     },
     death_ray: {
@@ -444,8 +444,8 @@ const CardData = {
         type: 'attack',
         cost: 4,
         icon: '☠️',
-        description: '造成 50 点伤害',
-        damage: 50,
+        description: '造成 55 点伤害',
+        damage: 55,
         target: 'single'
     }
 };
@@ -475,8 +475,120 @@ const Cards = {
             if (card.weak) card.weak += 1;
             if (card.strength) card.strength += 1;
             if (card.hits) card.hits += 1;
+            if (card.blockPerTurn) card.blockPerTurn = Math.ceil(card.blockPerTurn * 1.3);
+            if (card.damagePerTurn) card.damagePerTurn = Math.ceil(card.damagePerTurn * 1.3);
+            if (card.energyPerTurn) card.energyPerTurn += 1;
+            if (card.nextTurnBlock) card.nextTurnBlock = Math.ceil(card.nextTurnBlock * 1.3);
+            if (card.attackBonus) card.attackBonus += 1;
+            if (card.blockOnAttack) card.blockOnAttack += 1;
+            if (card.thorns) card.thorns += 1;
+            if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
+            if (card.energy) card.energy += 1;
         }
+        card.description = this.buildDescription(card);
         return card;
+    },
+
+    buildDescription(card) {
+        const parts = [];
+
+        if (card.damage && card.damagePerEnergy) {
+            parts.push(`造成 X*${card.damagePerEnergy} 伤害，消耗 X 能量`);
+        } else if (card.damage) {
+            const hits = card.hits || 1;
+            if (hits > 1) {
+                parts.push(`造成 ${card.damage} 伤害 x${hits}`);
+            } else {
+                parts.push(`造成 ${card.damage} 点伤害`);
+            }
+        }
+
+        if (card.block) {
+            parts.push(`获得 ${card.block} 护甲`);
+        }
+
+        if (card.heal) {
+            parts.push(`回复 ${card.heal} HP`);
+        }
+
+        if (card.draw) {
+            parts.push(`抽 ${card.draw} 张牌`);
+        }
+
+        if (card.energy && !card.damagePerEnergy) {
+            parts.push(`获得 ${card.energy} 能量`);
+        }
+
+        if (card.poison) {
+            parts.push(`施加 ${card.poison} 腐蚀`);
+        }
+
+        if (card.weak) {
+            parts.push(`施加 ${card.weak} 虚弱`);
+        }
+
+        if (card.weakAll) {
+            parts.push(`所有敌人获得 ${card.weakAll} 虚弱`);
+        }
+
+        if (card.strength) {
+            parts.push(`每次攻击额外 +${card.strength} 伤害`);
+        }
+
+        if (card.blockPerTurn) {
+            parts.push(`每回合开始获得 ${card.blockPerTurn} 护甲`);
+        }
+
+        if (card.damagePerTurn && !card.damagePerTurnSelf) {
+            parts.push(`每回合对随机敌人造成 ${card.damagePerTurn} 伤害`);
+        }
+
+        if (card.energyPerTurn) {
+            parts.push(`每回合 +${card.energyPerTurn} 能量`);
+        }
+
+        if (card.damagePerTurnSelf) {
+            parts.push(`每回合受 ${card.damagePerTurnSelf} 伤害`);
+        }
+
+        if (card.attackBonus) {
+            parts.push(`攻击牌伤害 +${card.attackBonus}`);
+        }
+
+        if (card.blockOnAttack) {
+            parts.push(`每打出攻击牌获得 ${card.blockOnAttack} 护甲`);
+        }
+
+        if (card.thorns) {
+            parts.push(`反弹 ${card.thorns} 伤害`);
+        }
+
+        if (card.nextTurnBlock) {
+            parts.push(`下回合额外 ${card.nextTurnBlock} 护甲`);
+        }
+
+        if (card.selfDamage) {
+            parts.push(`自身受 ${card.selfDamage} 伤害`);
+        }
+
+        if (card.ignoreBlock) {
+            parts.push(`无视护甲`);
+        }
+
+        if (card.reboot) {
+            parts.push(`弃掉所有手牌，抽等量+2张`);
+        }
+
+        if (card.freeCard) {
+            parts.push(`随机 1 张手牌费用变 0`);
+        }
+
+        if (card.upgradeAll) {
+            parts.push(`所有卡牌伤害/护甲 +${card.upgradeAll}`);
+        }
+
+        if (parts.length === 0) return card.description || '';
+        return parts.join('，');
     },
 
     getRewardPool() {
@@ -491,12 +603,30 @@ const Cards = {
     },
 
     getCardDescription(card) {
-        let desc = card.description;
-        if (card.upgraded) {
-            desc = desc.replace(/\d+/g, (match) => {
-                return Math.ceil(parseInt(match) * 1.3);
-            });
-        }
-        return desc;
+        return card.description;
+    },
+
+    upgradeCard(card) {
+        if (card.upgraded) return;
+        card.upgraded = true;
+        card.name = card.name + '+';
+        if (card.damage) card.damage = Math.ceil(card.damage * 1.3);
+        if (card.block) card.block = Math.ceil(card.block * 1.3);
+        if (card.heal) card.heal = Math.ceil(card.heal * 1.3);
+        if (card.draw) card.draw += 1;
+        if (card.poison) card.poison = Math.ceil(card.poison * 1.3);
+        if (card.weak) card.weak += 1;
+        if (card.strength) card.strength += 1;
+        if (card.hits) card.hits += 1;
+        if (card.blockPerTurn) card.blockPerTurn = Math.ceil(card.blockPerTurn * 1.3);
+        if (card.damagePerTurn) card.damagePerTurn = Math.ceil(card.damagePerTurn * 1.3);
+        if (card.energyPerTurn) card.energyPerTurn += 1;
+        if (card.nextTurnBlock) card.nextTurnBlock = Math.ceil(card.nextTurnBlock * 1.3);
+        if (card.attackBonus) card.attackBonus += 1;
+        if (card.blockOnAttack) card.blockOnAttack += 1;
+        if (card.thorns) card.thorns += 1;
+        if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
+        if (card.energy) card.energy += 1;
+        card.description = this.buildDescription(card);
     }
 };

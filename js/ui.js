@@ -313,12 +313,7 @@ const UI = {
             cardDiv.classList.remove('unplayable');
             cardDiv.style.cursor = 'pointer';
             cardDiv.onclick = () => {
-                card.upgraded = true;
-                card.name = card.name + '+';
-                if (card.damage) card.damage = Math.ceil(card.damage * 1.3);
-                if (card.block) card.block = Math.ceil(card.block * 1.3);
-                if (card.heal) card.heal = Math.ceil(card.heal * 1.3);
-                if (card.draw) card.draw += 1;
+                Cards.upgradeCard(card);
                 Game.continueAfterRest();
             };
             container.appendChild(cardDiv);

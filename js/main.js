@@ -141,9 +141,9 @@ const Game = {
         this.currentSaveName = null;
         this.state = {
             player: {
-                hp: 80,
-                maxHp: 80,
-                gold: 0,
+                hp: 85,
+                maxHp: 85,
+                gold: 50,
                 deck: Cards.getInitialDeck(),
                 relics: []
             },
