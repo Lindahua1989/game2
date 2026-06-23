@@ -79,7 +79,10 @@ const Combat = {
             }
             this.state.hand.push(this.state.drawPile.pop());
         }
-        setTimeout(() => UI.animateCardDraw(), 50);
+        setTimeout(() => {
+            UI.animateCardDraw();
+            Sound.play('draw');
+        }, 50);
     },
 
     cancelTargeting() {
@@ -108,6 +111,8 @@ const Combat = {
         this.state.targetingCard = null;
         UI.animateCardPlay(cardIndex);
         UI.showCombatLog(`使用 ${card.name}`, 'system');
+        Sound.play('card_play');
+        GameStats.recordCardPlayed();
         await Utils.delay(250);
         this.state.energy -= cost;
         this.state.hand.splice(cardIndex, 1);
@@ -185,11 +190,13 @@ const Combat = {
         if (card.block) {
             this.state.playerBlock += card.block;
             UI.showBlockGain(card.block);
+            Sound.play('block');
         }
 
         if (card.heal) {
             Game.state.player.hp = Math.min(Game.state.player.maxHp, Game.state.player.hp + card.heal);
             UI.showPlayerHeal(card.heal);
+            Sound.play('heal');
         }
 
         if (card.draw) {
@@ -199,6 +206,7 @@ const Combat = {
         if (card.energy) {
             this.state.energy += card.energy;
             UI.showEnergyPulse();
+            Sound.play('energy');
         }
 
         if (card.selfDamage) {
@@ -225,6 +233,7 @@ const Combat = {
 
         if (card.strength) {
             this.state.playerPowers.strength += card.strength;
+            Sound.play('buff');
         }
 
         if (card.blockPerTurn) {
@@ -292,6 +301,8 @@ const Combat = {
         if (remaining > 0) {
             UI.showEnemyDamage(enemy.uid, remaining, hitLevel || 'light');
             UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`, 'damage');
+            Sound.play('damage');
+            GameStats.recordDamage(remaining);
         }
 
         if (enemy.hp <= 0) {
@@ -460,8 +471,10 @@ const Combat = {
             const playerArea = document.getElementById('player-area');
             UI.showDamageNumber(playerArea, remaining, 'damage');
             UI.showCombatLog(`你受到了 ${remaining} 点伤害`, 'damage');
+            Sound.play('enemy_attack');
         } else if (blocked > 0) {
             UI.showCombatLog(`护甲抵挡了 ${blocked} 点伤害`, 'block');
+            Sound.play('block');
         }
 
         if (Game.state.player.hp <= 0) {
@@ -493,13 +506,16 @@ const Combat = {
         Game.state.player.gold += goldReward;
 
         Game.state.stats.battlesWon = (Game.state.stats.battlesWon || 0) + 1;
+        GameStats.recordBattle(Game.state.currentFloor, this.state.enemyTier);
 
         const rewards = Cards.getRandomRewards(3);
         UI.showRewardScreen(goldReward, rewards);
+        Sound.play('victory');
     },
 
     onPlayerDeath() {
         this.state.combatOver = true;
+        GameStats.recordRunEnd(Game.state.currentFloor, Game.state.stats.battlesWon || 0, false);
         Game.showScreen('screen-gameover');
         const stats = document.getElementById('gameover-stats');
         stats.innerHTML = `
@@ -507,5 +523,6 @@ const Combat = {
             <p>战斗胜利：${Game.state.stats.battlesWon || 0}</p>
             <p>获得金币：${Game.state.player.gold}</p>
         `;
+        Sound.play('defeat');
     }
 };

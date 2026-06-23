@@ -323,6 +323,7 @@ const Game = {
             }
             this.state.currentFloor++;
             this.state.stats.floorsCleared++;
+            GameStats.recordFloorReached(this.state.currentFloor);
             Map.generate(this.state.currentFloor);
         }
 
@@ -332,6 +333,7 @@ const Game = {
     },
 
     showVictory() {
+        GameStats.recordRunEnd(this.state.currentFloor, this.state.stats.battlesWon || 0, true);
         this.showScreen('screen-victory');
         const stats = document.getElementById('victory-stats');
         stats.innerHTML = `
@@ -340,6 +342,25 @@ const Game = {
             <p>卡组大小：${this.state.player.deck.length}</p>
             <p>科技模块：${this.state.player.relics.length}</p>
         `;
+    },
+
+    showStatsScreen() {
+        this.showScreen('screen-stats');
+        this.showStatsTab('stats');
+    },
+
+    showStatsTab(tab) {
+        document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
+        const tabs = document.querySelectorAll('.stats-tab');
+        if (tab === 'stats' && tabs[0]) tabs[0].classList.add('active');
+        if (tab === 'achievements' && tabs[1]) tabs[1].classList.add('active');
+
+        const content = document.getElementById('stats-content');
+        if (tab === 'stats') {
+            content.innerHTML = GameStats.getStatsDisplay();
+        } else {
+            content.innerHTML = GameStats.getAchievementsDisplay();
+        }
     },
 
     toTitle() {
