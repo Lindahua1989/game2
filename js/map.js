@@ -5,6 +5,7 @@ const Map = {
         const rows = 15;
         const nodesPerRow = 4;
         const map = [];
+        const mode = GameModes.getMode();
 
         for (let row = 0; row < rows; row++) {
             const rowNodes = [];
@@ -15,13 +16,16 @@ const Map = {
                 if (row === 0) {
                     type = 'combat';
                 } else if (row === rows - 1) {
-                    type = 'boss';
+                    type = GameModes.shouldGenerateBoss(floor) ? 'boss' : 'elite';
                 } else if (row === 7) {
-                    type = Utils.randomChoice(['rest', 'shop']);
+                    const options = [];
+                    if (GameModes.shouldGenerateRest(floor)) options.push('rest');
+                    if (GameModes.shouldGenerateShop(floor)) options.push('shop');
+                    type = options.length > 0 ? Utils.randomChoice(options) : 'combat';
                 } else if (row === 12) {
                     type = 'elite';
                 } else {
-                    type = this.getRandomNodeType(row);
+                    type = this.getRandomNodeType(row, floor);
                 }
 
                 rowNodes.push({
@@ -69,17 +73,50 @@ const Map = {
         return map;
     },
 
-    getRandomNodeType(row) {
+    getRandomNodeType(row, floor) {
+        const mode = GameModes.getMode();
+        
+        if (GameModes.hasRule('boss_only')) {
+            return 'combat';
+        }
+
         if (row < 3) {
-            return Utils.randomChoice(['combat', 'combat', 'combat', 'event']);
+            const options = ['combat', 'combat', 'combat'];
+            if (!GameModes.hasRule('no_shop') && !GameModes.hasRule('no_rest')) {
+                options.push('event');
+            }
+            return Utils.randomChoice(options);
         }
         if (row < 6) {
-            return Utils.randomChoice(['combat', 'combat', 'event', 'event', 'shop']);
+            const options = ['combat', 'combat'];
+            if (!GameModes.hasRule('no_shop') && !GameModes.hasRule('no_rest')) {
+                options.push('event', 'event');
+            }
+            if (GameModes.shouldGenerateShop(floor)) {
+                options.push('shop');
+            }
+            return Utils.randomChoice(options);
         }
         if (row < 10) {
-            return Utils.randomChoice(['combat', 'combat', 'event', 'rest', 'elite']);
+            const options = ['combat', 'combat'];
+            if (!GameModes.hasRule('no_shop') && !GameModes.hasRule('no_rest')) {
+                options.push('event');
+            }
+            if (GameModes.shouldGenerateRest(floor)) {
+                options.push('rest');
+            }
+            options.push('elite');
+            return Utils.randomChoice(options);
         }
-        return Utils.randomChoice(['combat', 'elite', 'rest', 'event']);
+        const options = ['combat'];
+        options.push('elite');
+        if (!GameModes.hasRule('no_shop') && !GameModes.hasRule('no_rest')) {
+            options.push('event');
+        }
+        if (GameModes.shouldGenerateRest(floor)) {
+            options.push('rest');
+        }
+        return Utils.randomChoice(options);
     },
 
     getNodeIcon(type) {

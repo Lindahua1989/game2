@@ -17,6 +17,7 @@
                 <div class="title-buttons">
                     <button class="btn btn-primary btn-large" onclick="Game.startNewRun()">开始征程</button>
                     <button class="btn btn-secondary btn-large" onclick="DailyChallenge.showDailyInfo()">📅 每日挑战</button>
+                    <button class="btn btn-secondary btn-large" onclick="Leaderboard.showLeaderboard()">🏆 排行榜</button>
                     <button class="btn btn-secondary btn-large" onclick="Skins.showSkinSelection()">🎨 角色皮肤</button>
                     <button class="btn btn-secondary btn-large" onclick="Game.showLoadScreen()">📂 读取存档</button>
                     <button class="btn btn-secondary btn-large" onclick="Game.showStatsScreen()">📊 统计成就</button>
@@ -26,12 +27,21 @@
             </div>
         </div>
 
+        <div id="screen-mode-select" class="screen">
+            <div class="mode-select-content">
+                <h2>选择游戏模式</h2>
+                <div class="mode-grid" id="mode-grid"></div>
+                <button class="btn btn-secondary" onclick="Game.toTitle()">返回</button>
+            </div>
+        </div>
+
         <div id="screen-map" class="screen">
             <div class="map-header">
                 <div class="player-stats">
                     <span class="stat hp">❤️ <span id="map-hp">80</span>/<span id="map-max-hp">80</span></span>
                     <span class="stat gold">💰 <span id="map-gold">99</span></span>
                     <span class="stat floor">📍 第 <span id="map-floor">1</span> 层</span>
+                    <span class="stat timer" id="map-timer" style="display: none;">⏱️ <span id="timer-display">15:00</span></span>
                 </div>
                 <div class="map-actions">
                     <span id="save-indicator" class="save-indicator"></span>
@@ -227,6 +237,8 @@
     <script src="js/daily.js"></script>
     <script src="js/skins.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/gameModes.js"></script>
+    <script src="js/leaderboard.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/enemies.js"></script>
     <script src="js/relics.js"></script>

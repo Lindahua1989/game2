@@ -137,6 +137,16 @@ const Game = {
     },
 
     startNewRun() {
+        this.showModeSelectScreen();
+    },
+
+    showModeSelectScreen() {
+        this.showScreen('screen-mode-select');
+        UI.renderModeSelection();
+    },
+
+    selectMode(modeId) {
+        GameModes.setMode(modeId);
         Unlocks.showDeckSelection();
     },
 
@@ -163,6 +173,10 @@ const Game = {
         this.showScreen('screen-map');
         Map.render();
         UI.updateMapStats();
+        
+        if (GameModes.getMode().timeLimit) {
+            UI.startTimer();
+        }
     },
 
     showSaveDialog() {
@@ -360,7 +374,9 @@ const Game = {
 
     returnToMap() {
         if (this.state.currentNode && this.state.currentNode.type === 'boss') {
-            if (this.state.currentFloor >= 3) {
+            GameModes.onFloorComplete(this.state.currentFloor);
+            
+            if (GameModes.isVictory()) {
                 this.showVictory();
                 return;
             }
@@ -375,16 +391,48 @@ const Game = {
         UI.updateMapStats();
     },
 
+    onTimeUp() {
+        UI.stopTimer();
+        UI.showNotification('⏰ 时间到！挑战失败', 'warning');
+        
+        setTimeout(() => {
+            const score = GameModes.getScore();
+            const mode = GameModes.getMode();
+            
+            Leaderboard.addScore(mode.id, score);
+            GameStats.recordRunEnd(this.state.currentFloor, this.state.stats.battlesWon || 0, false);
+            
+            this.showScreen('screen-gameover');
+            const stats = document.getElementById('gameover-stats');
+            stats.innerHTML = `
+                <p>到达层数：${this.state.currentFloor}</p>
+                <p>战斗胜利：${this.state.stats.battlesWon || 0}</p>
+                <p>获得金币：${this.state.player.gold}</p>
+                <p>最终得分：${score.toLocaleString()}</p>
+            `;
+        }, 2000);
+    },
+
     showVictory() {
+        UI.stopTimer();
+        const score = GameModes.getScore();
+        const mode = GameModes.getMode();
+        
         GameStats.recordRunEnd(this.state.currentFloor, this.state.stats.battlesWon || 0, true);
         DailyChallenge.endDailyChallenge(true);
+        Leaderboard.addScore(mode.id, score);
+        
         this.showScreen('screen-victory');
         const stats = document.getElementById('victory-stats');
         stats.innerHTML = `
+            <p>🎉 恭喜通关！</p>
+            <p>游戏模式：${mode.name}</p>
             <p>战斗胜利：${this.state.stats.battlesWon || 0}</p>
             <p>获得金币：${this.state.player.gold}</p>
             <p>卡组大小：${this.state.player.deck.length}</p>
             <p>科技模块：${this.state.player.relics.length}</p>
+            <p style="font-size: 24px; color: #ffaa00; margin-top: 20px;">最终得分：${score.toLocaleString()}</p>
+            ${Leaderboard.isHighScore(mode.id, score) ? '<p style="color: #ff4444; font-weight: bold;">🏆 新纪录！</p>' : ''}
         `;
     },
 

@@ -620,5 +620,90 @@ const UI = {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 500);
         }, 3000);
+    },
+
+    renderModeSelection() {
+        const container = document.getElementById('mode-grid');
+        container.innerHTML = '';
+
+        Object.values(GameModes.modes).forEach(mode => {
+            const div = document.createElement('div');
+            div.className = 'mode-option';
+            div.onclick = () => Game.selectMode(mode.id);
+
+            let rulesHtml = '';
+            if (mode.specialRules && mode.specialRules.length > 0) {
+                rulesHtml = '<div class="mode-rules">';
+                mode.specialRules.forEach(rule => {
+                    const ruleText = this.getRuleText(rule);
+                    rulesHtml += `<span class="rule-tag">${ruleText}</span>`;
+                });
+                rulesHtml += '</div>';
+            }
+
+            div.innerHTML = `
+                <div class="mode-icon">${mode.icon}</div>
+                <div class="mode-name">${mode.name}</div>
+                <div class="mode-desc">${mode.description}</div>
+                ${rulesHtml}
+            `;
+            container.appendChild(div);
+        });
+    },
+
+    getRuleText(rule) {
+        const ruleTexts = {
+            'scaling_enemies': '敌人逐渐增强',
+            'no_final_boss': '无最终Boss',
+            'time_limit': '限时挑战',
+            'speed_bonus': '速度奖励',
+            'boss_only': '仅Boss战',
+            'no_rest': '无休息点',
+            'no_shop': '无商店',
+            'heal_between': '战后回复'
+        };
+        return ruleTexts[rule] || rule;
+    },
+
+    startTimer() {
+        const timerDisplay = document.getElementById('map-timer');
+        const timerText = document.getElementById('timer-display');
+        
+        if (timerDisplay) {
+            timerDisplay.style.display = 'inline';
+        }
+
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+
+        this.timerInterval = setInterval(() => {
+            GameModes.updateTimer();
+            const remaining = GameModes.getTimeRemaining();
+            
+            if (remaining !== null) {
+                timerText.textContent = GameModes.formatTime(remaining);
+                
+                if (remaining <= 60) {
+                    timerText.style.color = '#ff4444';
+                } else if (remaining <= 180) {
+                    timerText.style.color = '#ffaa00';
+                } else {
+                    timerText.style.color = '#00d4ff';
+                }
+
+                if (GameModes.isTimeUp()) {
+                    clearInterval(this.timerInterval);
+                    Game.onTimeUp();
+                }
+            }
+        }, 1000);
+    },
+
+    stopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
     }
 };

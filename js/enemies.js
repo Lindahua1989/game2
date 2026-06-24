@@ -519,13 +519,17 @@ const Enemies = {
     createEnemy(id) {
         const base = EnemyData[id];
         if (!base) return null;
+        
+        const scaling = GameModes.getEnemyScaling(Game.state ? Game.state.currentFloor : 1);
+        const scaledHp = Math.floor(base.hp * scaling);
+        
         const enemy = {
             id: base.id,
             uid: Utils.generateId(),
             name: base.name,
             icon: base.icon,
-            hp: base.hp,
-            maxHp: base.hp,
+            hp: scaledHp,
+            maxHp: scaledHp,
             block: 0,
             tier: base.tier,
             patternIndex: 0,
@@ -541,8 +545,32 @@ const Enemies = {
             enemy.phases = Utils.deepClone(base.phases);
             enemy.currentPhase = 0;
             enemy.pattern = enemy.phases[0].pattern;
+            
+            if (scaling > 1) {
+                enemy.phases.forEach(phase => {
+                    phase.pattern.forEach(action => {
+                        if (action.value) {
+                            action.value = Math.floor(action.value * scaling);
+                        }
+                        if (action.block) {
+                            action.block = Math.floor(action.block * scaling);
+                        }
+                    });
+                });
+            }
         } else {
             enemy.pattern = Utils.deepClone(base.pattern);
+            
+            if (scaling > 1) {
+                enemy.pattern.forEach(action => {
+                    if (action.value) {
+                        action.value = Math.floor(action.value * scaling);
+                    }
+                    if (action.block) {
+                        action.block = Math.floor(action.block * scaling);
+                    }
+                });
+            }
         }
 
         this.rollIntent(enemy);
