@@ -32,9 +32,9 @@ const UI = {
             const intentText = Enemies.getIntentText(enemy.intent);
 
             let statusHtml = '';
-            if (enemy.status.poison > 0) statusHtml += `<span class="status-badge status-poison">☢️${enemy.status.poison}</span>`;
-            if (enemy.status.weak > 0) statusHtml += `<span class="status-badge status-weak">💫${enemy.status.weak}</span>`;
-            if (enemy.status.strength > 0) statusHtml += `<span class="status-badge status-strength">💪${enemy.status.strength}</span>`;
+            if (enemy.status.poison > 0) statusHtml += `<span class="status-badge status-poison">☢️${enemy.status.poison}<span class="status-tooltip">腐蚀：每回合受到 ${enemy.status.poison} 点伤害<br>每回合减少 1 层</span></span>`;
+            if (enemy.status.weak > 0) statusHtml += `<span class="status-badge status-weak">💫${enemy.status.weak}<span class="status-tooltip">虚弱：攻击伤害降低 25%<br>每回合减少 1 层</span></span>`;
+            if (enemy.status.strength > 0) statusHtml += `<span class="status-badge status-strength">💪${enemy.status.strength}<span class="status-tooltip">力量：攻击伤害 +${enemy.status.strength}</span></span>`;
 
             div.innerHTML = `
                 <div class="enemy-intent">${intentText}</div>
@@ -60,10 +60,37 @@ const UI = {
         const playerStatus = document.getElementById('player-status');
         let playerStatusHtml = '';
         if (state.playerPoison > 0) {
-            playerStatusHtml += `<span class="status-badge status-poison">☢️${state.playerPoison}</span>`;
+            playerStatusHtml += `<span class="status-badge status-poison">☢️${state.playerPoison}<span class="status-tooltip">腐蚀：每回合受到 ${state.playerPoison} 点伤害<br>每回合减少 1 层</span></span>`;
         }
         if (state.playerPowers.strength > 0) {
-            playerStatusHtml += `<span class="status-badge status-strength">💪${state.playerPowers.strength}</span>`;
+            playerStatusHtml += `<span class="status-badge status-strength">💪${state.playerPowers.strength}<span class="status-tooltip">力量：攻击伤害 +${state.playerPowers.strength}</span></span>`;
+        }
+        if (state.playerPowers.blockPerTurn > 0) {
+            playerStatusHtml += `<span class="status-badge status-block-per-turn">🛡️${state.playerPowers.blockPerTurn}<span class="status-tooltip">每回合开始获得 ${state.playerPowers.blockPerTurn} 护甲</span></span>`;
+        }
+        if (state.playerPowers.damagePerTurn > 0) {
+            playerStatusHtml += `<span class="status-badge status-damage-per-turn">🐝${state.playerPowers.damagePerTurn}<span class="status-tooltip">纳米蜂群：每回合对随机敌人造成 ${state.playerPowers.damagePerTurn} 伤害</span></span>`;
+        }
+        if (state.playerPowers.attackBonus > 0) {
+            playerStatusHtml += `<span class="status-badge status-attack-bonus">🎯${state.playerPowers.attackBonus}<span class="status-tooltip">自动瞄准：攻击牌伤害 +${state.playerPowers.attackBonus}</span></span>`;
+        }
+        if (state.playerPowers.thorns > 0) {
+            playerStatusHtml += `<span class="status-badge status-thorns">🌵${state.playerPowers.thorns}<span class="status-tooltip">荆棘：受到攻击时反弹 ${state.playerPowers.thorns} 伤害</span></span>`;
+        }
+        if (state.playerPowers.blockOnAttack > 0) {
+            playerStatusHtml += `<span class="status-badge status-block-on-attack">🔧${state.playerPowers.blockOnAttack}<span class="status-tooltip">机械强化：每打出攻击牌获得 ${state.playerPowers.blockOnAttack} 护甲</span></span>`;
+        }
+        if (state.playerPowers.energyPerTurn > 0) {
+            playerStatusHtml += `<span class="status-badge status-energy-per-turn">⚡${state.playerPowers.energyPerTurn}<span class="status-tooltip">过载协议：每回合 +${state.playerPowers.energyPerTurn} 能量</span></span>`;
+        }
+        if (state.playerPowers.healPerTurn > 0) {
+            playerStatusHtml += `<span class="status-badge status-heal-per-turn">💚${state.playerPowers.healPerTurn}<span class="status-tooltip">修复无人机：每回合回复 ${state.playerPowers.healPerTurn} HP</span></span>`;
+        }
+        if (state.playerPowers.armorOnHit > 0) {
+            playerStatusHtml += `<span class="status-badge status-armor-on-hit">🔰${state.playerPowers.armorOnHit}<span class="status-tooltip">自适应装甲：每次受伤时获得 ${state.playerPowers.armorOnHit} 护甲</span></span>`;
+        }
+        if (state.playerPowers.berserkerBonus > 0) {
+            playerStatusHtml += `<span class="status-badge status-berserker">😤${state.playerPowers.berserkerBonus}<span class="status-tooltip">狂战士之怒：HP越低伤害越高（最多 +${state.playerPowers.berserkerBonus}）</span></span>`;
         }
         playerStatus.innerHTML = playerStatusHtml;
 

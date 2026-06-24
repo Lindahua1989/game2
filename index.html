@@ -54,24 +54,28 @@
                 </div>
                 <button class="btn btn-small" onclick="Game.togglePause()">⏸️ 暂停</button>
             </div>
-            <div id="enemy-area"></div>
-            <div id="combat-log"></div>
-            <div id="player-area">
-                <div class="player-block-display">
-                    <span id="player-block">0</span> 🛡️
+            <div class="combat-main">
+                <div id="combat-log"></div>
+                <div class="combat-content">
+                    <div id="enemy-area"></div>
+                    <div id="player-area">
+                        <div class="player-block-display">
+                            <span id="player-block">0</span> 🛡️
+                        </div>
+                        <div class="player-energy">
+                            <span id="energy-current">3</span>/<span id="energy-max">3</span> ⚡
+                        </div>
+                        <div class="player-status" id="player-status"></div>
+                    </div>
+                    <div id="hand-area" onclick="event.stopPropagation()"></div>
+                    <div class="combat-bottom" onclick="event.stopPropagation()">
+                        <div class="pile-info">
+                            <button class="btn btn-small" onclick="UI.showPile('draw')">抽牌堆 (<span id="draw-count">0</span>)</button>
+                            <button class="btn btn-small" onclick="UI.showPile('discard')">弃牌堆 (<span id="discard-count">0</span>)</button>
+                        </div>
+                        <button id="end-turn-btn" class="btn btn-end-turn" onclick="Combat.endTurn()">结束回合</button>
+                    </div>
                 </div>
-                <div class="player-energy">
-                    <span id="energy-current">3</span>/<span id="energy-max">3</span> ⚡
-                </div>
-                <div class="player-status" id="player-status"></div>
-            </div>
-            <div id="hand-area" onclick="event.stopPropagation()"></div>
-            <div class="combat-bottom" onclick="event.stopPropagation()">
-                <div class="pile-info">
-                    <button class="btn btn-small" onclick="UI.showPile('draw')">抽牌堆 (<span id="draw-count">0</span>)</button>
-                    <button class="btn btn-small" onclick="UI.showPile('discard')">弃牌堆 (<span id="discard-count">0</span>)</button>
-                </div>
-                <button id="end-turn-btn" class="btn btn-end-turn" onclick="Combat.endTurn()">结束回合</button>
             </div>
         </div>
 

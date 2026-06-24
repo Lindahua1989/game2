@@ -416,11 +416,41 @@ body {
     align-items: center;
     background: rgba(0, 0, 0, 0.4);
     border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+    flex-shrink: 0;
 }
 
 .combat-info {
     color: #888;
     font-size: 14px;
+}
+
+.combat-main {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+}
+
+#combat-log {
+    width: 25%;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    color: #888;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid rgba(0, 212, 255, 0.15);
+    flex-shrink: 0;
+}
+
+.combat-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 #enemy-area {
@@ -430,7 +460,7 @@ body {
     justify-content: center;
     gap: 50px;
     padding: 24px;
-    min-height: 240px;
+    min-height: 200px;
     flex-wrap: wrap;
 }
 
@@ -655,26 +685,55 @@ body {
     padding: 2px 6px;
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.5);
+    position: relative;
+    cursor: help;
+}
+
+.status-badge .status-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 10, 30, 0.95);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #e0e0ff;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    line-height: 1.5;
+}
+
+.status-badge .status-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 212, 255, 0.4);
+}
+
+.status-badge:hover .status-tooltip {
+    display: block;
 }
 
 .status-poison { color: #44ff44; }
 .status-weak { color: #ffaa00; }
 .status-strength { color: #ff4444; }
-
-#combat-log {
-    width: 100%;
-    height: 80px;
-    display: flex;
-    flex-direction: column;
-    font-size: 13px;
-    color: #888;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 4px 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(0, 212, 255, 0.08);
-    border-bottom: 1px solid rgba(0, 212, 255, 0.08);
-}
+.status-block-per-turn { color: #4488ff; }
+.status-damage-per-turn { color: #ffcc00; }
+.status-attack-bonus { color: #ff6688; }
+.status-thorns { color: #88cc44; }
+.status-block-on-attack { color: #66aaff; }
+.status-energy-per-turn { color: #ffdd44; }
+.status-heal-per-turn { color: #66ff88; }
+.status-armor-on-hit { color: #44aaff; }
+.status-berserker { color: #ff8844; }
 
 .log-entry {
     padding: 2px 0;
@@ -1474,6 +1533,8 @@ body {
     .enemy-sprite { width: 72px; height: 72px; font-size: 40px; }
     #hand-area { gap: 4px; padding: 8px; }
     .map-node { width: 44px; height: 44px; font-size: 20px; }
+    .combat-main { flex-direction: column; }
+    #combat-log { width: 100%; height: 120px; border-right: none; border-bottom: 1px solid rgba(0, 212, 255, 0.15); }
 }
 
 /* ===== STATS SCREEN ===== */
