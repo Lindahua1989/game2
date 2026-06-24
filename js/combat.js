@@ -176,6 +176,7 @@ const Combat = {
 
     async executeCard(card, targetIndex) {
         let bonusDmg = this.state.playerPowers.strength + this.state.playerPowers.attackBonus + this.state.firstAttackBonus;
+        const cardBonus = Relics.getCardBonus(Game.state.player.relics);
         
         if (this.state.playerPowers.berserkerBonus && card.type === 'attack') {
             const hpPercent = Game.state.player.hp / Game.state.player.maxHp;
@@ -184,7 +185,7 @@ const Combat = {
         }
 
         if (card.damage) {
-            let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0);
+            let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
             if (dmg < 0) dmg = 0;
             const hits = card.hits || 1;
             const totalDmg = dmg * hits;
@@ -236,8 +237,9 @@ const Combat = {
         }
 
         if (card.block) {
-            this.state.playerBlock += card.block;
-            UI.showBlockGain(card.block);
+            const blockValue = card.block + cardBonus;
+            this.state.playerBlock += blockValue;
+            UI.showBlockGain(blockValue);
             Sound.play('block');
         }
 
@@ -646,7 +648,19 @@ const Combat = {
         GameStats.recordBattle(Game.state.currentFloor, this.state.enemyTier);
 
         const rewards = Cards.getRandomRewards(3);
-        UI.showRewardScreen(goldReward, rewards);
+        let specialRewards = { cards: [], relics: [] };
+
+        if (this.state.enemyTier === 'elite') {
+            specialRewards.cards = Cards.getEliteRewards(2);
+            const ownedRelicIds = Game.state.player.relics.map(r => r.id);
+            specialRewards.relics = Relics.getElitePool(ownedRelicIds);
+        } else if (this.state.enemyTier === 'boss') {
+            specialRewards.cards = Cards.getBossRewards(2);
+            const ownedRelicIds = Game.state.player.relics.map(r => r.id);
+            specialRewards.relics = Relics.getBossPool(ownedRelicIds);
+        }
+
+        UI.showRewardScreen(goldReward, rewards, specialRewards, this.state.enemyTier);
         Sound.play('victory');
     },
 

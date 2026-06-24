@@ -635,6 +635,129 @@ const CardData = {
         description: '每回合开始回复 3 HP',
         healPerTurn: 3,
         target: 'self'
+    },
+    // === 精英专属卡牌 ===
+    void_strike: {
+        id: 'void_strike',
+        name: '虚空斩击',
+        type: 'attack',
+        cost: 1,
+        icon: '🌑',
+        description: '造成 12 伤害，施加 2 虚弱',
+        damage: 12,
+        weak: 2,
+        target: 'single',
+        rarity: 'elite'
+    },
+    plasma_burst: {
+        id: 'plasma_burst',
+        name: '等离子爆发',
+        type: 'attack',
+        cost: 2,
+        icon: '💫',
+        description: '对所有敌人造成 12 伤害',
+        damage: 12,
+        target: 'all',
+        rarity: 'elite'
+    },
+    time_lock: {
+        id: 'time_lock',
+        name: '时间锁定',
+        type: 'skill',
+        cost: 1,
+        icon: '⏳',
+        description: '获得 15 护甲，所有敌人获得 1 虚弱',
+        block: 15,
+        weakAll: 1,
+        target: 'self',
+        rarity: 'elite'
+    },
+    energy_nova: {
+        id: 'energy_nova',
+        name: '能量新星',
+        type: 'skill',
+        cost: 0,
+        icon: '🌟',
+        description: '获得 2 能量，抽 1 张牌',
+        energy: 2,
+        draw: 1,
+        target: 'self',
+        rarity: 'elite'
+    },
+    titan_fist: {
+        id: 'titan_fist',
+        name: '泰坦之拳',
+        type: 'attack',
+        cost: 2,
+        icon: '👊',
+        description: '造成 25 伤害，无视护甲',
+        damage: 25,
+        ignoreBlock: true,
+        target: 'single',
+        rarity: 'elite'
+    },
+    // === Boss专属卡牌 ===
+    omega_beam: {
+        id: 'omega_beam',
+        name: '奥米伽射线',
+        type: 'attack',
+        cost: 2,
+        icon: '☄️',
+        description: '造成 30 伤害，对所有敌人造成 10 伤害',
+        damage: 30,
+        aoeDamage: 10,
+        target: 'single',
+        rarity: 'boss'
+    },
+    dragon_breath: {
+        id: 'dragon_breath',
+        name: '龙息吐息',
+        type: 'attack',
+        cost: 2,
+        icon: '🔥',
+        description: '对所有敌人造成 18 伤害，施加 3 腐蚀',
+        damage: 18,
+        poisonAll: 3,
+        target: 'all',
+        rarity: 'boss'
+    },
+    nexus_core: {
+        id: 'nexus_core',
+        name: '核心枢纽',
+        type: 'power',
+        cost: 2,
+        icon: '💎',
+        description: '每回合开始获得 8 护甲，+2 能量',
+        blockPerTurn: 8,
+        energyPerTurn: 2,
+        target: 'self',
+        rarity: 'boss'
+    },
+    quantum_resurrection: {
+        id: 'quantum_resurrection',
+        name: '量子重生',
+        type: 'skill',
+        cost: 1,
+        icon: '✨',
+        description: '回复 20 HP，获得 15 护甲，抽 2 张牌',
+        heal: 20,
+        block: 15,
+        draw: 2,
+        target: 'self',
+        rarity: 'boss'
+    },
+    void_annihilation: {
+        id: 'void_annihilation',
+        name: '虚空湮灭',
+        type: 'attack',
+        cost: 3,
+        icon: '💀',
+        description: '造成 50 伤害，施加 5 虚弱 + 5 腐蚀',
+        damage: 50,
+        weak: 5,
+        poison: 5,
+        target: 'single',
+        rarity: 'boss'
     }
 };
 
@@ -830,9 +953,30 @@ const Cards = {
     },
 
     getRewardPool() {
-        return Object.keys(CardData).filter(id =>
-            !['laser_shot', 'energy_shield', 'plasma_cannon'].includes(id)
-        );
+        return Object.keys(CardData).filter(id => {
+            const card = CardData[id];
+            return !['laser_shot', 'energy_shield', 'plasma_cannon'].includes(id) 
+                && card.rarity !== 'elite' 
+                && card.rarity !== 'boss';
+        });
+    },
+
+    getElitePool() {
+        return Object.keys(CardData).filter(id => CardData[id].rarity === 'elite');
+    },
+
+    getBossPool() {
+        return Object.keys(CardData).filter(id => CardData[id].rarity === 'boss');
+    },
+
+    getEliteRewards(count = 2) {
+        const pool = this.getElitePool();
+        return Utils.pickRandom(pool, Math.min(count, pool.length)).map(id => this.createCard(id));
+    },
+
+    getBossRewards(count = 2) {
+        const pool = this.getBossPool();
+        return Utils.pickRandom(pool, Math.min(count, pool.length)).map(id => this.createCard(id));
     },
 
     getRandomRewards(count = 3) {

@@ -154,12 +154,74 @@ const UI = {
         }
     },
 
-    showRewardScreen(gold, cards) {
+    showRewardScreen(gold, cards, specialRewards = { cards: [], relics: [] }, enemyTier = 'normal') {
         Game.showScreen('screen-reward');
         document.getElementById('reward-gold').textContent = `💰 获得 ${gold} 金币`;
 
         const container = document.getElementById('reward-cards');
         container.innerHTML = '';
+
+        if (specialRewards.cards.length > 0 || specialRewards.relics.length > 0) {
+            const specialHeader = document.createElement('div');
+            specialHeader.style.cssText = 'width: 100%; text-align: center; margin-bottom: 16px;';
+            const tierText = enemyTier === 'boss' ? '👑 Boss专属奖励' : '💀 精英专属奖励';
+            specialHeader.innerHTML = `<h3 style="color: ${enemyTier === 'boss' ? '#ffaa00' : '#b44aff'}; margin: 0;">${tierText}</h3>`;
+            container.appendChild(specialHeader);
+
+            specialRewards.cards.forEach((card, idx) => {
+                const cardDiv = this.createCardElement(card, idx);
+                cardDiv.classList.remove('unplayable');
+                cardDiv.style.cursor = 'pointer';
+                cardDiv.style.border = `3px solid ${enemyTier === 'boss' ? '#ffaa00' : '#b44aff'}`;
+                cardDiv.style.boxShadow = `0 0 20px ${enemyTier === 'boss' ? 'rgba(255, 170, 0, 0.6)' : 'rgba(180, 74, 255, 0.6)'}`;
+                cardDiv.onclick = () => {
+                    Game.state.player.deck.push(card);
+                    Game.continueAfterReward();
+                };
+                container.appendChild(cardDiv);
+            });
+
+            specialRewards.relics.forEach((relic, idx) => {
+                const relicDiv = document.createElement('div');
+                relicDiv.style.cssText = `
+                    display: inline-flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 16px;
+                    margin: 8px;
+                    background: rgba(20, 20, 50, 0.9);
+                    border: 3px solid ${enemyTier === 'boss' ? '#ffaa00' : '#b44aff'};
+                    border-radius: 12px;
+                    cursor: pointer;
+                    box-shadow: 0 0 20px ${enemyTier === 'boss' ? 'rgba(255, 170, 0, 0.6)' : 'rgba(180, 74, 255, 0.6)'};
+                    transition: all 0.3s;
+                    width: 140px;
+                    height: 196px;
+                    justify-content: center;
+                `;
+                relicDiv.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 8px;">${relic.icon}</div>
+                    <div style="font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 4px;">${relic.name}</div>
+                    <div style="font-size: 11px; color: #aaa; text-align: center; line-height: 1.4;">${relic.description}</div>
+                `;
+                relicDiv.onmouseenter = () => {
+                    relicDiv.style.transform = 'translateY(-10px) scale(1.05)';
+                };
+                relicDiv.onmouseleave = () => {
+                    relicDiv.style.transform = 'translateY(0) scale(1)';
+                };
+                relicDiv.onclick = () => {
+                    Game.state.player.relics.push(relic);
+                    Game.continueAfterReward();
+                };
+                container.appendChild(relicDiv);
+            });
+
+            const separator = document.createElement('div');
+            separator.style.cssText = 'width: 100%; text-align: center; margin: 16px 0;';
+            separator.innerHTML = '<h3 style="color: #00d4ff; margin: 0;">普通奖励</h3>';
+            container.appendChild(separator);
+        }
 
         cards.forEach((card, idx) => {
             const cardDiv = this.createCardElement(card, idx, (c) => {

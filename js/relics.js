@@ -180,6 +180,77 @@ const RelicData = {
         icon: '🌀',
         description: '战斗开始时对所有敌人施加 1 虚弱',
         rarity: 'uncommon'
+    },
+    // === 精英专属遗物 ===
+    elite_core_fragment: {
+        id: 'elite_core_fragment',
+        name: '精英核心碎片',
+        icon: '💠',
+        description: '每回合开始获得 4 护甲，+1 能量',
+        rarity: 'elite',
+        blockPerTurn: 4,
+        energyPerTurn: 1
+    },
+    elite_hunter_mark: {
+        id: 'elite_hunter_mark',
+        name: '猎人印记',
+        icon: '🎯',
+        description: '每回合第一张攻击牌伤害 +8',
+        rarity: 'elite',
+        firstAttackBonus: 8
+    },
+    elite_void_essence: {
+        id: 'elite_void_essence',
+        name: '虚空精华',
+        icon: '🌑',
+        description: '战斗开始时对所有敌人施加 3 腐蚀',
+        rarity: 'elite',
+        poisonAll: 3
+    },
+    elite_time_crystal: {
+        id: 'elite_time_crystal',
+        name: '时间水晶',
+        icon: '⏰',
+        description: '每场战斗第一回合抽 8 张牌',
+        rarity: 'elite',
+        firstTurnDraw: 8
+    },
+    // === Boss专属遗物 ===
+    boss_omega_matrix: {
+        id: 'boss_omega_matrix',
+        name: '奥米伽矩阵',
+        icon: '🧠',
+        description: '每回合开始获得 10 护甲，+2 能量，对所有敌人造成 5 伤害',
+        rarity: 'boss',
+        blockPerTurn: 10,
+        energyPerTurn: 2,
+        damageAll: 5
+    },
+    boss_dragon_heart: {
+        id: 'boss_dragon_heart',
+        name: '龙心核心',
+        icon: '❤️‍🔥',
+        description: '最大 HP +30，每回合回复 5 HP',
+        rarity: 'boss',
+        maxHpBonus: 30,
+        healPerTurn: 5
+    },
+    boss_nexus_shard: {
+        id: 'boss_nexus_shard',
+        name: '枢纽碎片',
+        icon: '💎',
+        description: '所有卡牌伤害 +5，护甲 +5',
+        rarity: 'boss',
+        cardBonus: 5
+    },
+    boss_void_crown: {
+        id: 'boss_void_crown',
+        name: '虚空王冠',
+        icon: '👑',
+        description: '每回合抽 7 张牌，+3 能量',
+        rarity: 'boss',
+        drawPerTurn: 7,
+        energyPerTurn: 3
     }
 };
 
@@ -193,8 +264,26 @@ const Relics = {
     },
 
     getRandom(count = 1, exclude = []) {
-        const pool = Object.values(RelicData).filter(r => !exclude.includes(r.id));
+        const pool = Object.values(RelicData).filter(r => 
+            !exclude.includes(r.id) 
+            && r.rarity !== 'elite' 
+            && r.rarity !== 'boss'
+        );
         return Utils.pickRandom(pool, count);
+    },
+
+    getElitePool(exclude = []) {
+        const pool = Object.values(RelicData).filter(r => 
+            r.rarity === 'elite' && !exclude.includes(r.id)
+        );
+        return Utils.pickRandom(pool, Math.min(1, pool.length));
+    },
+
+    getBossPool(exclude = []) {
+        const pool = Object.values(RelicData).filter(r => 
+            r.rarity === 'boss' && !exclude.includes(r.id)
+        );
+        return Utils.pickRandom(pool, Math.min(1, pool.length));
     },
 
     onCombatStart(relics, combatState) {
@@ -220,6 +309,26 @@ const Relics = {
             }
             if (r.id === 'vampiric_module') {
                 combatState.vampiricHealsThisTurn = 0;
+            }
+            // Elite relics
+            if (r.id === 'elite_void_essence') {
+                combatState.enemies.forEach(e => {
+                    e.status.poison += 3;
+                });
+            }
+            if (r.id === 'elite_time_crystal') {
+                combatState.firstTurnExtraDraw = (combatState.firstTurnExtraDraw || 0) + 3;
+            }
+            // Boss relics
+            if (r.id === 'boss_omega_matrix') {
+                combatState.playerBlock += 10;
+                combatState.enemies.forEach(e => {
+                    Combat.dealDamageToEnemy(e, 5);
+                });
+            }
+            if (r.id === 'boss_dragon_heart') {
+                Game.state.player.maxHp += 30;
+                Game.state.player.hp += 30;
             }
         });
     },
@@ -252,6 +361,31 @@ const Relics = {
             }
             if (r.id === 'vampiric_module') {
                 combatState.vampiricHealsThisTurn = 0;
+            }
+            // Elite relics
+            if (r.id === 'elite_core_fragment') {
+                combatState.playerBlock += 4;
+            }
+            if (r.id === 'elite_hunter_mark') {
+                combatState.firstAttackBonus = (combatState.firstAttackBonus || 0) + 8;
+            }
+            if (r.id === 'elite_time_crystal' && combatState.turn === 1 && combatState.firstTurnExtraDraw) {
+                combatState.extraDraw = (combatState.extraDraw || 0) + combatState.firstTurnExtraDraw;
+            }
+            // Boss relics
+            if (r.id === 'boss_omega_matrix') {
+                combatState.playerBlock += 10;
+                if (combatState.enemies.length > 0) {
+                    combatState.enemies.forEach(e => {
+                        Combat.dealDamageToEnemy(e, 5);
+                    });
+                }
+            }
+            if (r.id === 'boss_dragon_heart') {
+                Game.state.player.hp = Math.min(Game.state.player.maxHp, Game.state.player.hp + 5);
+            }
+            if (r.id === 'boss_void_crown') {
+                combatState.extraDraw = (combatState.extraDraw || 0) + 2;
             }
         });
     },
@@ -328,7 +462,18 @@ const Relics = {
         let extra = 0;
         relics.forEach(r => {
             if (r.id === 'energy_core') extra += 1;
+            if (r.id === 'elite_core_fragment') extra += 1;
+            if (r.id === 'boss_omega_matrix') extra += 2;
+            if (r.id === 'boss_void_crown') extra += 3;
         });
         return extra;
+    },
+
+    getCardBonus(relics) {
+        let bonus = 0;
+        relics.forEach(r => {
+            if (r.id === 'boss_nexus_shard') bonus += 5;
+        });
+        return bonus;
     }
 };
