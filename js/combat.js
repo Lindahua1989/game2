@@ -123,6 +123,12 @@ const Combat = {
 
         let cost = card.cost;
         if (cost === -1) cost = this.state.energy;
+        
+        if (this.state.firstCardDiscount && cost > 0) {
+            cost = Math.max(0, cost - 1);
+            this.state.firstCardDiscount = false;
+        }
+        
         if (cost > this.state.energy) return;
 
         if (card.target === 'single' && targetIndex === undefined) {
@@ -157,6 +163,11 @@ const Combat = {
 
     async executeCard(card, targetIndex) {
         let bonusDmg = this.state.playerPowers.strength + this.state.playerPowers.attackBonus + this.state.firstAttackBonus;
+        
+        if (this.state.berserkerBonus && card.type === 'attack') {
+            bonusDmg += this.state.berserkerBonus;
+            this.state.berserkerBonus = 0;
+        }
 
         if (card.damage) {
             let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0);
@@ -326,6 +337,7 @@ const Combat = {
             UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`, 'damage');
             Sound.play('damage');
             GameStats.recordDamage(remaining);
+            Relics.onDamageDealt(Game.state.player.relics, remaining, this.state);
         }
 
         if (enemy.hp <= 0) {
@@ -410,6 +422,8 @@ const Combat = {
             await Utils.delay(200);
         }
 
+        this.state.currentAttacker = enemy;
+
         switch (intent.type) {
             case 'attack':
                 const hits = intent.hits || 1;
@@ -471,6 +485,8 @@ const Combat = {
                 UI.showCombatLog(`${enemy.name} 召唤了增援！`, 'enemy');
                 break;
         }
+        
+        this.state.currentAttacker = null;
     },
 
     dealDamageToPlayer(damage) {
@@ -497,13 +513,22 @@ const Combat = {
             UI.showDamageNumber(playerArea, remaining, 'damage');
             UI.showCombatLog(`你受到了 ${remaining} 点伤害`, 'damage');
             Sound.play('enemy_attack');
+            
+            const reflectedDamage = Relics.onPlayerDamaged(Game.state.player.relics, remaining, this.state);
+            if (reflectedDamage > 0 && this.state.currentAttacker) {
+                this.dealDamageToEnemy(this.state.currentAttacker, reflectedDamage, false, 'light');
+                UI.showCombatLog(`荆棘反弹了 ${reflectedDamage} 伤害`, 'damage');
+            }
         } else if (blocked > 0) {
             UI.showCombatLog(`护甲抵挡了 ${blocked} 点伤害`, 'block');
             Sound.play('block');
         }
 
         if (Game.state.player.hp <= 0) {
-            Game.state.player.hp = 0;
+            Relics.onPlayerDamaged(Game.state.player.relics, remaining, this.state);
+            if (Game.state.player.hp <= 0) {
+                Game.state.player.hp = 0;
+            }
         }
     },
 

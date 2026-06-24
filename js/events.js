@@ -216,6 +216,326 @@ const EventData = [
                 effect: () => '你决定不冒险，绕路前进。'
             }
         ]
+    },
+    {
+        id: 'ancient_shrine',
+        icon: '⛩️',
+        title: '古老神殿',
+        description: '一座被遗忘的古老神殿，祭坛上放着三件神器。',
+        choices: [
+            {
+                text: '🗡️ 力量之刃',
+                effect: (state) => {
+                    const pool = Cards.getRewardPool().filter(id => CardData[id].type === 'attack');
+                    if (pool.length > 0) {
+                        const cardId = Utils.randomChoice(pool);
+                        const card = Cards.createCard(cardId);
+                        Cards.upgradeCard(card);
+                        state.player.deck.push(card);
+                        return `获得升级卡牌：${card.name}！`;
+                    }
+                    return '没有合适的卡牌。';
+                }
+            },
+            {
+                text: '🛡️ 守护之盾',
+                effect: (state) => {
+                    state.player.maxHp += 10;
+                    state.player.hp += 10;
+                    return '神殿的祝福！最大 HP +10，并回复 10 HP。';
+                }
+            },
+            {
+                text: '💰 财富之杯',
+                effect: (state) => {
+                    state.player.gold += 50;
+                    return '杯中装满金币！获得 50 金币。';
+                }
+            }
+        ]
+    },
+    {
+        id: 'trapped_chest',
+        icon: '📦',
+        title: '可疑的宝箱',
+        description: '一个华丽的宝箱出现在路边，但看起来有些可疑。',
+        choices: [
+            {
+                text: '🔓 打开宝箱',
+                effect: (state) => {
+                    if (Math.random() < 0.7) {
+                        const gold = Utils.randomInt(20, 40);
+                        state.player.gold += gold;
+                        return `宝箱里有 ${gold} 金币！`;
+                    } else {
+                        state.player.hp = Math.max(1, state.player.hp - 12);
+                        return '宝箱是陷阱！受到 12 点伤害。';
+                    }
+                }
+            },
+            {
+                text: '🚫 无视宝箱',
+                effect: () => '你谨慎地绕过了宝箱。'
+            }
+        ]
+    },
+    {
+        id: 'wandering_merchant',
+        icon: '🧳',
+        title: '流浪商人',
+        description: '一个背着大包小包的商人向你招手。',
+        choices: [
+            {
+                text: '💊 购买药水（15 金币）',
+                effect: (state) => {
+                    if (state.player.gold >= 15) {
+                        state.player.gold -= 15;
+                        state.player.hp = Math.min(state.player.maxHp, state.player.hp + 25);
+                        return '购买成功！回复 25 HP。';
+                    }
+                    return '金币不足！';
+                }
+            },
+            {
+                text: '🎲 赌博游戏（10 金币）',
+                effect: (state) => {
+                    if (state.player.gold >= 10) {
+                        state.player.gold -= 10;
+                        if (Math.random() < 0.5) {
+                            state.player.gold += 30;
+                            return '运气不错！赢得 30 金币。';
+                        } else {
+                            return '运气不佳，输掉了 10 金币。';
+                        }
+                    }
+                    return '金币不足！';
+                }
+            },
+            {
+                text: '👋 离开',
+                effect: () => '你继续前进。'
+            }
+        ]
+    },
+    {
+        id: 'corrupted_ai',
+        icon: '🤖',
+        title: '失控的AI',
+        description: '一个AI核心正在发出混乱的信号，似乎需要帮助。',
+        choices: [
+            {
+                text: '🔧 尝试修复',
+                effect: (state) => {
+                    if (Math.random() < 0.6) {
+                        const relics = Relics.getRandom(1, state.player.relics.map(r => r.id));
+                        if (relics.length > 0) {
+                            state.player.relics.push(relics[0]);
+                            return `修复成功！AI赠予你：${relics[0].name}`;
+                        }
+                        return '修复成功，但AI没有多余的东西给你。';
+                    } else {
+                        state.player.hp = Math.max(1, state.player.hp - 8);
+                        return '修复失败！AI暴走，受到 8 点伤害。';
+                    }
+                }
+            },
+            {
+                text: '💥 摧毁它',
+                effect: (state) => {
+                    state.player.gold += 20;
+                    return '摧毁AI核心，获得 20 金币。';
+                }
+            }
+        ]
+    },
+    {
+        id: 'training_ground',
+        icon: '🎯',
+        title: '训练场',
+        description: '一个废弃的训练场，可以用来提升技能。',
+        choices: [
+            {
+                text: '⚔️ 攻击训练',
+                effect: (state) => {
+                    const attackCards = state.player.deck.filter(c => c.type === 'attack' && !c.upgraded);
+                    if (attackCards.length > 0) {
+                        const card = Utils.randomChoice(attackCards);
+                        Cards.upgradeCard(card);
+                        return `训练完成！${card.name.replace('+', '')} 已升级！`;
+                    }
+                    return '没有可升级的攻击卡牌。';
+                }
+            },
+            {
+                text: '🛡️ 防御训练',
+                effect: (state) => {
+                    const skillCards = state.player.deck.filter(c => c.type === 'skill' && !c.upgraded);
+                    if (skillCards.length > 0) {
+                        const card = Utils.randomChoice(skillCards);
+                        Cards.upgradeCard(card);
+                        return `训练完成！${card.name.replace('+', '')} 已升级！`;
+                    }
+                    return '没有可升级的技能卡牌。';
+                }
+            },
+            {
+                text: '🚪 离开',
+                effect: () => '你决定继续前进。'
+            }
+        ]
+    },
+    {
+        id: 'quantum_anomaly',
+        icon: '✨',
+        title: '量子异常',
+        description: '空间中出现了一个闪烁的量子异常点。',
+        choices: [
+            {
+                text: '🔬 研究异常',
+                effect: (state) => {
+                    const roll = Math.random();
+                    if (roll < 0.4) {
+                        state.player.maxHp += 5;
+                        state.player.hp += 5;
+                        return '研究成功！最大 HP +5。';
+                    } else if (roll < 0.7) {
+                        state.player.gold += 25;
+                        return '从异常中提取能量，获得 25 金币。';
+                    } else {
+                        state.player.hp = Math.max(1, state.player.hp - 6);
+                        return '异常不稳定！受到 6 点伤害。';
+                    }
+                }
+            },
+            {
+                text: '⚡ 吸收能量',
+                effect: (state) => {
+                    state.player.hp = Math.max(1, state.player.hp - 5);
+                    const pool = Cards.getRewardPool();
+                    const cardId = Utils.randomChoice(pool);
+                    const card = Cards.createCard(cardId);
+                    state.player.deck.push(card);
+                    return `吸收能量（受到 5 伤害），获得卡牌：${card.name}`;
+                }
+            }
+        ]
+    },
+    {
+        id: 'abandoned_ship',
+        icon: '🚀',
+        title: '废弃飞船',
+        description: '一艘废弃的飞船漂浮在太空中，可能还有物资。',
+        choices: [
+            {
+                text: '🔍 搜索货舱',
+                effect: (state) => {
+                    const gold = Utils.randomInt(15, 35);
+                    state.player.gold += gold;
+                    return `在货舱找到 ${gold} 金币！`;
+                }
+            },
+            {
+                text: '🔧 拆卸零件',
+                effect: (state) => {
+                    const relics = Relics.getRandom(1, state.player.relics.map(r => r.id));
+                    if (relics.length > 0) {
+                        state.player.relics.push(relics[0]);
+                        return `拆卸成功！获得：${relics[0].name}`;
+                    }
+                    return '没有找到有用的零件。';
+                }
+            },
+            {
+                text: '🚪 离开',
+                effect: () => '你决定不冒险。'
+            }
+        ]
+    },
+    {
+        id: 'healing_spring',
+        icon: '💧',
+        title: '治愈之泉',
+        description: '一个散发着柔和光芒的治愈之泉。',
+        choices: [
+            {
+                text: '💧 饮用泉水',
+                effect: (state) => {
+                    state.player.hp = Math.min(state.player.maxHp, state.player.hp + 30);
+                    return '泉水治愈了你的伤口！回复 30 HP。';
+                }
+            },
+            {
+                text: '🍶 装瓶带走',
+                effect: (state) => {
+                    state.player.hp = Math.min(state.player.maxHp, state.player.hp + 15);
+                    state.player.maxHp += 3;
+                    return '装瓶带走！回复 15 HP，最大 HP +3。';
+                }
+            }
+        ]
+    },
+    {
+        id: 'card_forge',
+        icon: '🔨',
+        title: '卡牌锻造炉',
+        description: '一个古老的卡牌锻造炉，可以将普通卡牌转化为强力卡牌。',
+        choices: [
+            {
+                text: '🔨 锻造卡牌（25 金币）',
+                effect: (state) => {
+                    if (state.player.gold >= 25) {
+                        state.player.gold -= 25;
+                        const upgradeable = state.player.deck.filter(c => !c.upgraded);
+                        if (upgradeable.length > 0) {
+                            const card = Utils.randomChoice(upgradeable);
+                            Cards.upgradeCard(card);
+                            return `锻造成功！${card.name.replace('+', '')} 已升级！`;
+                        }
+                        return '没有可锻造的卡牌。';
+                    }
+                    return '金币不足！';
+                }
+            },
+            {
+                text: '🚪 离开',
+                effect: () => '你决定继续前进。'
+            }
+        ]
+    },
+    {
+        id: 'mysterious_portal',
+        icon: '🌌',
+        title: '神秘传送门',
+        description: '一个闪烁着星光的传送门出现在面前。',
+        choices: [
+            {
+                text: '🌌 进入传送门',
+                effect: (state) => {
+                    const roll = Math.random();
+                    if (roll < 0.25) {
+                        state.player.hp = state.player.maxHp;
+                        return '传送门治愈了你！HP 完全恢复。';
+                    } else if (roll < 0.5) {
+                        state.player.gold += 40;
+                        return '传送门通向宝藏！获得 40 金币。';
+                    } else if (roll < 0.75) {
+                        const pool = Cards.getRewardPool();
+                        const cardId = Utils.randomChoice(pool);
+                        const card = Cards.createCard(cardId);
+                        Cards.upgradeCard(card);
+                        state.player.deck.push(card);
+                        return `传送门赠予你：${card.name}！`;
+                    } else {
+                        state.player.hp = Math.max(1, state.player.hp - 15);
+                        return '传送门不稳定！受到 15 点伤害。';
+                    }
+                }
+            },
+            {
+                text: '🚶 绕道而行',
+                effect: () => '你谨慎地绕过了传送门。'
+            }
+        ]
     }
 ];
 

@@ -17,6 +17,7 @@
                 <div class="title-buttons">
                     <button class="btn btn-primary btn-large" onclick="Game.startNewRun()">开始征程</button>
                     <button class="btn btn-secondary btn-large" onclick="DailyChallenge.showDailyInfo()">📅 每日挑战</button>
+                    <button class="btn btn-secondary btn-large" onclick="Skins.showSkinSelection()">🎨 角色皮肤</button>
                     <button class="btn btn-secondary btn-large" onclick="Game.showLoadScreen()">📂 读取存档</button>
                     <button class="btn btn-secondary btn-large" onclick="Game.showStatsScreen()">📊 统计成就</button>
                 </div>
@@ -203,6 +204,10 @@
         <div id="deck-selection-modal" class="deck-selection-modal">
             <div class="deck-selection-content" id="deck-selection-content"></div>
         </div>
+        
+        <div id="skin-selection-modal" class="deck-selection-modal">
+            <div class="deck-selection-content" id="skin-selection-content"></div>
+        </div>
     </div>
 
     <script src="js/utils.js"></script>
@@ -211,6 +216,7 @@
     <script src="js/particles.js"></script>
     <script src="js/unlocks.js"></script>
     <script src="js/daily.js"></script>
+    <script src="js/skins.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/enemies.js"></script>
     <script src="js/relics.js"></script>
