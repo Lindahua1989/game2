@@ -269,13 +269,234 @@ const EnemyData = {
                 ]
             }
         ]
+    },
+    // === 新增敌人 ===
+    plasma_elemental: {
+        id: 'plasma_elemental',
+        name: '等离子元素',
+        icon: '🔥',
+        hp: 32,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack', value: 9 },
+            { type: 'attack', value: 7, hits: 2 },
+            { type: 'block', value: 8 }
+        ]
+    },
+    void_walker: {
+        id: 'void_walker',
+        name: '虚空行者',
+        icon: '🌑',
+        hp: 28,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack_weak', value: 6, weak: 2 },
+            { type: 'attack', value: 11 },
+            { type: 'block', value: 10 }
+        ]
+    },
+    cyber_assassin: {
+        id: 'cyber_assassin',
+        name: '赛博刺客',
+        icon: '🗡️',
+        hp: 26,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack', value: 10 },
+            { type: 'attack', value: 8 },
+            { type: 'attack', value: 12 }
+        ]
+    },
+    shield_drone: {
+        id: 'shield_drone',
+        name: '护盾无人机',
+        icon: '🛡️',
+        hp: 18,
+        tier: 'normal',
+        pattern: [
+            { type: 'block', value: 12 },
+            { type: 'attack', value: 5 },
+            { type: 'block', value: 8 }
+        ]
+    },
+    toxic_spitter: {
+        id: 'toxic_spitter',
+        name: '毒液喷射者',
+        icon: '☣️',
+        hp: 24,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack_poison', value: 5, poison: 3 },
+            { type: 'attack_poison', value: 4, poison: 2, hits: 2 },
+            { type: 'attack', value: 8 }
+        ]
+    },
+    energy_vampire: {
+        id: 'energy_vampire',
+        name: '能量吸血鬼',
+        icon: '🧛',
+        hp: 30,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack', value: 7 },
+            { type: 'heal', value: 7 },
+            { type: 'attack', value: 9 }
+        ]
+    },
+    gravity_manipulator: {
+        id: 'gravity_manipulator',
+        name: '重力操控者',
+        icon: '🌀',
+        hp: 34,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack_weak', value: 7, weak: 2 },
+            { type: 'block', value: 10 },
+            { type: 'attack', value: 11 }
+        ]
+    },
+    phase_shifter: {
+        id: 'phase_shifter',
+        name: '相位转换者',
+        icon: '⚡',
+        hp: 22,
+        tier: 'normal',
+        pattern: [
+            { type: 'attack', value: 8 },
+            { type: 'block', value: 15 },
+            { type: 'attack', value: 10 }
+        ]
+    },
+    // === 新增精英 ===
+    time_lord: {
+        id: 'time_lord',
+        name: '时间领主',
+        icon: '⏰',
+        hp: 90,
+        tier: 'elite',
+        pattern: [
+            { type: 'attack', value: 14 },
+            { type: 'block_attack', value: 16, block: 12 },
+            { type: 'attack', value: 12, hits: 2 },
+            { type: 'charge' },
+            { type: 'attack', value: 28 }
+        ]
+    },
+    plasma_titan: {
+        id: 'plasma_titan',
+        name: '等离子泰坦',
+        icon: '🔥',
+        hp: 100,
+        tier: 'elite',
+        pattern: [
+            { type: 'attack', value: 16 },
+            { type: 'attack', value: 12, hits: 2 },
+            { type: 'block', value: 18 },
+            { type: 'charge' },
+            { type: 'attack', value: 35 }
+        ]
+    },
+    void_empress: {
+        id: 'void_empress',
+        name: '虚空女皇',
+        icon: '👑',
+        hp: 85,
+        tier: 'elite',
+        pattern: [
+            { type: 'attack_weak', value: 12, weak: 3 },
+            { type: 'summon', value: 1 },
+            { type: 'attack_poison', value: 10, poison: 4 },
+            { type: 'block', value: 20 }
+        ]
+    },
+    // === 新增Boss ===
+    boss_dragon: {
+        id: 'boss_dragon',
+        name: '机械巨龙',
+        icon: '🐉',
+        hp: 150,
+        tier: 'boss',
+        dialogue: {
+            entry: '渺小的生物...准备成为我的燃料！',
+            phase2: '你激怒了我...感受龙焰的愤怒！',
+            phase3: '不可能...我是不朽的！'
+        },
+        phases: [
+            {
+                threshold: 100,
+                pattern: [
+                    { type: 'attack', value: 14 },
+                    { type: 'attack', value: 10, hits: 2 },
+                    { type: 'block', value: 15 }
+                ]
+            },
+            {
+                threshold: 50,
+                pattern: [
+                    { type: 'attack', value: 20 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 30 },
+                    { type: 'attack', value: 15, hits: 2 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 25 },
+                    { type: 'attack', value: 18, hits: 3 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 40 }
+                ]
+            }
+        ]
+    },
+    boss_nexus: {
+        id: 'boss_nexus',
+        name: '核心枢纽',
+        icon: '💎',
+        hp: 200,
+        tier: 'boss',
+        dialogue: {
+            entry: '我是这个系统的核心...你无法摧毁我。',
+            phase2: '启动防御协议...召唤护卫！',
+            phase3: '系统过载...全力输出！'
+        },
+        phases: [
+            {
+                threshold: 150,
+                pattern: [
+                    { type: 'attack', value: 12 },
+                    { type: 'block_attack', value: 10, block: 18 },
+                    { type: 'attack_weak', value: 14, weak: 2 }
+                ]
+            },
+            {
+                threshold: 80,
+                pattern: [
+                    { type: 'summon', value: 2 },
+                    { type: 'attack', value: 18 },
+                    { type: 'block', value: 22 },
+                    { type: 'attack', value: 15, hits: 2 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 28 },
+                    { type: 'attack', value: 20, hits: 2 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 45 },
+                    { type: 'attack_poison', value: 18, poison: 6 }
+                ]
+            }
+        ]
     }
 };
 
 const Enemies = {
     getEncounter(floor, type) {
         if (type === 'boss') {
-            const bosses = ['boss_guardian', 'boss_queen', 'boss_omega'];
+            const bosses = ['boss_guardian', 'boss_queen', 'boss_omega', 'boss_dragon', 'boss_nexus'];
             const bossId = bosses[Math.min(floor - 1, bosses.length - 1)];
             return [this.createEnemy(bossId)];
         }

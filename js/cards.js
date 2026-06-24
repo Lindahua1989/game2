@@ -447,6 +447,194 @@ const CardData = {
         description: '造成 55 点伤害',
         damage: 55,
         target: 'single'
+    },
+    // === 新增卡牌 ===
+    shield_bash: {
+        id: 'shield_bash',
+        name: '护盾猛击',
+        type: 'attack',
+        cost: 2,
+        icon: '🛡️',
+        description: '造成等同于护甲的伤害',
+        shieldBash: true,
+        target: 'single'
+    },
+    time_warp: {
+        id: 'time_warp',
+        name: '时间扭曲',
+        type: 'skill',
+        cost: 2,
+        icon: '⏰',
+        description: '额外获得一个回合',
+        extraTurn: true,
+        target: 'self'
+    },
+    virus_spread: {
+        id: 'virus_spread',
+        name: '病毒扩散',
+        type: 'attack',
+        cost: 1,
+        icon: '🦠',
+        description: '对所有敌人施加 2 腐蚀',
+        poisonAll: 2,
+        target: 'all_enemies'
+    },
+    energy_drain: {
+        id: 'energy_drain',
+        name: '能量汲取',
+        type: 'attack',
+        cost: 1,
+        icon: '💧',
+        description: '造成 5 伤害，回复 3 HP',
+        damage: 5,
+        heal: 3,
+        target: 'single'
+    },
+    mirror_image: {
+        id: 'mirror_image',
+        name: '镜像分身',
+        type: 'skill',
+        cost: 1,
+        icon: '🪞',
+        description: '复制手牌中费用最低的卡牌',
+        copyCard: true,
+        target: 'self'
+    },
+    explosive_shot: {
+        id: 'explosive_shot',
+        name: '爆裂射击',
+        type: 'attack',
+        cost: 2,
+        icon: '💥',
+        description: '造成 12 伤害，对所有敌人造成 6 伤害',
+        damage: 12,
+        aoeDamage: 6,
+        target: 'single'
+    },
+    adaptive_armor: {
+        id: 'adaptive_armor',
+        name: '自适应装甲',
+        type: 'power',
+        cost: 1,
+        icon: '🔰',
+        description: '每次受到伤害时获得 2 护甲',
+        armorOnHit: 2,
+        target: 'self'
+    },
+    power_surge: {
+        id: 'power_surge',
+        name: '能量激增',
+        type: 'skill',
+        cost: 0,
+        icon: '⚡',
+        description: '本回合所有卡牌费用 -1',
+        costReduction: 1,
+        target: 'self'
+    },
+    heal_beam: {
+        id: 'heal_beam',
+        name: '治愈光束',
+        type: 'skill',
+        cost: 2,
+        icon: '💚',
+        description: '回复 15 HP，获得 5 护甲',
+        heal: 15,
+        block: 5,
+        target: 'self'
+    },
+    weaken_field: {
+        id: 'weaken_field',
+        name: '虚弱力场',
+        type: 'skill',
+        cost: 1,
+        icon: '🌫️',
+        description: '所有敌人获得 3 虚弱',
+        weakAll: 3,
+        target: 'all_enemies'
+    },
+    critical_strike: {
+        id: 'critical_strike',
+        name: '致命一击',
+        type: 'attack',
+        cost: 2,
+        icon: '⚔️',
+        description: '造成 8 伤害，50% 概率造成双倍伤害',
+        damage: 8,
+        critChance: 0.5,
+        target: 'single'
+    },
+    shield_wall: {
+        id: 'shield_wall',
+        name: '护盾之墙',
+        type: 'skill',
+        cost: 2,
+        icon: '🏰',
+        description: '获得 15 护甲，下回合额外 10 护甲',
+        block: 15,
+        nextTurnBlock: 10,
+        target: 'self'
+    },
+    energy_burst: {
+        id: 'energy_burst',
+        name: '能量爆发',
+        type: 'attack',
+        cost: 1,
+        icon: '✨',
+        description: '造成等同于手牌数的伤害',
+        handDamage: true,
+        target: 'single'
+    },
+    toxic_cloud: {
+        id: 'toxic_cloud',
+        name: '毒雾弥漫',
+        type: 'skill',
+        cost: 2,
+        icon: '☁️',
+        description: '所有敌人获得 4 腐蚀 + 2 虚弱',
+        poisonAll: 4,
+        weakAll: 2,
+        target: 'all_enemies'
+    },
+    berserker_rage: {
+        id: 'berserker_rage',
+        name: '狂战士之怒',
+        type: 'power',
+        cost: 2,
+        icon: '😤',
+        description: 'HP 越低伤害越高（最多 +8）',
+        berserkerBonus: 8,
+        target: 'self'
+    },
+    phase_shift: {
+        id: 'phase_shift',
+        name: '相位转移',
+        type: 'skill',
+        cost: 1,
+        icon: '🌀',
+        description: '获得 10 护甲，抽 2 张牌',
+        block: 10,
+        draw: 2,
+        target: 'self'
+    },
+    plasma_wave: {
+        id: 'plasma_wave',
+        name: '等离子波',
+        type: 'attack',
+        cost: 3,
+        icon: '🌊',
+        description: '对所有敌人造成 15 伤害',
+        damage: 15,
+        target: 'all'
+    },
+    repair_drone: {
+        id: 'repair_drone',
+        name: '修复无人机',
+        type: 'power',
+        cost: 2,
+        icon: '🤖',
+        description: '每回合开始回复 3 HP',
+        healPerTurn: 3,
+        target: 'self'
     }
 };
 
@@ -484,6 +672,12 @@ const Cards = {
             if (card.thorns) card.thorns += 1;
             if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
             if (card.energy) card.energy += 1;
+            if (card.aoeDamage) card.aoeDamage = Math.ceil(card.aoeDamage * 1.3);
+            if (card.armorOnHit) card.armorOnHit += 1;
+            if (card.poisonAll) card.poisonAll = Math.ceil(card.poisonAll * 1.3);
+            if (card.weakAll) card.weakAll += 1;
+            if (card.healPerTurn) card.healPerTurn = Math.ceil(card.healPerTurn * 1.3);
+            if (card.berserkerBonus) card.berserkerBonus += 2;
         }
         card.description = this.buildDescription(card);
         return card;
@@ -587,6 +781,50 @@ const Cards = {
             parts.push(`所有卡牌伤害/护甲 +${card.upgradeAll}`);
         }
 
+        if (card.shieldBash) {
+            parts.push(`造成等同于护甲的伤害`);
+        }
+
+        if (card.extraTurn) {
+            parts.push(`额外获得一个回合`);
+        }
+
+        if (card.poisonAll) {
+            parts.push(`所有敌人获得 ${card.poisonAll} 腐蚀`);
+        }
+
+        if (card.copyCard) {
+            parts.push(`复制手牌中费用最低的卡牌`);
+        }
+
+        if (card.aoeDamage) {
+            parts.push(`对所有敌人造成 ${card.aoeDamage} 伤害`);
+        }
+
+        if (card.armorOnHit) {
+            parts.push(`每次受到伤害时获得 ${card.armorOnHit} 护甲`);
+        }
+
+        if (card.costReduction) {
+            parts.push(`本回合所有卡牌费用 -${card.costReduction}`);
+        }
+
+        if (card.critChance) {
+            parts.push(`${Math.round(card.critChance * 100)}% 概率造成双倍伤害`);
+        }
+
+        if (card.handDamage) {
+            parts.push(`造成等同于手牌数的伤害`);
+        }
+
+        if (card.berserkerBonus) {
+            parts.push(`HP 越低伤害越高（最多 +${card.berserkerBonus}）`);
+        }
+
+        if (card.healPerTurn) {
+            parts.push(`每回合开始回复 ${card.healPerTurn} HP`);
+        }
+
         if (parts.length === 0) return card.description || '';
         return parts.join('，');
     },
@@ -627,6 +865,12 @@ const Cards = {
         if (card.thorns) card.thorns += 1;
         if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
         if (card.energy) card.energy += 1;
+        if (card.aoeDamage) card.aoeDamage = Math.ceil(card.aoeDamage * 1.3);
+        if (card.armorOnHit) card.armorOnHit += 1;
+        if (card.poisonAll) card.poisonAll = Math.ceil(card.poisonAll * 1.3);
+        if (card.weakAll) card.weakAll += 1;
+        if (card.healPerTurn) card.healPerTurn = Math.ceil(card.healPerTurn * 1.3);
+        if (card.berserkerBonus) card.berserkerBonus += 2;
         card.description = this.buildDescription(card);
     }
 };

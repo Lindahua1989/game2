@@ -2027,3 +2027,122 @@ body {
     border-color: rgba(255, 204, 0, 0.6);
     box-shadow: 0 0 40px rgba(255, 204, 0, 0.4);
 }
+
+/* ===== SETTINGS ===== */
+#settings-content h2 {
+    font-size: 32px;
+    color: #00d4ff;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+#settings-content h3 {
+    font-size: 18px;
+    color: #b44aff;
+    margin-bottom: 16px;
+    margin-top: 24px;
+}
+
+.settings-section {
+    background: rgba(20, 20, 50, 0.6);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-item label {
+    color: #e0e0ff;
+    font-size: 14px;
+    flex: 1;
+}
+
+.setting-item input[type="range"] {
+    flex: 2;
+    height: 6px;
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    background: #00d4ff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+}
+
+.setting-item input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #00d4ff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+}
+
+.setting-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #00d4ff;
+}
+
+.setting-item select {
+    background: rgba(20, 20, 50, 0.9);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 6px;
+    color: #e0e0ff;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.setting-item select:focus {
+    border-color: rgba(0, 212, 255, 0.8);
+}
+
+.setting-item input[type="number"] {
+    background: rgba(20, 20, 50, 0.9);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 6px;
+    color: #e0e0ff;
+    padding: 8px 12px;
+    font-size: 14px;
+    width: 80px;
+    outline: none;
+}
+
+.setting-item input[type="number"]:focus {
+    border-color: rgba(0, 212, 255, 0.8);
+}
+
+.setting-item span {
+    color: #b44aff;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
+}
+
+.settings-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+}

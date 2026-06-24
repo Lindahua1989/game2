@@ -67,6 +67,15 @@ const Combat = {
             }
         }
 
+        if (this.state.playerPowers.healPerTurn > 0) {
+            const healAmount = Math.min(this.state.playerPowers.healPerTurn, Game.state.player.maxHp - Game.state.player.hp);
+            if (healAmount > 0) {
+                Game.state.player.hp += healAmount;
+                UI.showCombatLog(`修复无人机回复 ${healAmount} HP`, 'heal');
+                UI.showPlayerHeal(healAmount);
+            }
+        }
+
         if (this.state.playerPoison > 0) {
             const poisonDmg = this.state.playerPoison;
             Game.state.player.hp -= poisonDmg;
@@ -129,6 +138,10 @@ const Combat = {
             this.state.firstCardDiscount = false;
         }
         
+        if (this.state.costReduction && cost > 0) {
+            cost = Math.max(0, cost - this.state.costReduction);
+        }
+        
         if (cost > this.state.energy) return;
 
         if (card.target === 'single' && targetIndex === undefined) {
@@ -164,9 +177,10 @@ const Combat = {
     async executeCard(card, targetIndex) {
         let bonusDmg = this.state.playerPowers.strength + this.state.playerPowers.attackBonus + this.state.firstAttackBonus;
         
-        if (this.state.berserkerBonus && card.type === 'attack') {
-            bonusDmg += this.state.berserkerBonus;
-            this.state.berserkerBonus = 0;
+        if (this.state.playerPowers.berserkerBonus && card.type === 'attack') {
+            const hpPercent = Game.state.player.hp / Game.state.player.maxHp;
+            const berserkerDmg = Math.floor(this.state.playerPowers.berserkerBonus * (1 - hpPercent));
+            bonusDmg += berserkerDmg;
         }
 
         if (card.damage) {
@@ -314,6 +328,65 @@ const Combat = {
             this.state.hand[idx].tempCostZero = true;
         }
 
+        if (card.shieldBash) {
+            const dmg = this.state.playerBlock + bonusDmg;
+            const target = this.state.enemies[targetIndex];
+            if (target) this.dealDamageToEnemy(target, dmg, false, 'medium');
+        }
+
+        if (card.extraTurn) {
+            this.state.extraTurns = (this.state.extraTurns || 0) + 1;
+        }
+
+        if (card.poisonAll) {
+            this.state.enemies.forEach(e => { e.status.poison += card.poisonAll; });
+        }
+
+        if (card.copyCard && this.state.hand.length > 0) {
+            const lowestCostCard = this.state.hand.reduce((min, c) => c.cost < min.cost ? c : min);
+            const copiedCard = Cards.createCard(lowestCostCard.id, lowestCostCard.upgraded);
+            this.state.hand.push(copiedCard);
+        }
+
+        if (card.aoeDamage) {
+            this.state.enemies.forEach(enemy => {
+                this.dealDamageToEnemy(enemy, card.aoeDamage, false, 'light');
+            });
+        }
+
+        if (card.armorOnHit) {
+            this.state.playerPowers.armorOnHit = (this.state.playerPowers.armorOnHit || 0) + card.armorOnHit;
+        }
+
+        if (card.costReduction) {
+            this.state.costReduction = (this.state.costReduction || 0) + card.costReduction;
+        }
+
+        if (card.critChance && card.damage) {
+            if (Math.random() < card.critChance) {
+                const target = this.state.enemies[targetIndex];
+                if (target) {
+                    const critDmg = card.damage + bonusDmg;
+                    this.dealDamageToEnemy(target, critDmg, card.ignoreBlock, 'heavy');
+                    UI.showCombatLog(`暴击！`, 'damage');
+                }
+            }
+        }
+
+        if (card.handDamage) {
+            const dmg = this.state.hand.length + bonusDmg;
+            const target = this.state.enemies[targetIndex];
+            if (target) this.dealDamageToEnemy(target, dmg, false, 'medium');
+        }
+
+        if (card.berserkerBonus) {
+            this.state.playerPowers.berserkerBonus = (this.state.playerPowers.berserkerBonus || 0) + card.berserkerBonus;
+        }
+
+        if (card.healPerTurn) {
+            this.state.playerPowers.healPerTurn = (this.state.playerPowers.healPerTurn || 0) + card.healPerTurn;
+        }
+
         this.state.firstAttackBonus = 0;
     },
 
@@ -353,11 +426,20 @@ const Combat = {
         this.state.discardPile.push(...this.state.hand);
         this.state.hand = [];
 
+        if (this.state.extraTurns && this.state.extraTurns > 0) {
+            this.state.extraTurns--;
+            this.state.turn++;
+            UI.showCombatLog(`额外回合！`, 'system');
+            this.startPlayerTurn();
+            return;
+        }
+
         await this.enemyTurn();
 
         if (this.checkCombatEnd()) return;
 
         this.state.turn++;
+        this.state.costReduction = 0;
         this.startPlayerTurn();
     },
 
@@ -513,6 +595,11 @@ const Combat = {
             UI.showDamageNumber(playerArea, remaining, 'damage');
             UI.showCombatLog(`你受到了 ${remaining} 点伤害`, 'damage');
             Sound.play('enemy_attack');
+            
+            if (this.state.playerPowers.armorOnHit > 0) {
+                this.state.playerBlock += this.state.playerPowers.armorOnHit;
+                UI.showCombatLog(`自适应装甲获得 ${this.state.playerPowers.armorOnHit} 护甲`, 'block');
+            }
             
             const reflectedDamage = Relics.onPlayerDamaged(Game.state.player.relics, remaining, this.state);
             if (reflectedDamage > 0 && this.state.currentAttacker) {
