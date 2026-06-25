@@ -1,4 +1,6 @@
 const Particles = {
+    ambientInterval: null,
+
     spawn(element, type, count = 8) {
         if (!element) return;
         
@@ -57,5 +59,51 @@ const Particles = {
             document.body.appendChild(particle);
             setTimeout(() => particle.remove(), duration * 1000);
         }
+    },
+
+    startAmbient(containerId = 'screen-combat') {
+        this.stopAmbient();
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        this.ambientInterval = setInterval(() => {
+            if (!document.getElementById(containerId) || !document.getElementById(containerId).classList.contains('active')) {
+                this.stopAmbient();
+                return;
+            }
+
+            const particle = document.createElement('div');
+            particle.className = 'ambient-particle';
+            
+            const size = 2 + Math.random() * 3;
+            const x = Math.random() * 100;
+            const duration = 4 + Math.random() * 6;
+            const drift = (Math.random() - 0.5) * 100;
+            const opacity = 0.2 + Math.random() * 0.4;
+            const colors = ['rgba(0, 212, 255, 0.6)', 'rgba(180, 74, 255, 0.5)', 'rgba(255, 255, 255, 0.4)'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            particle.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}%;
+                bottom: -10px;
+                background: ${color};
+                --drift: ${drift}px;
+                --opacity: ${opacity};
+                animation-duration: ${duration}s;
+            `;
+
+            container.appendChild(particle);
+            setTimeout(() => particle.remove(), duration * 1000);
+        }, 500);
+    },
+
+    stopAmbient() {
+        if (this.ambientInterval) {
+            clearInterval(this.ambientInterval);
+            this.ambientInterval = null;
+        }
+        document.querySelectorAll('.ambient-particle').forEach(p => p.remove());
     }
 };

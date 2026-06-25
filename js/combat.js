@@ -3,6 +3,7 @@ const Combat = {
 
     startCombat(enemies) {
         document.getElementById('combat-log').innerHTML = '';
+        Particles.startAmbient('screen-combat');
         this.state = {
             enemies: enemies,
             drawPile: Utils.shuffle([...Game.state.player.deck]),
@@ -700,6 +701,7 @@ const Combat = {
     },
 
     onVictory() {
+        Particles.stopAmbient();
         Relics.onCombatEnd(Game.state.player.relics, this.state);
 
         let goldReward = Enemies.getGoldReward(this.state.enemyTier);
@@ -727,6 +729,7 @@ const Combat = {
     },
 
     onPlayerDeath() {
+        Particles.stopAmbient();
         this.state.combatOver = true;
         GameStats.recordRunEnd(Game.state.currentFloor, Game.state.stats.battlesWon || 0, false);
         DailyChallenge.endDailyChallenge(false);

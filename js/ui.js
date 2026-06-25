@@ -36,9 +36,14 @@ const UI = {
             if (enemy.status.weak > 0) statusHtml += `<span class="status-badge status-weak">💫${enemy.status.weak}<span class="status-tooltip">虚弱：攻击伤害降低四分之一<br>每回合减少 1 层</span></span>`;
             if (enemy.status.strength > 0) statusHtml += `<span class="status-badge status-strength">💪${enemy.status.strength}<span class="status-tooltip">力量：攻击伤害 +${enemy.status.strength}</span></span>`;
 
+            let spriteAura = '';
+            if (enemy.status.poison > 0) spriteAura += ' status-aura-poison';
+            if (enemy.status.weak > 0) spriteAura += ' status-aura-weak';
+            if (enemy.status.strength > 0) spriteAura += ' status-aura-strength';
+
             div.innerHTML = `
                 <div class="enemy-intent">${intentText}</div>
-                <div class="enemy-sprite">
+                <div class="enemy-sprite${spriteAura}">
                     ${enemy.icon}
                     ${enemy.block > 0 ? `<span class="enemy-block">${enemy.block}</span>` : ''}
                 </div>

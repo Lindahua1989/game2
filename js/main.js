@@ -315,7 +315,7 @@ const Game = {
         }
     },
 
-    showScreen(screenId) {
+    showScreen(screenId, transition = 'fade') {
         const currentScreen = document.querySelector('.screen.active');
         const newScreen = document.getElementById(screenId);
         
@@ -334,6 +334,16 @@ const Game = {
             setTimeout(() => {
                 currentScreen.classList.remove('active', 'fade-out');
                 newScreen.classList.add('active');
+                if (transition === 'slide-left') {
+                    newScreen.classList.add('slide-in-left');
+                    setTimeout(() => newScreen.classList.remove('slide-in-left'), 400);
+                } else if (transition === 'slide-right') {
+                    newScreen.classList.add('slide-in-right');
+                    setTimeout(() => newScreen.classList.remove('slide-in-right'), 400);
+                } else if (transition === 'slide-up') {
+                    newScreen.classList.add('slide-in-up');
+                    setTimeout(() => newScreen.classList.remove('slide-in-up'), 400);
+                }
             }, 200);
         } else {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-out'));
@@ -364,19 +374,19 @@ const Game = {
         switch (node.type) {
             case 'combat':
                 const enemies = Enemies.getEncounter(this.state.currentFloor, 'normal');
-                this.showScreen('screen-combat');
+                this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(enemies);
                 break;
 
             case 'elite':
                 const eliteEnemies = Enemies.getEncounter(this.state.currentFloor, 'elite');
-                this.showScreen('screen-combat');
+                this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(eliteEnemies);
                 break;
 
             case 'boss':
                 const boss = Enemies.getEncounter(this.state.currentFloor, 'boss');
-                this.showScreen('screen-combat');
+                this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(boss);
                 break;
 
@@ -456,7 +466,7 @@ const Game = {
             return;
         }
 
-        this.showScreen('screen-map');
+        this.showScreen('screen-map', 'slide-right');
         Map.render();
         UI.updateMapStats();
     },
