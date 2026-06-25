@@ -5,8 +5,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🔫',
-        description: '造成 7 点伤害',
-        damage: 7,
+        description: '造成 5~9 点伤害',
+        minDamage: 5,
+        maxDamage: 9,
         target: 'single'
     },
     energy_shield: {
@@ -25,8 +26,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '💥',
-        description: '造成 16 点伤害',
-        damage: 16,
+        description: '造成 13~19 点伤害',
+        minDamage: 13,
+        maxDamage: 19,
         target: 'single'
     },
     emp_pulse: {
@@ -35,8 +37,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '⚡',
-        description: '对所有敌人造成 8 点伤害',
-        damage: 8,
+        description: '对所有敌人造成 6~10 点伤害',
+        minDamage: 6,
+        maxDamage: 10,
         target: 'all'
     },
     nano_armor: {
@@ -65,8 +68,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '💚',
-        description: '造成 10 伤害，回复 5 HP',
-        damage: 10,
+        description: '造成 8~12 伤害，回复 5 HP',
+        minDamage: 8,
+        maxDamage: 12,
         heal: 5,
         target: 'single'
     },
@@ -76,8 +80,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🔥',
-        description: '造成 4 伤害 x2',
-        damage: 4,
+        description: '造成 3~5 伤害 x2',
+        minDamage: 3,
+        maxDamage: 5,
         hits: 2,
         target: 'single'
     },
@@ -97,8 +102,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '☢️',
-        description: '造成 4 伤害，施加 3 腐蚀',
-        damage: 4,
+        description: '造成 3~5 伤害，施加 3 腐蚀',
+        minDamage: 3,
+        maxDamage: 5,
         poison: 3,
         target: 'single'
     },
@@ -108,8 +114,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '🌩️',
-        description: '造成 20 点伤害',
-        damage: 20,
+        description: '造成 17~23 点伤害',
+        minDamage: 17,
+        maxDamage: 23,
         target: 'single'
     },
     quantum_dodge: {
@@ -140,8 +147,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '✨',
-        description: '造成 5 伤害 x3',
-        damage: 5,
+        description: '造成 4~6 伤害 x3',
+        minDamage: 4,
+        maxDamage: 6,
         hits: 3,
         target: 'single'
     },
@@ -181,8 +189,9 @@ const CardData = {
         type: 'attack',
         cost: 3,
         icon: '🎯',
-        description: '造成 35 点伤害',
-        damage: 35,
+        description: '造成 30~40 点伤害',
+        minDamage: 30,
+        maxDamage: 40,
         target: 'single'
     },
     nano_swarm: {
@@ -201,8 +210,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🌀',
-        description: '造成 6 伤害，获得 1 能量',
-        damage: 6,
+        description: '造成 4~8 伤害，获得 1 能量',
+        minDamage: 4,
+        maxDamage: 8,
         energy: 1,
         target: 'single'
     },
@@ -234,8 +244,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '🎯',
-        description: '造成 20 伤害，无视护甲',
-        damage: 20,
+        description: '造成 17~23 伤害，无视护甲',
+        minDamage: 17,
+        maxDamage: 23,
         ignoreBlock: true,
         target: 'single'
     },
@@ -256,8 +267,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '⚔️',
-        description: '造成 9 点伤害',
-        damage: 9,
+        description: '造成 7~11 点伤害',
+        minDamage: 7,
+        maxDamage: 11,
         target: 'single'
     },
     reflect_shield: {
@@ -287,8 +299,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '⛓️',
-        description: '对随机敌人造成 7 伤害 x3',
-        damage: 7,
+        description: '对随机敌人造成 5~9 伤害 x3',
+        minDamage: 5,
+        maxDamage: 9,
         hits: 3,
         target: 'random'
     },
@@ -340,8 +353,9 @@ const CardData = {
         type: 'attack',
         cost: 0,
         icon: '💣',
-        description: '造成 40 伤害，自身受 20 伤害',
-        damage: 40,
+        description: '造成 35~45 伤害，自身受 20 伤害',
+        minDamage: 35,
+        maxDamage: 45,
         selfDamage: 20,
         target: 'single'
     },
@@ -371,8 +385,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '💉',
-        description: '造成 3 伤害，施加 2 虚弱 + 2 腐蚀',
-        damage: 3,
+        description: '造成 2~4 伤害，施加 2 虚弱 + 2 腐蚀',
+        minDamage: 2,
+        maxDamage: 4,
         weak: 2,
         poison: 2,
         target: 'single'
@@ -403,8 +418,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '〰️',
-        description: '造成 12 伤害，施加 3 虚弱',
-        damage: 12,
+        description: '造成 10~14 伤害，施加 3 虚弱',
+        minDamage: 10,
+        maxDamage: 14,
         weak: 3,
         target: 'single'
     },
@@ -444,8 +460,9 @@ const CardData = {
         type: 'attack',
         cost: 4,
         icon: '☠️',
-        description: '造成 55 点伤害',
-        damage: 55,
+        description: '造成 48~62 点伤害',
+        minDamage: 48,
+        maxDamage: 62,
         target: 'single'
     },
     // === 新增卡牌 ===
@@ -485,8 +502,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '💧',
-        description: '造成 5 伤害，回复 3 HP',
-        damage: 5,
+        description: '造成 3~7 伤害，回复 3 HP',
+        minDamage: 3,
+        maxDamage: 7,
         heal: 3,
         target: 'single'
     },
@@ -506,9 +524,11 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '💥',
-        description: '造成 12 伤害，对所有敌人造成 6 伤害',
-        damage: 12,
-        aoeDamage: 6,
+        description: '造成 10~14 伤害，对所有敌人造成 4~8 伤害',
+        minDamage: 10,
+        maxDamage: 14,
+        minAoeDamage: 4,
+        maxAoeDamage: 8,
         target: 'single'
     },
     adaptive_armor: {
@@ -558,8 +578,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '⚔️',
-        description: '造成 8 伤害，一半概率造成双倍伤害',
-        damage: 8,
+        description: '造成 6~10 伤害，一半概率造成双倍伤害',
+        minDamage: 6,
+        maxDamage: 10,
         critChance: 0.5,
         target: 'single'
     },
@@ -622,8 +643,9 @@ const CardData = {
         type: 'attack',
         cost: 3,
         icon: '🌊',
-        description: '对所有敌人造成 15 伤害',
-        damage: 15,
+        description: '对所有敌人造成 12~18 伤害',
+        minDamage: 12,
+        maxDamage: 18,
         target: 'all'
     },
     repair_drone: {
@@ -643,8 +665,9 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🌑',
-        description: '造成 12 伤害，施加 2 虚弱',
-        damage: 12,
+        description: '造成 10~14 伤害，施加 2 虚弱',
+        minDamage: 10,
+        maxDamage: 14,
         weak: 2,
         target: 'single',
         rarity: 'elite'
@@ -655,8 +678,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '💫',
-        description: '对所有敌人造成 12 伤害',
-        damage: 12,
+        description: '对所有敌人造成 10~14 伤害',
+        minDamage: 10,
+        maxDamage: 14,
         target: 'all',
         rarity: 'elite'
     },
@@ -690,8 +714,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '👊',
-        description: '造成 25 伤害，无视护甲',
-        damage: 25,
+        description: '造成 21~29 伤害，无视护甲',
+        minDamage: 21,
+        maxDamage: 29,
         ignoreBlock: true,
         target: 'single',
         rarity: 'elite'
@@ -703,9 +728,11 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '☄️',
-        description: '造成 30 伤害，对所有敌人造成 10 伤害',
-        damage: 30,
-        aoeDamage: 10,
+        description: '造成 26~34 伤害，对所有敌人造成 8~12 伤害',
+        minDamage: 26,
+        maxDamage: 34,
+        minAoeDamage: 8,
+        maxAoeDamage: 12,
         target: 'single',
         rarity: 'boss'
     },
@@ -715,8 +742,9 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '🔥',
-        description: '对所有敌人造成 18 伤害，施加 3 腐蚀',
-        damage: 18,
+        description: '对所有敌人造成 15~21 伤害，施加 3 腐蚀',
+        minDamage: 15,
+        maxDamage: 21,
         poisonAll: 3,
         target: 'all',
         rarity: 'boss'
@@ -752,8 +780,9 @@ const CardData = {
         type: 'attack',
         cost: 3,
         icon: '💀',
-        description: '造成 50 伤害，施加 5 虚弱 + 5 腐蚀',
-        damage: 50,
+        description: '造成 43~57 伤害，施加 5 虚弱 + 5 腐蚀',
+        minDamage: 43,
+        maxDamage: 57,
         weak: 5,
         poison: 5,
         target: 'single',
@@ -778,6 +807,8 @@ const Cards = {
         card.upgraded = upgraded;
         if (upgraded) {
             card.name = card.name + '+';
+            if (card.minDamage) card.minDamage = Math.ceil(card.minDamage * 1.3);
+            if (card.maxDamage) card.maxDamage = Math.ceil(card.maxDamage * 1.3);
             if (card.damage) card.damage = Math.ceil(card.damage * 1.3);
             if (card.block) card.block = Math.ceil(card.block * 1.3);
             if (card.heal) card.heal = Math.ceil(card.heal * 1.3);
@@ -795,6 +826,8 @@ const Cards = {
             if (card.thorns) card.thorns += 1;
             if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
             if (card.energy) card.energy += 1;
+            if (card.minAoeDamage) card.minAoeDamage = Math.ceil(card.minAoeDamage * 1.3);
+            if (card.maxAoeDamage) card.maxAoeDamage = Math.ceil(card.maxAoeDamage * 1.3);
             if (card.aoeDamage) card.aoeDamage = Math.ceil(card.aoeDamage * 1.3);
             if (card.armorOnHit) card.armorOnHit += 1;
             if (card.poisonAll) card.poisonAll = Math.ceil(card.poisonAll * 1.3);
@@ -811,6 +844,13 @@ const Cards = {
 
         if (card.damage && card.damagePerEnergy) {
             parts.push(`造成 X*${card.damagePerEnergy} 伤害，消耗 X 能量`);
+        } else if (card.minDamage && card.maxDamage) {
+            const hits = card.hits || 1;
+            if (hits > 1) {
+                parts.push(`造成 ${card.minDamage}~${card.maxDamage} 伤害 x${hits}`);
+            } else {
+                parts.push(`造成 ${card.minDamage}~${card.maxDamage} 点伤害`);
+            }
         } else if (card.damage) {
             const hits = card.hits || 1;
             if (hits > 1) {
@@ -920,7 +960,9 @@ const Cards = {
             parts.push(`复制手牌中费用最低的卡牌`);
         }
 
-        if (card.aoeDamage) {
+        if (card.minAoeDamage && card.maxAoeDamage) {
+            parts.push(`对所有敌人造成 ${card.minAoeDamage}~${card.maxAoeDamage} 伤害`);
+        } else if (card.aoeDamage) {
             parts.push(`对所有敌人造成 ${card.aoeDamage} 伤害`);
         }
 
@@ -992,6 +1034,8 @@ const Cards = {
         if (card.upgraded) return;
         card.upgraded = true;
         card.name = card.name + '+';
+        if (card.minDamage) card.minDamage = Math.ceil(card.minDamage * 1.3);
+        if (card.maxDamage) card.maxDamage = Math.ceil(card.maxDamage * 1.3);
         if (card.damage) card.damage = Math.ceil(card.damage * 1.3);
         if (card.block) card.block = Math.ceil(card.block * 1.3);
         if (card.heal) card.heal = Math.ceil(card.heal * 1.3);
@@ -1009,6 +1053,8 @@ const Cards = {
         if (card.thorns) card.thorns += 1;
         if (card.selfDamage) card.selfDamage = Math.ceil(card.selfDamage * 0.8);
         if (card.energy) card.energy += 1;
+        if (card.minAoeDamage) card.minAoeDamage = Math.ceil(card.minAoeDamage * 1.3);
+        if (card.maxAoeDamage) card.maxAoeDamage = Math.ceil(card.maxAoeDamage * 1.3);
         if (card.aoeDamage) card.aoeDamage = Math.ceil(card.aoeDamage * 1.3);
         if (card.armorOnHit) card.armorOnHit += 1;
         if (card.poisonAll) card.poisonAll = Math.ceil(card.poisonAll * 1.3);

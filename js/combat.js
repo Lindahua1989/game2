@@ -184,7 +184,54 @@ const Combat = {
             bonusDmg += berserkerDmg;
         }
 
-        if (card.damage) {
+        if (card.minDamage && card.maxDamage) {
+            const hits = card.hits || 1;
+            const avgDmg = Math.floor((card.minDamage + card.maxDamage) / 2) + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
+            const totalDmg = avgDmg * hits;
+
+            let hitLevel;
+            if (card.poison) {
+                hitLevel = 'poison';
+            } else if (card.target === 'all' || card.target === 'random') {
+                hitLevel = 'aoe';
+            } else if (totalDmg >= 20) {
+                hitLevel = 'heavy';
+            } else if (totalDmg >= 10) {
+                hitLevel = 'medium';
+            } else {
+                hitLevel = 'light';
+            }
+
+            const rollDamage = () => {
+                const base = Utils.randomInt(card.minDamage, card.maxDamage);
+                return base + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
+            };
+
+            if (card.target === 'all') {
+                for (const enemy of this.state.enemies) {
+                    for (let h = 0; h < hits; h++) {
+                        this.dealDamageToEnemy(enemy, rollDamage(), card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
+                    }
+                }
+            } else if (card.target === 'random') {
+                for (let h = 0; h < hits; h++) {
+                    const alive = this.state.enemies.filter(e => e.hp > 0);
+                    if (alive.length > 0) {
+                        this.dealDamageToEnemy(Utils.randomChoice(alive), rollDamage(), card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
+                    }
+                }
+            } else {
+                const target = this.state.enemies[targetIndex];
+                if (target) {
+                    for (let h = 0; h < hits; h++) {
+                        this.dealDamageToEnemy(target, rollDamage(), card.ignoreBlock, hitLevel);
+                        if (hits > 1) await Utils.delay(100);
+                    }
+                }
+            }
+        } else if (card.damage) {
             let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
             if (dmg < 0) dmg = 0;
             const hits = card.hits || 1;
@@ -350,7 +397,12 @@ const Combat = {
             this.state.hand.push(copiedCard);
         }
 
-        if (card.aoeDamage) {
+        if (card.minAoeDamage && card.maxAoeDamage) {
+            this.state.enemies.forEach(enemy => {
+                const aoeDmg = Utils.randomInt(card.minAoeDamage, card.maxAoeDamage);
+                this.dealDamageToEnemy(enemy, aoeDmg, false, 'light');
+            });
+        } else if (card.aoeDamage) {
             this.state.enemies.forEach(enemy => {
                 this.dealDamageToEnemy(enemy, card.aoeDamage, false, 'light');
             });
