@@ -94,10 +94,72 @@ const SaveManager = {
             if (d.gameModeId && GameModes.modes[d.gameModeId]) {
                 GameModes.setMode(d.gameModeId);
             }
+            
+            const hasAvailableNodes = Map.data && Map.data.some(row => 
+                row.some(node => node.available && !node.visited)
+            );
+            
+            if (!hasAvailableNodes && d.currentNode) {
+                const isLastRow = d.currentNode.row === Map.data.length - 1;
+                if (isLastRow) {
+                    GameModes.onFloorComplete(Game.state.currentFloor);
+                    
+                    if (GameModes.isVictory()) {
+                        return true;
+                    }
+                    
+                    Game.state.currentFloor++;
+                    Game.state.stats.floorsCleared++;
+                    GameStats.recordFloorReached(Game.state.currentFloor);
+                    Map.generate(Game.state.currentFloor);
+                    Game.state.currentNode = null;
+                }
+            }
+            
             return true;
         } catch (e) {
             console.warn('读档失败:', e);
             return false;
+        }
+    },
+
+    recoverFromStuckState() {
+        if (!Map.data) return;
+
+        const hasAvailable = Map.data.some(row => row.some(n => n.available));
+        if (hasAvailable) return;
+
+        const currentNode = Game.state.currentNode;
+        if (!currentNode) return;
+
+        const lastRow = Map.data.length - 1;
+        const isStuckAtLastRow = currentNode.row === lastRow && currentNode.visited;
+
+        if (isStuckAtLastRow) {
+            GameModes.onFloorComplete(Game.state.currentFloor);
+
+            if (GameModes.isVictory()) {
+                return;
+            }
+
+            Game.state.currentFloor++;
+            Game.state.stats.floorsCleared++;
+            GameStats.recordFloorReached(Game.state.currentFloor);
+            Map.generate(Game.state.currentFloor);
+            Game.state.currentNode = null;
+        } else {
+            const visitedNodes = [];
+            Map.data.forEach(row => row.forEach(n => { if (n.visited) visitedNodes.push(n); }));
+            
+            if (visitedNodes.length > 0) {
+                const lastVisited = visitedNodes[visitedNodes.length - 1];
+                lastVisited.connections.forEach(connId => {
+                    const [cr, cc] = connId.split('-').map(Number);
+                    if (Map.data[cr] && Map.data[cr][cc]) {
+                        Map.data[cr][cc].available = true;
+                    }
+                });
+            }
         }
     },
 
