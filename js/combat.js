@@ -37,11 +37,17 @@ const Combat = {
         Relics.onCombatStart(Game.state.player.relics, this.state);
         
         const boss = enemies.find(e => e.tier === 'boss');
-        if (boss && boss.dialogue && boss.dialogue.entry) {
-            UI.showBossDialogue(boss.name, boss.dialogue.entry);
+        if (boss) {
+            UI.showBossEntrance(boss.name, boss.icon);
+            setTimeout(() => {
+                if (boss.dialogue && boss.dialogue.entry) {
+                    UI.showBossDialogue(boss.name, boss.dialogue.entry);
+                }
+                this.startPlayerTurn();
+            }, 2000);
+        } else {
+            this.startPlayerTurn();
         }
-        
-        this.startPlayerTurn();
     },
 
     startPlayerTurn() {
@@ -151,11 +157,11 @@ const Combat = {
         }
 
         this.state.targetingCard = null;
-        UI.animateCardPlay(cardIndex);
+        UI.animateCardPlay(cardIndex, card.type, targetIndex);
         UI.showCombatLog(`使用 ${card.name}`, 'system');
         Sound.play('card_play');
         GameStats.recordCardPlayed();
-        await Utils.delay(250);
+        await Utils.delay(300);
         this.state.energy -= cost;
         this.state.hand.splice(cardIndex, 1);
 
@@ -416,13 +422,14 @@ const Combat = {
             this.state.costReduction = (this.state.costReduction || 0) + card.costReduction;
         }
 
-        if (card.critChance && card.damage) {
+        if (card.critChance && card.minDamage && card.maxDamage) {
             if (Math.random() < card.critChance) {
                 const target = this.state.enemies[targetIndex];
                 if (target) {
-                    const critDmg = card.damage + bonusDmg;
-                    this.dealDamageToEnemy(target, critDmg, card.ignoreBlock, 'heavy');
-                    UI.showCombatLog(`暴击！`, 'damage');
+                    const baseDmg = Utils.randomInt(card.minDamage, card.maxDamage);
+                    const critDmg = (baseDmg + bonusDmg) * 2;
+                    this.dealDamageToEnemy(target, critDmg, card.ignoreBlock, 'heavy', true);
+                    UI.showCombatLog(`暴击！造成 ${critDmg} 伤害`, 'damage');
                 }
             }
         }
@@ -444,7 +451,7 @@ const Combat = {
         this.state.firstAttackBonus = 0;
     },
 
-    dealDamageToEnemy(enemy, damage, ignoreBlock = false, hitLevel) {
+    dealDamageToEnemy(enemy, damage, ignoreBlock = false, hitLevel, isCritical = false) {
         let remaining = damage;
 
         if (!ignoreBlock && enemy.block > 0) {
@@ -460,8 +467,10 @@ const Combat = {
         enemy.hp -= remaining;
 
         if (remaining > 0) {
-            UI.showEnemyDamage(enemy.uid, remaining, hitLevel || 'light');
-            UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`, 'damage');
+            UI.showEnemyDamage(enemy.uid, remaining, hitLevel || 'light', isCritical);
+            if (!isCritical) {
+                UI.showCombatLog(`对 ${enemy.name} 造成 ${remaining} 伤害`, 'damage');
+            }
             Sound.play('damage');
             GameStats.recordDamage(remaining);
             Relics.onDamageDealt(Game.state.player.relics, remaining, this.state);
@@ -469,7 +478,7 @@ const Combat = {
 
         if (enemy.hp <= 0) {
             enemy.hp = 0;
-            UI.showEnemyDeath(enemy.uid);
+            UI.showEnemyDeath(enemy.uid, enemy.tier);
             UI.showCombatLog(`${enemy.name} 被消灭了！`, 'system');
         }
     },
@@ -509,7 +518,7 @@ const Combat = {
                 UI.showCombatLog(`${enemy.name} 受到 ${poisonDmg} 腐蚀伤害`, 'damage');
                 if (enemy.hp <= 0) {
                     enemy.hp = 0;
-                    UI.showEnemyDeath(enemy.uid);
+                    UI.showEnemyDeath(enemy.uid, enemy.tier);
                     await Utils.delay(400);
                     continue;
                 }
