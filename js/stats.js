@@ -54,7 +54,7 @@ const GameStats = {
             gold_hoarder: { name: '守财奴', desc: '单局积累100金币', unlocked: false, icon: '💰' },
             damage_dealer: { name: '伤害制造者', desc: '累计造成1000点伤害', unlocked: false, icon: '⚔️' },
             veteran: { name: '老兵', desc: '完成10局游戏', unlocked: false, icon: '🎖️' },
-            perfect_run: { name: '完美通关', desc: '通关游戏且HP>50%', unlocked: false, icon: '⭐' }
+            perfect_run: { name: '完美通关', desc: '通关游戏且HP超过一半', unlocked: false, icon: '⭐' }
         };
     },
 

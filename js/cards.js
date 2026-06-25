@@ -558,7 +558,7 @@ const CardData = {
         type: 'attack',
         cost: 2,
         icon: '⚔️',
-        description: '造成 8 伤害，50% 概率造成双倍伤害',
+        description: '造成 8 伤害，一半概率造成双倍伤害',
         damage: 8,
         critChance: 0.5,
         target: 'single'
@@ -933,7 +933,7 @@ const Cards = {
         }
 
         if (card.critChance) {
-            parts.push(`${Math.round(card.critChance * 100)}% 概率造成双倍伤害`);
+            parts.push(`一半概率造成双倍伤害`);
         }
 
         if (card.handDamage) {

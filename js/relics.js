@@ -10,7 +10,7 @@ const RelicData = {
         id: 'quantum_chip',
         name: '量子芯片',
         icon: '💎',
-        description: '每回合 20% 概率多抽 1 张牌',
+        description: '每回合两成概率多抽 1 张牌',
         rarity: 'common'
     },
     auto_turret: {
@@ -129,7 +129,7 @@ const RelicData = {
         id: 'berserker_chip',
         name: '狂战士芯片',
         icon: '😤',
-        description: 'HP 低于 50% 时，攻击伤害 +3',
+        description: 'HP 低于一半时，攻击伤害 +3',
         rarity: 'uncommon'
     },
     vampiric_module: {
@@ -143,7 +143,7 @@ const RelicData = {
         id: 'lucky_coin',
         name: '幸运硬币',
         icon: '🍀',
-        description: '每场战斗有 30% 概率获得额外 15 金币',
+        description: '每场战斗有三成概率获得额外 15 金币',
         rarity: 'common'
     },
     energy_amplifier: {

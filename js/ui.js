@@ -33,7 +33,7 @@ const UI = {
 
             let statusHtml = '';
             if (enemy.status.poison > 0) statusHtml += `<span class="status-badge status-poison">☢️${enemy.status.poison}<span class="status-tooltip">腐蚀：每回合受到 ${enemy.status.poison} 点伤害<br>每回合减少 1 层</span></span>`;
-            if (enemy.status.weak > 0) statusHtml += `<span class="status-badge status-weak">💫${enemy.status.weak}<span class="status-tooltip">虚弱：攻击伤害降低 25%<br>每回合减少 1 层</span></span>`;
+            if (enemy.status.weak > 0) statusHtml += `<span class="status-badge status-weak">💫${enemy.status.weak}<span class="status-tooltip">虚弱：攻击伤害降低四分之一<br>每回合减少 1 层</span></span>`;
             if (enemy.status.strength > 0) statusHtml += `<span class="status-badge status-strength">💪${enemy.status.strength}<span class="status-tooltip">力量：攻击伤害 +${enemy.status.strength}</span></span>`;
 
             div.innerHTML = `
