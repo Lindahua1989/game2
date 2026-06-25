@@ -216,6 +216,29 @@ const RelicData = {
         firstTurnDraw: 8
     },
     // === Boss专属遗物 ===
+    // Boss 1: 守卫核心
+    boss_guardian_shield: {
+        id: 'boss_guardian_shield',
+        name: '守卫之盾',
+        icon: '🛡️',
+        description: '每回合开始获得 12 护甲，受到攻击时反弹 4 伤害',
+        rarity: 'boss',
+        blockPerTurn: 12,
+        thorns: 4,
+        bossId: 'boss_guardian'
+    },
+    // Boss 2: 虫族女王
+    boss_queen_hive: {
+        id: 'boss_queen_hive',
+        name: '虫族蜂巢',
+        icon: '🐝',
+        description: '每回合对随机敌人造成 8 伤害，战斗开始时对所有敌人施加 3 腐蚀',
+        rarity: 'boss',
+        damagePerTurn: 8,
+        poisonAll: 3,
+        bossId: 'boss_queen'
+    },
+    // Boss 3: 主控AI·奥米伽
     boss_omega_matrix: {
         id: 'boss_omega_matrix',
         name: '奥米伽矩阵',
@@ -224,8 +247,10 @@ const RelicData = {
         rarity: 'boss',
         blockPerTurn: 10,
         energyPerTurn: 2,
-        damageAll: 5
+        damageAll: 5,
+        bossId: 'boss_omega'
     },
+    // Boss 4: 机械巨龙
     boss_dragon_heart: {
         id: 'boss_dragon_heart',
         name: '龙心核心',
@@ -233,15 +258,18 @@ const RelicData = {
         description: '最大 HP +30，每回合回复 5 HP',
         rarity: 'boss',
         maxHpBonus: 30,
-        healPerTurn: 5
+        healPerTurn: 5,
+        bossId: 'boss_dragon'
     },
+    // Boss 5: 核心枢纽
     boss_nexus_shard: {
         id: 'boss_nexus_shard',
         name: '枢纽碎片',
         icon: '💎',
         description: '所有卡牌伤害 +5，护甲 +5',
         rarity: 'boss',
-        cardBonus: 5
+        cardBonus: 5,
+        bossId: 'boss_nexus'
     },
     boss_void_crown: {
         id: 'boss_void_crown',
@@ -250,7 +278,8 @@ const RelicData = {
         description: '每回合抽 7 张牌，+3 能量',
         rarity: 'boss',
         drawPerTurn: 7,
-        energyPerTurn: 3
+        energyPerTurn: 3,
+        bossId: 'boss_nexus'
     }
 };
 
@@ -279,9 +308,9 @@ const Relics = {
         return Utils.pickRandom(pool, Math.min(1, pool.length));
     },
 
-    getBossPool(exclude = []) {
+    getBossPool(exclude = [], bossId) {
         const pool = Object.values(RelicData).filter(r => 
-            r.rarity === 'boss' && !exclude.includes(r.id)
+            r.rarity === 'boss' && !exclude.includes(r.id) && (!bossId || r.bossId === bossId)
         );
         return Utils.pickRandom(pool, Math.min(1, pool.length));
     },

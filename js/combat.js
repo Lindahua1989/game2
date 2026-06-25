@@ -707,9 +707,10 @@ const Combat = {
             const ownedRelicIds = Game.state.player.relics.map(r => r.id);
             specialRewards.relics = Relics.getElitePool(ownedRelicIds);
         } else if (this.state.enemyTier === 'boss') {
-            specialRewards.cards = Cards.getBossRewards(2);
+            const bossId = this.state.enemies[0]?.id;
+            specialRewards.cards = Cards.getBossRewards(2, bossId);
             const ownedRelicIds = Game.state.player.relics.map(r => r.id);
-            specialRewards.relics = Relics.getBossPool(ownedRelicIds);
+            specialRewards.relics = Relics.getBossPool(ownedRelicIds, bossId);
         }
 
         UI.showRewardScreen(goldReward, rewards, specialRewards, this.state.enemyTier);

@@ -450,12 +450,82 @@ const Game = {
                 this.showVictory();
                 return;
             }
+            
+            this.state.pendingFloorAdvance = true;
+            this.showDeckEdit();
+            return;
+        }
+
+        this.showScreen('screen-map');
+        Map.render();
+        UI.updateMapStats();
+    },
+
+    showDeckEdit() {
+        this.deckEditState = {
+            upgradeCard: null,
+            removeCards: []
+        };
+        this.showScreen('screen-deck-edit');
+        UI.renderDeckEdit();
+    },
+
+    selectUpgradeCard(cardUid) {
+        if (this.deckEditState.upgradeCard === cardUid) {
+            this.deckEditState.upgradeCard = null;
+        } else {
+            this.deckEditState.upgradeCard = cardUid;
+        }
+        UI.renderDeckEdit();
+    },
+
+    selectRemoveCard(cardUid) {
+        const deck = this.state.player.deck;
+        const minDeckSize = 25;
+        const maxRemovable = deck.length > minDeckSize ? deck.length - minDeckSize : 1;
+        
+        const idx = this.deckEditState.removeCards.indexOf(cardUid);
+        if (idx >= 0) {
+            this.deckEditState.removeCards.splice(idx, 1);
+        } else if (this.deckEditState.removeCards.length < maxRemovable) {
+            this.deckEditState.removeCards.push(cardUid);
+        }
+        UI.renderDeckEdit();
+    },
+
+    finishDeckEdit() {
+        const deck = this.state.player.deck;
+        
+        if (this.deckEditState.upgradeCard) {
+            const card = deck.find(c => c.uid === this.deckEditState.upgradeCard);
+            if (card && !card.upgraded) {
+                Cards.upgradeCard(card);
+            }
+        }
+        
+        if (this.deckEditState.removeCards.length > 0) {
+            this.deckEditState.removeCards.forEach(uid => {
+                const idx = deck.findIndex(c => c.uid === uid);
+                if (idx >= 0) deck.splice(idx, 1);
+            });
+        }
+        
+        this.advanceFloor();
+    },
+
+    skipDeckEdit() {
+        this.advanceFloor();
+    },
+
+    advanceFloor() {
+        if (this.state.pendingFloorAdvance) {
+            this.state.pendingFloorAdvance = false;
             this.state.currentFloor++;
             this.state.stats.floorsCleared++;
             GameStats.recordFloorReached(this.state.currentFloor);
             Map.generate(this.state.currentFloor);
         }
-
+        
         this.showScreen('screen-map');
         Map.render();
         UI.updateMapStats();

@@ -151,6 +151,25 @@
             </div>
         </div>
 
+        <div id="screen-deck-edit" class="screen">
+            <div class="deck-edit-content">
+                <h2>🎴 卡组编辑</h2>
+                <p class="deck-edit-info">击败Boss后，你可以强化卡组</p>
+                <div class="deck-edit-section">
+                    <h3>⬆️ 升级一张卡牌</h3>
+                    <div id="deck-edit-upgrade-cards"></div>
+                </div>
+                <div class="deck-edit-section">
+                    <h3>🗑️ 移除卡牌 <span id="deck-edit-remove-info"></span></h3>
+                    <div id="deck-edit-remove-cards"></div>
+                </div>
+                <div class="deck-edit-actions">
+                    <button class="btn btn-primary" onclick="Game.finishDeckEdit()">完成编辑</button>
+                    <button class="btn btn-secondary" onclick="Game.skipDeckEdit()">跳过</button>
+                </div>
+            </div>
+        </div>
+
         <div id="screen-gameover" class="screen">
             <div class="gameover-content">
                 <h1 class="gameover-title">系统崩溃</h1>

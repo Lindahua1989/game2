@@ -705,5 +705,54 @@ const UI = {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
+    },
+
+    renderDeckEdit() {
+        const deck = Game.state.player.deck;
+        const editState = Game.deckEditState;
+        const minDeckSize = 25;
+        const maxRemovable = deck.length > minDeckSize ? deck.length - minDeckSize : 1;
+        
+        const upgradeContainer = document.getElementById('deck-edit-upgrade-cards');
+        const removeContainer = document.getElementById('deck-edit-remove-cards');
+        const removeInfo = document.getElementById('deck-edit-remove-info');
+        
+        upgradeContainer.innerHTML = '';
+        removeContainer.innerHTML = '';
+        
+        const upgradeableCards = deck.filter(c => !c.upgraded);
+        upgradeableCards.forEach(card => {
+            const cardDiv = this.createCardElement(card, 0);
+            cardDiv.classList.add('deck-edit-card');
+            if (editState.upgradeCard === card.uid) {
+                cardDiv.classList.add('selected');
+                const badge = document.createElement('div');
+                badge.className = 'card-badge';
+                badge.textContent = '升级';
+                cardDiv.appendChild(badge);
+            }
+            cardDiv.onclick = () => Game.selectUpgradeCard(card.uid);
+            upgradeContainer.appendChild(cardDiv);
+        });
+        
+        if (upgradeableCards.length === 0) {
+            upgradeContainer.innerHTML = '<p style="color: #888;">所有卡牌已升级</p>';
+        }
+        
+        removeInfo.textContent = `(可选 ${editState.removeCards.length}/${maxRemovable}，卡组最少保留 ${minDeckSize} 张)`;
+        
+        deck.forEach(card => {
+            const cardDiv = this.createCardElement(card, 0);
+            cardDiv.classList.add('deck-edit-card');
+            if (editState.removeCards.includes(card.uid)) {
+                cardDiv.classList.add('removed');
+                const badge = document.createElement('div');
+                badge.className = 'card-badge remove-badge';
+                badge.textContent = '移除';
+                cardDiv.appendChild(badge);
+            }
+            cardDiv.onclick = () => Game.selectRemoveCard(card.uid);
+            removeContainer.appendChild(cardDiv);
+        });
     }
 };

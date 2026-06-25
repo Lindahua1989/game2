@@ -722,44 +722,79 @@ const CardData = {
         rarity: 'elite'
     },
     // === Boss专属卡牌 ===
+    // Boss 1: 守卫核心
+    guardian_fortress: {
+        id: 'guardian_fortress',
+        name: '守卫堡垒',
+        type: 'skill',
+        cost: 2,
+        icon: '🏰',
+        description: '获得 30 护甲，下回合额外 15 护甲',
+        block: 30,
+        nextTurnBlock: 15,
+        target: 'self',
+        rarity: 'boss',
+        bossId: 'boss_guardian'
+    },
+    // Boss 2: 虫族女王
+    queen_toxin: {
+        id: 'queen_toxin',
+        name: '女王毒素',
+        type: 'attack',
+        cost: 2,
+        icon: '👑',
+        description: '对所有敌人造成 15~21 伤害，施加 5 腐蚀',
+        minDamage: 15,
+        maxDamage: 21,
+        poisonAll: 5,
+        target: 'all',
+        rarity: 'boss',
+        bossId: 'boss_queen'
+    },
+    // Boss 3: 主控AI·奥米伽
     omega_beam: {
         id: 'omega_beam',
         name: '奥米伽射线',
         type: 'attack',
         cost: 2,
-        icon: '☄️',
+        icon: '🧠',
         description: '造成 26~34 伤害，对所有敌人造成 8~12 伤害',
         minDamage: 26,
         maxDamage: 34,
         minAoeDamage: 8,
         maxAoeDamage: 12,
         target: 'single',
-        rarity: 'boss'
+        rarity: 'boss',
+        bossId: 'boss_omega'
     },
+    // Boss 4: 机械巨龙
     dragon_breath: {
         id: 'dragon_breath',
         name: '龙息吐息',
         type: 'attack',
         cost: 2,
-        icon: '🔥',
-        description: '对所有敌人造成 15~21 伤害，施加 3 腐蚀',
-        minDamage: 15,
-        maxDamage: 21,
-        poisonAll: 3,
+        icon: '🐉',
+        description: '对所有敌人造成 18~24 伤害，施加 4 腐蚀',
+        minDamage: 18,
+        maxDamage: 24,
+        poisonAll: 4,
         target: 'all',
-        rarity: 'boss'
+        rarity: 'boss',
+        bossId: 'boss_dragon'
     },
+    // Boss 5: 核心枢纽
     nexus_core: {
         id: 'nexus_core',
         name: '核心枢纽',
         type: 'power',
         cost: 2,
         icon: '💎',
-        description: '每回合开始获得 8 护甲，+2 能量',
-        blockPerTurn: 8,
+        description: '每回合开始获得 10 护甲，+2 能量',
+        blockPerTurn: 10,
         energyPerTurn: 2,
         target: 'self',
-        rarity: 'boss'
+        rarity: 'boss',
+        bossId: 'boss_nexus'
     },
     quantum_resurrection: {
         id: 'quantum_resurrection',
@@ -772,7 +807,8 @@ const CardData = {
         block: 15,
         draw: 2,
         target: 'self',
-        rarity: 'boss'
+        rarity: 'boss',
+        bossId: 'boss_omega'
     },
     void_annihilation: {
         id: 'void_annihilation',
@@ -786,7 +822,8 @@ const CardData = {
         weak: 5,
         poison: 5,
         target: 'single',
-        rarity: 'boss'
+        rarity: 'boss',
+        bossId: 'boss_nexus'
     }
 };
 
@@ -1007,8 +1044,11 @@ const Cards = {
         return Object.keys(CardData).filter(id => CardData[id].rarity === 'elite');
     },
 
-    getBossPool() {
-        return Object.keys(CardData).filter(id => CardData[id].rarity === 'boss');
+    getBossPool(bossId) {
+        return Object.keys(CardData).filter(id => {
+            const card = CardData[id];
+            return card.rarity === 'boss' && (!bossId || card.bossId === bossId);
+        });
     },
 
     getEliteRewards(count = 2) {
@@ -1016,8 +1056,8 @@ const Cards = {
         return Utils.pickRandom(pool, Math.min(count, pool.length)).map(id => this.createCard(id));
     },
 
-    getBossRewards(count = 2) {
-        const pool = this.getBossPool();
+    getBossRewards(count = 2, bossId) {
+        const pool = this.getBossPool(bossId);
         return Utils.pickRandom(pool, Math.min(count, pool.length)).map(id => this.createCard(id));
     },
 
