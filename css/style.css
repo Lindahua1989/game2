@@ -1542,6 +1542,8 @@ body {
 #screen-deck-edit {
     background: rgba(10, 10, 26, 0.95);
     overflow-y: auto;
+    justify-content: flex-start;
+    padding: 40px 20px;
 }
 
 .deck-edit-content {
@@ -1549,6 +1551,7 @@ body {
     max-width: 1200px;
     width: 95%;
     padding: 20px;
+    margin: auto;
 }
 
 .deck-edit-content h2 {
@@ -1581,6 +1584,8 @@ body {
     gap: 16px;
     justify-content: center;
     margin-bottom: 16px;
+    padding-top: 16px;
+    min-height: 220px;
 }
 
 .deck-edit-actions {

@@ -44,8 +44,9 @@ const Shop = {
         const item = shopData.cards[index];
         if (!item || shopData.purchased.has('card_' + index)) return false;
         if (state.player.gold < item.price) return false;
+        if (!Cards.canAddToDeck(state.player.deck, item.card)) return false;
         state.player.gold -= item.price;
-        state.player.deck.push(item.card);
+        Cards.addToDeck(state.player.deck, item.card);
         shopData.purchased.add('card_' + index);
         return true;
     },

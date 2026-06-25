@@ -490,13 +490,221 @@ const EnemyData = {
                 ]
             }
         ]
+    },
+    // === 新增Boss (层6-10) ===
+    boss_phantom: {
+        id: 'boss_phantom',
+        name: '幻影领主',
+        icon: '👻',
+        hp: 240,
+        tier: 'boss',
+        dialogue: {
+            entry: '你看到的只是我的幻影...真正的我无处不在。',
+            phase2: '幻影消散...现出真身！',
+            phase3: '虚空之力...吞噬一切！'
+        },
+        phases: [
+            {
+                threshold: 180,
+                pattern: [
+                    { type: 'attack_weak', value: 15, weak: 3 },
+                    { type: 'block', value: 20 },
+                    { type: 'attack', value: 18, hits: 2 }
+                ]
+            },
+            {
+                threshold: 100,
+                pattern: [
+                    { type: 'attack', value: 22 },
+                    { type: 'attack_poison', value: 16, poison: 4 },
+                    { type: 'block_attack', value: 20, block: 25 },
+                    { type: 'attack', value: 25, hits: 2 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 30 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 50 },
+                    { type: 'attack_weak', value: 28, weak: 4 },
+                    { type: 'attack_poison', value: 22, poison: 6 }
+                ]
+            }
+        ]
+    },
+    boss_titan: {
+        id: 'boss_titan',
+        name: '泰坦巨像',
+        icon: '🗿',
+        hp: 280,
+        tier: 'boss',
+        dialogue: {
+            entry: '渺小的存在...在我面前化为尘埃。',
+            phase2: '你激怒了泰坦...准备承受怒火！',
+            phase3: '大地震颤...泰坦之怒！'
+        },
+        phases: [
+            {
+                threshold: 210,
+                pattern: [
+                    { type: 'attack', value: 20 },
+                    { type: 'block', value: 30 },
+                    { type: 'attack', value: 25 }
+                ]
+            },
+            {
+                threshold: 120,
+                pattern: [
+                    { type: 'charge' },
+                    { type: 'attack', value: 40 },
+                    { type: 'block_attack', value: 30, block: 35 },
+                    { type: 'attack', value: 35, hits: 2 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 45 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 60 },
+                    { type: 'attack', value: 40, hits: 3 },
+                    { type: 'block', value: 40 }
+                ]
+            }
+        ]
+    },
+    boss_void_emperor: {
+        id: 'boss_void_emperor',
+        name: '虚空皇帝',
+        icon: '🌑',
+        hp: 320,
+        tier: 'boss',
+        dialogue: {
+            entry: '虚空是我的领域...你已踏入死地。',
+            phase2: '虚空裂隙...吞噬你的存在！',
+            phase3: '虚空崩塌...同归于尽！'
+        },
+        phases: [
+            {
+                threshold: 240,
+                pattern: [
+                    { type: 'attack_poison', value: 18, poison: 5 },
+                    { type: 'attack_weak', value: 20, weak: 3 },
+                    { type: 'block', value: 25 }
+                ]
+            },
+            {
+                threshold: 140,
+                pattern: [
+                    { type: 'attack', value: 30 },
+                    { type: 'attack_poison', value: 25, poison: 6 },
+                    { type: 'summon', value: 2 },
+                    { type: 'attack', value: 35, hits: 2 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 50 },
+                    { type: 'attack_poison', value: 30, poison: 8 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 65 },
+                    { type: 'attack_weak', value: 40, weak: 5 }
+                ]
+            }
+        ]
+    },
+    boss_cosmic_horror: {
+        id: 'boss_cosmic_horror',
+        name: '宇宙恐惧',
+        icon: '🌌',
+        hp: 360,
+        tier: 'boss',
+        dialogue: {
+            entry: '我是宇宙的恐惧本身...你的理智将在此崩溃。',
+            phase2: '疯狂降临...你的思维开始扭曲！',
+            phase3: '终极恐惧...直面深渊！'
+        },
+        phases: [
+            {
+                threshold: 270,
+                pattern: [
+                    { type: 'attack_weak', value: 22, weak: 4 },
+                    { type: 'attack_poison', value: 20, poison: 6 },
+                    { type: 'attack', value: 28 }
+                ]
+            },
+            {
+                threshold: 160,
+                pattern: [
+                    { type: 'attack', value: 35, hits: 2 },
+                    { type: 'attack_poison', value: 28, poison: 7 },
+                    { type: 'summon', value: 3 },
+                    { type: 'block_attack', value: 35, block: 30 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 55 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 70 },
+                    { type: 'attack_poison', value: 35, poison: 10 },
+                    { type: 'attack', value: 45, hits: 3 }
+                ]
+            }
+        ]
+    },
+    boss_final_god: {
+        id: 'boss_final_god',
+        name: '终焉之神',
+        icon: '⚡',
+        hp: 400,
+        tier: 'boss',
+        dialogue: {
+            entry: '我是终结...也是开始。你的旅程到此为止。',
+            phase2: '神之力觉醒...凡人无法抗衡！',
+            phase3: '终焉降临...万物归零！'
+        },
+        phases: [
+            {
+                threshold: 300,
+                pattern: [
+                    { type: 'attack', value: 30 },
+                    { type: 'block', value: 35 },
+                    { type: 'attack', value: 35, hits: 2 }
+                ]
+            },
+            {
+                threshold: 180,
+                pattern: [
+                    { type: 'attack', value: 40 },
+                    { type: 'attack_poison', value: 30, poison: 8 },
+                    { type: 'summon', value: 3 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 55 }
+                ]
+            },
+            {
+                threshold: 0,
+                pattern: [
+                    { type: 'attack', value: 60 },
+                    { type: 'charge' },
+                    { type: 'attack', value: 80 },
+                    { type: 'attack', value: 50, hits: 3 },
+                    { type: 'attack_poison', value: 40, poison: 12 },
+                    { type: 'block', value: 50 }
+                ]
+            }
+        ]
     }
 };
 
 const Enemies = {
     getEncounter(floor, type) {
         if (type === 'boss') {
-            const bosses = ['boss_guardian', 'boss_queen', 'boss_omega', 'boss_dragon', 'boss_nexus'];
+            const bosses = ['boss_guardian', 'boss_queen', 'boss_omega', 'boss_dragon', 'boss_nexus', 'boss_phantom', 'boss_titan', 'boss_void_emperor', 'boss_cosmic_horror', 'boss_final_god'];
             const bossId = bosses[Math.min(floor - 1, bosses.length - 1)];
             return [this.createEnemy(bossId)];
         }

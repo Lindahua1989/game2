@@ -12,7 +12,7 @@ const EventData = [
                         const pool = Cards.getRewardPool();
                         const cardId = Utils.randomChoice(pool);
                         const card = Cards.createCard(cardId);
-                        state.player.deck.push(card);
+                        Cards.addToDeck(state.player.deck, card);
                         return `找到了一张卡牌：${card.name}！`;
                     } else {
                         state.player.hp = Math.max(1, state.player.hp - 8);
@@ -116,7 +116,7 @@ const EventData = [
                         });
                         const cardId = Utils.randomChoice(rareCards);
                         const card = Cards.createCard(cardId);
-                        state.player.deck.push(card);
+                        Cards.addToDeck(state.player.deck, card);
                         return `获得稀有卡牌：${card.name}！`;
                     }
                     return '金币不足！商人消失在阴影中。';
@@ -231,7 +231,7 @@ const EventData = [
                         const cardId = Utils.randomChoice(pool);
                         const card = Cards.createCard(cardId);
                         Cards.upgradeCard(card);
-                        state.player.deck.push(card);
+                        Cards.addToDeck(state.player.deck, card);
                         return `获得升级卡牌：${card.name}！`;
                     }
                     return '没有合适的卡牌。';
@@ -414,7 +414,7 @@ const EventData = [
                     const pool = Cards.getRewardPool();
                     const cardId = Utils.randomChoice(pool);
                     const card = Cards.createCard(cardId);
-                    state.player.deck.push(card);
+                    Cards.addToDeck(state.player.deck, card);
                     return `吸收能量（受到 5 伤害），获得卡牌：${card.name}`;
                 }
             }
@@ -523,7 +523,7 @@ const EventData = [
                         const cardId = Utils.randomChoice(pool);
                         const card = Cards.createCard(cardId);
                         Cards.upgradeCard(card);
-                        state.player.deck.push(card);
+                        Cards.addToDeck(state.player.deck, card);
                         return `传送门赠予你：${card.name}！`;
                     } else {
                         state.player.hp = Math.max(1, state.player.hp - 15);

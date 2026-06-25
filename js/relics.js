@@ -280,6 +280,62 @@ const RelicData = {
         drawPerTurn: 7,
         energyPerTurn: 3,
         bossId: 'boss_nexus'
+    },
+    // Boss 6: 幻影领主
+    boss_phantom_cloak: {
+        id: 'boss_phantom_cloak',
+        name: '幻影斗篷',
+        icon: '🌫️',
+        description: '每回合开始获得 15 护甲，30%概率闪避攻击',
+        rarity: 'boss',
+        blockPerTurn: 15,
+        bossId: 'boss_phantom'
+    },
+    // Boss 7: 泰坦巨像
+    boss_titan_core: {
+        id: 'boss_titan_core',
+        name: '泰坦核心',
+        icon: '⚙️',
+        description: '最大 HP +50，每回合开始获得 8 护甲，攻击伤害 +5',
+        rarity: 'boss',
+        maxHpBonus: 50,
+        blockPerTurn: 8,
+        bossId: 'boss_titan'
+    },
+    // Boss 8: 虚空皇帝
+    boss_void_throne: {
+        id: 'boss_void_throne',
+        name: '虚空王座',
+        icon: '🪑',
+        description: '战斗开始时对所有敌人施加 5 腐蚀 + 3 虚弱，每回合抽 6 张牌',
+        rarity: 'boss',
+        poisonAll: 5,
+        weakAll: 3,
+        drawPerTurn: 6,
+        bossId: 'boss_void_emperor'
+    },
+    // Boss 9: 宇宙恐惧
+    boss_cosmic_eye: {
+        id: 'boss_cosmic_eye',
+        name: '宇宙之眼',
+        icon: '👁️',
+        description: '每回合 +4 能量，每回合开始对所有敌人造成 8 伤害',
+        rarity: 'boss',
+        energyPerTurn: 4,
+        damageAll: 8,
+        bossId: 'boss_cosmic_horror'
+    },
+    // Boss 10: 终焉之神
+    boss_divine_spark: {
+        id: 'boss_divine_spark',
+        name: '神性火花',
+        icon: '✴️',
+        description: '所有卡牌伤害 +8，护甲 +8，每回合 +5 能量，抽 8 张牌',
+        rarity: 'boss',
+        cardBonus: 8,
+        energyPerTurn: 5,
+        drawPerTurn: 8,
+        bossId: 'boss_final_god'
     }
 };
 

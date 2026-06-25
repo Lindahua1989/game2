@@ -3,9 +3,9 @@ const GameModes = {
         normal: {
             id: 'normal',
             name: '标准模式',
-            description: '穿越5层地图，击败最终Boss',
+            description: '穿越10层地图，击败最终Boss',
             icon: '⚔️',
-            maxFloors: 5,
+            maxFloors: 10,
             enemyScaling: 1.0,
             rewardScaling: 1.0,
             timeLimit: null,
@@ -25,12 +25,12 @@ const GameModes = {
         speedrun: {
             id: 'speedrun',
             name: '竞速模式',
-            description: '限时20分钟通关5层，追求最快速度',
+            description: '限时30分钟通关10层，追求最快速度',
             icon: '⚡',
-            maxFloors: 5,
+            maxFloors: 10,
             enemyScaling: 0.9,
             rewardScaling: 1.2,
-            timeLimit: 1200,
+            timeLimit: 1800,
             specialRules: ['time_limit', 'speed_bonus']
         },
         bossrush: {

@@ -174,9 +174,21 @@ const UI = {
                 cardDiv.style.cursor = 'pointer';
                 cardDiv.style.border = `3px solid ${enemyTier === 'boss' ? '#ffaa00' : '#b44aff'}`;
                 cardDiv.style.boxShadow = `0 0 20px ${enemyTier === 'boss' ? 'rgba(255, 170, 0, 0.6)' : 'rgba(180, 74, 255, 0.6)'}`;
+                
+                const canAdd = Cards.canAddToDeck(Game.state.player.deck, card);
+                if (!canAdd) {
+                    cardDiv.style.opacity = '0.5';
+                    cardDiv.style.cursor = 'not-allowed';
+                    const badge = document.createElement('div');
+                    badge.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 68, 102, 0.9); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: bold;';
+                    badge.textContent = '已拥有';
+                    cardDiv.appendChild(badge);
+                }
+                
                 cardDiv.onclick = () => {
-                    Game.state.player.deck.push(card);
-                    Game.continueAfterReward();
+                    if (Cards.addToDeck(Game.state.player.deck, card)) {
+                        Game.continueAfterReward();
+                    }
                 };
                 container.appendChild(cardDiv);
             });
@@ -225,14 +237,26 @@ const UI = {
 
         cards.forEach((card, idx) => {
             const cardDiv = this.createCardElement(card, idx, (c) => {
-                Game.state.player.deck.push(c);
+                Cards.addToDeck(Game.state.player.deck, c);
                 Game.continueAfterReward();
             });
             cardDiv.classList.remove('unplayable');
             cardDiv.style.cursor = 'pointer';
+            
+            const canAdd = Cards.canAddToDeck(Game.state.player.deck, card);
+            if (!canAdd) {
+                cardDiv.style.opacity = '0.5';
+                cardDiv.style.cursor = 'not-allowed';
+                const badge = document.createElement('div');
+                badge.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 68, 102, 0.9); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: bold;';
+                badge.textContent = '已拥有';
+                cardDiv.appendChild(badge);
+            }
+            
             cardDiv.onclick = () => {
-                Game.state.player.deck.push(card);
-                Game.continueAfterReward();
+                if (Cards.addToDeck(Game.state.player.deck, card)) {
+                    Game.continueAfterReward();
+                }
             };
             container.appendChild(cardDiv);
         });
@@ -282,7 +306,13 @@ const UI = {
             div.innerHTML = cardEl.innerHTML;
             div.innerHTML += `<div class="shop-price">💰 ${item.price}</div>`;
 
-            if (!shopData.purchased.has('card_' + idx)) {
+            const canAdd = Cards.canAddToDeck(Game.state.player.deck, item.card);
+            if (!canAdd) {
+                div.classList.add('sold');
+                div.innerHTML += '<div style="color: #ff4466; font-size: 12px; margin-top: 4px;">已拥有</div>';
+            }
+
+            if (!shopData.purchased.has('card_' + idx) && canAdd) {
                 div.onclick = () => {
                     if (Shop.buyCard(idx, shopData, Game.state)) {
                         div.classList.add('sold');

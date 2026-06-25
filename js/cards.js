@@ -824,6 +824,84 @@ const CardData = {
         target: 'single',
         rarity: 'boss',
         bossId: 'boss_nexus'
+    },
+    // Boss 6: 幻影领主
+    phantom_strike: {
+        id: 'phantom_strike',
+        name: '幻影突袭',
+        type: 'attack',
+        cost: 1,
+        icon: '👻',
+        description: '造成 12~18 伤害 x2，施加 3 虚弱',
+        minDamage: 12,
+        maxDamage: 18,
+        hits: 2,
+        weak: 3,
+        target: 'single',
+        rarity: 'boss',
+        bossId: 'boss_phantom'
+    },
+    // Boss 7: 泰坦巨像
+    titan_crush: {
+        id: 'titan_crush',
+        name: '泰坦粉碎',
+        type: 'attack',
+        cost: 3,
+        icon: '🗿',
+        description: '造成 55~70 伤害，无视护甲',
+        minDamage: 55,
+        maxDamage: 70,
+        ignoreBlock: true,
+        target: 'single',
+        rarity: 'boss',
+        bossId: 'boss_titan'
+    },
+    // Boss 8: 虚空皇帝
+    void_decree: {
+        id: 'void_decree',
+        name: '虚空诏令',
+        type: 'skill',
+        cost: 2,
+        icon: '🌑',
+        description: '所有敌人获得 6 腐蚀 + 4 虚弱，抽 3 张牌',
+        poisonAll: 6,
+        weakAll: 4,
+        draw: 3,
+        target: 'all_enemies',
+        rarity: 'boss',
+        bossId: 'boss_void_emperor'
+    },
+    // Boss 9: 宇宙恐惧
+    cosmic_madness: {
+        id: 'cosmic_madness',
+        name: '宇宙疯狂',
+        type: 'attack',
+        cost: 2,
+        icon: '🌌',
+        description: '对所有敌人造成 20~28 伤害，施加 5 腐蚀 + 3 虚弱',
+        minDamage: 20,
+        maxDamage: 28,
+        poisonAll: 5,
+        weakAll: 3,
+        target: 'all',
+        rarity: 'boss',
+        bossId: 'boss_cosmic_horror'
+    },
+    // Boss 10: 终焉之神
+    divine_judgment: {
+        id: 'divine_judgment',
+        name: '神之裁决',
+        type: 'attack',
+        cost: 4,
+        icon: '⚡',
+        description: '造成 70~90 伤害，对所有敌人造成 25~35 伤害',
+        minDamage: 70,
+        maxDamage: 90,
+        minAoeDamage: 25,
+        maxAoeDamage: 35,
+        target: 'single',
+        rarity: 'boss',
+        bossId: 'boss_final_god'
     }
 };
 
@@ -1102,5 +1180,21 @@ const Cards = {
         if (card.healPerTurn) card.healPerTurn = Math.ceil(card.healPerTurn * 1.3);
         if (card.berserkerBonus) card.berserkerBonus += 2;
         card.description = this.buildDescription(card);
+    },
+
+    canAddToDeck(deck, card) {
+        if (card.rarity === 'elite') {
+            const hasEliteCopy = deck.some(c => c.id === card.id);
+            return !hasEliteCopy;
+        }
+        return true;
+    },
+
+    addToDeck(deck, card) {
+        if (this.canAddToDeck(deck, card)) {
+            deck.push(card);
+            return true;
+        }
+        return false;
     }
 };
