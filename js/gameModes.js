@@ -104,14 +104,7 @@ const GameModes = {
     },
 
     shouldGenerateBoss(floor) {
-        const mode = this.getMode();
-        if (this.hasRule('boss_only')) {
-            return true;
-        }
-        if (this.hasRule('no_final_boss')) {
-            return false;
-        }
-        return floor === mode.maxFloors;
+        return true;
     },
 
     shouldGenerateRest(floor) {
