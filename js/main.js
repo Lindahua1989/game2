@@ -41,7 +41,8 @@ const SaveManager = {
             currentFloor: Game.state.currentFloor,
             currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
             stats: Utils.deepClone(Game.state.stats),
-            mapData: Utils.deepClone(Map.data)
+            mapData: Utils.deepClone(Map.data),
+            gameModeId: GameModes.getMode().id
         };
         try {
             localStorage.setItem(SAVE_PREFIX + id, JSON.stringify(saveData));
@@ -65,7 +66,8 @@ const SaveManager = {
                 currentFloor: Game.state.currentFloor,
                 currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
                 stats: Utils.deepClone(Game.state.stats),
-                mapData: Utils.deepClone(Map.data)
+                mapData: Utils.deepClone(Map.data),
+                gameModeId: GameModes.getMode().id
             };
             try {
                 localStorage.setItem(Game.currentSaveKey, JSON.stringify(saveData));
@@ -89,6 +91,9 @@ const SaveManager = {
             Map.data = d.mapData;
             Game.currentSaveKey = key;
             Game.currentSaveName = d.name;
+            if (d.gameModeId && GameModes.modes[d.gameModeId]) {
+                GameModes.setMode(d.gameModeId);
+            }
             return true;
         } catch (e) {
             console.warn('读档失败:', e);
@@ -373,7 +378,10 @@ const Game = {
     },
 
     returnToMap() {
-        if (this.state.currentNode && this.state.currentNode.type === 'boss') {
+        const currentNode = this.state.currentNode;
+        const isLastRow = currentNode && currentNode.row === Map.data.length - 1;
+
+        if (isLastRow) {
             GameModes.onFloorComplete(this.state.currentFloor);
             
             if (GameModes.isVictory()) {
