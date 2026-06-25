@@ -143,6 +143,26 @@ const GameStats = {
         document.body.appendChild(notification);
         setTimeout(() => {
             notification.classList.add('show');
+            const rect = notification.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle particle-achievement particle-animate';
+                const size = 4 + Math.random() * 8;
+                const angle = (Math.PI * 2 * i) / 20 + (Math.random() - 0.5) * 0.5;
+                const distance = 40 + Math.random() * 60;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                const duration = 0.6 + Math.random() * 0.4;
+                p.style.cssText = `
+                    width: ${size}px; height: ${size}px;
+                    left: ${cx - size / 2}px; top: ${cy - size / 2}px;
+                    --tx: ${tx}px; --ty: ${ty}px; --duration: ${duration}s;
+                `;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), duration * 1000);
+            }
         }, 100);
         setTimeout(() => {
             notification.classList.remove('show');

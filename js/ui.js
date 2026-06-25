@@ -176,9 +176,11 @@ const UI = {
             specialRewards.cards.forEach((card, idx) => {
                 const cardDiv = this.createCardElement(card, idx);
                 cardDiv.classList.remove('unplayable');
+                cardDiv.classList.add('card-reveal');
                 cardDiv.style.cursor = 'pointer';
                 cardDiv.style.border = `3px solid ${enemyTier === 'boss' ? '#ffaa00' : '#b44aff'}`;
                 cardDiv.style.boxShadow = `0 0 20px ${enemyTier === 'boss' ? 'rgba(255, 170, 0, 0.6)' : 'rgba(180, 74, 255, 0.6)'}`;
+                cardDiv.style.animationDelay = `${idx * 0.2}s`;
                 
                 const canAdd = Cards.canAddToDeck(Game.state.player.deck, card);
                 if (!canAdd) {
@@ -246,7 +248,9 @@ const UI = {
                 Game.continueAfterReward();
             });
             cardDiv.classList.remove('unplayable');
+            cardDiv.classList.add('card-reveal');
             cardDiv.style.cursor = 'pointer';
+            cardDiv.style.animationDelay = `${(specialRewards.cards.length + idx) * 0.15 + 0.3}s`;
             
             const canAdd = Cards.canAddToDeck(Game.state.player.deck, card);
             if (!canAdd) {
@@ -665,7 +669,7 @@ const UI = {
         this.showDamageNumber(playerArea, value, 'heal');
         playerArea.classList.add('heal-glow');
         setTimeout(() => playerArea.classList.remove('heal-glow'), 500);
-        Particles.spawn(playerArea, 'heal', 10);
+        Particles.spawn(playerArea, 'heal', 15);
     },
 
     showBlockGain(value) {
@@ -673,7 +677,7 @@ const UI = {
         this.showDamageNumber(document.getElementById('player-area'), value, 'block');
         blockEl.parentElement.classList.add('block-glow');
         setTimeout(() => blockEl.parentElement.classList.remove('block-glow'), 500);
-        Particles.spawn(blockEl.parentElement, 'block', 8);
+        Particles.spawn(blockEl.parentElement, 'block', 12);
     },
 
     showEnergyPulse() {
@@ -681,7 +685,7 @@ const UI = {
         if (el) {
             el.classList.add('energy-pulse');
             setTimeout(() => el.classList.remove('energy-pulse'), 400);
-            Particles.spawn(el, 'energy', 8);
+            Particles.spawn(el, 'energy', 12);
         }
     },
 
