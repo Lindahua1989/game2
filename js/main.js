@@ -199,7 +199,8 @@ const Game = {
     },
 
     startNewRun() {
-        this.showModeSelectScreen();
+        GameModes.setMode('normal');
+        Unlocks.showDeckSelection();
     },
 
     showModeSelectScreen() {
