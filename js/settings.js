@@ -145,6 +145,9 @@ const Settings = {
                         自动存档
                     </label>
                 </div>
+                <div class="setting-item">
+                    <button class="btn btn-secondary" onclick="CardLimits.showSettings()">🃏 卡牌数量限制设置</button>
+                </div>
             </div>
             
             <div class="settings-buttons">

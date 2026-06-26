@@ -3063,3 +3063,155 @@ body {
     0%, 100% { box-shadow: 0 0 20px rgba(255, 68, 102, 0.6), 0 0 40px rgba(255, 68, 102, 0.3); }
     50% { box-shadow: 0 0 30px rgba(255, 68, 102, 0.8), 0 0 50px rgba(255, 68, 102, 0.5); }
 }
+
+/* ===== CARD LIMITS MODAL ===== */
+#card-limits-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#card-limits-modal .modal-content {
+    background: #1a1a2e;
+    border: 2px solid #00d4ff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+#card-limits-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+#card-limits-modal .modal-header h2 {
+    color: #00d4ff;
+    font-size: 24px;
+    margin: 0;
+}
+
+#card-limits-modal .modal-body {
+    margin-bottom: 20px;
+}
+
+#card-limits-modal .modal-body h3 {
+    font-size: 18px;
+    margin: 20px 0 10px;
+}
+
+.card-limits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.card-limit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.card-limit-item:hover {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.4);
+}
+
+.card-limit-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.card-limit-info .card-icon {
+    font-size: 24px;
+}
+
+.card-limit-info .card-name {
+    color: #e0e0ff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.card-rarity {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card-rarity-common {
+    background: rgba(150, 150, 150, 0.3);
+    color: #aaa;
+}
+
+.card-rarity-uncommon {
+    background: rgba(0, 200, 100, 0.3);
+    color: #00ff88;
+}
+
+.card-rarity-rare {
+    background: rgba(0, 150, 255, 0.3);
+    color: #00aaff;
+}
+
+.card-rarity-elite {
+    background: rgba(255, 150, 0, 0.3);
+    color: #ffaa00;
+}
+
+.card-rarity-boss {
+    background: rgba(255, 50, 100, 0.3);
+    color: #ff4466;
+}
+
+.card-limit-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-limit-control .limit-value {
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #00d4ff;
+}
+
+.card-limit-control .btn-small {
+    padding: 4px 12px;
+    font-size: 16px;
+    min-width: 32px;
+}
+
+#card-limits-modal .modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 2px solid rgba(0, 212, 255, 0.3);
+}
+

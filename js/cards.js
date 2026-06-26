@@ -8,7 +8,8 @@ const CardData = {
         description: '造成 5~9 点伤害',
         minDamage: 5,
         maxDamage: 9,
-        target: 'single'
+        target: 'single',
+        maxCopies: 99
     },
     energy_shield: {
         id: 'energy_shield',
@@ -18,7 +19,8 @@ const CardData = {
         icon: '🛡️',
         description: '获得 6 点护甲',
         block: 6,
-        target: 'self'
+        target: 'self',
+        maxCopies: 99
     },
     plasma_cannon: {
         id: 'plasma_cannon',
@@ -29,7 +31,8 @@ const CardData = {
         description: '造成 13~19 点伤害',
         minDamage: 13,
         maxDamage: 19,
-        target: 'single'
+        target: 'single',
+        maxCopies: 99
     },
     emp_pulse: {
         id: 'emp_pulse',
@@ -40,7 +43,8 @@ const CardData = {
         description: '对所有敌人造成 6~10 点伤害',
         minDamage: 6,
         maxDamage: 10,
-        target: 'all'
+        target: 'all',
+        maxCopies: 2
     },
     nano_armor: {
         id: 'nano_armor',
@@ -50,7 +54,8 @@ const CardData = {
         icon: '🔰',
         description: '获得 18 点护甲',
         block: 18,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     overclock: {
         id: 'overclock',
@@ -60,7 +65,8 @@ const CardData = {
         icon: '⚙️',
         description: '每次攻击额外 +2 伤害',
         strength: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     nano_repair: {
         id: 'nano_repair',
@@ -72,7 +78,8 @@ const CardData = {
         minDamage: 8,
         maxDamage: 12,
         heal: 5,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     rapid_fire: {
         id: 'rapid_fire',
@@ -84,7 +91,8 @@ const CardData = {
         minDamage: 3,
         maxDamage: 5,
         hits: 2,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     data_download: {
         id: 'data_download',
@@ -94,7 +102,8 @@ const CardData = {
         icon: '📥',
         description: '抽 2 张牌',
         draw: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     radiation_round: {
         id: 'radiation_round',
@@ -106,7 +115,8 @@ const CardData = {
         minDamage: 3,
         maxDamage: 5,
         poison: 3,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     em_storm: {
         id: 'em_storm',
@@ -117,7 +127,8 @@ const CardData = {
         description: '造成 17~23 点伤害',
         minDamage: 17,
         maxDamage: 23,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     quantum_dodge: {
         id: 'quantum_dodge',
@@ -128,7 +139,8 @@ const CardData = {
         description: '获得 8 护甲，抽 1 张牌',
         block: 8,
         draw: 1,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     energy_overload: {
         id: 'energy_overload',
@@ -139,7 +151,8 @@ const CardData = {
         description: '获得 2 C能量，受到 3 伤害',
         energy: 2,
         selfDamage: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     laser_array: {
         id: 'laser_array',
@@ -151,7 +164,8 @@ const CardData = {
         minDamage: 4,
         maxDamage: 6,
         hits: 3,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     hologram: {
         id: 'hologram',
@@ -161,7 +175,8 @@ const CardData = {
         icon: '👻',
         description: '获得 12 点护甲',
         block: 12,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     system_reboot: {
         id: 'system_reboot',
@@ -171,7 +186,8 @@ const CardData = {
         icon: '🔄',
         description: '弃掉所有手牌，抽等量+2张',
         reboot: true,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     ion_shield: {
         id: 'ion_shield',
@@ -181,7 +197,8 @@ const CardData = {
         icon: '🔵',
         description: '每回合开始获得 3 护甲',
         blockPerTurn: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     railgun: {
         id: 'railgun',
@@ -192,7 +209,8 @@ const CardData = {
         description: '造成 30~40 点伤害',
         minDamage: 30,
         maxDamage: 40,
-        target: 'single'
+        target: 'single',
+        maxCopies: 1
     },
     nano_swarm: {
         id: 'nano_swarm',
@@ -202,7 +220,8 @@ const CardData = {
         icon: '🐝',
         description: '每回合对随机敌人造成 5 伤害',
         damagePerTurn: 5,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     energy_siphon: {
         id: 'energy_siphon',
@@ -214,7 +233,8 @@ const CardData = {
         minDamage: 4,
         maxDamage: 8,
         energy: 1,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     pulse_barrier: {
         id: 'pulse_barrier',
@@ -225,7 +245,8 @@ const CardData = {
         description: '获得 7 护甲，下回合额外 3 护甲',
         block: 7,
         nextTurnBlock: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     overload_protocol: {
         id: 'overload_protocol',
@@ -236,7 +257,8 @@ const CardData = {
         description: '每回合 +1 C能量，受 2 伤害',
         energyPerTurn: 1,
         damagePerTurnSelf: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     precision_strike: {
         id: 'precision_strike',
@@ -248,7 +270,8 @@ const CardData = {
         minDamage: 17,
         maxDamage: 23,
         ignoreBlock: true,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     tactical_scan: {
         id: 'tactical_scan',
@@ -259,7 +282,8 @@ const CardData = {
         description: '抽 2 张牌，获得 1 护甲',
         draw: 2,
         block: 1,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     plasma_blade: {
         id: 'plasma_blade',
@@ -270,7 +294,8 @@ const CardData = {
         description: '造成 7~11 点伤害',
         minDamage: 7,
         maxDamage: 11,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     reflect_shield: {
         id: 'reflect_shield',
@@ -281,7 +306,8 @@ const CardData = {
         description: '获得 10 护甲，反弹 3 伤害',
         block: 10,
         thorns: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     emergency_repair: {
         id: 'emergency_repair',
@@ -291,7 +317,8 @@ const CardData = {
         icon: '🩹',
         description: '回复 8 HP',
         heal: 8,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     chain_lightning: {
         id: 'chain_lightning',
@@ -303,7 +330,8 @@ const CardData = {
         minDamage: 5,
         maxDamage: 9,
         hits: 3,
-        target: 'random'
+        target: 'random',
+        maxCopies: 2
     },
     energy_convert: {
         id: 'energy_convert',
@@ -314,7 +342,8 @@ const CardData = {
         description: '将 2 点C能量转化为 10 护甲',
         energyCost: 2,
         block: 10,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     auto_aim: {
         id: 'auto_aim',
@@ -324,7 +353,8 @@ const CardData = {
         icon: '🎯',
         description: '攻击牌伤害 +3',
         attackBonus: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     quantum_entangle: {
         id: 'quantum_entangle',
@@ -335,7 +365,8 @@ const CardData = {
         description: '抽 1 张牌，随机 1 张手牌费用变 0',
         draw: 1,
         freeCard: true,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     gravity_field: {
         id: 'gravity_field',
@@ -345,7 +376,8 @@ const CardData = {
         icon: '🌊',
         description: '所有敌人获得 2 虚弱',
         weakAll: 2,
-        target: 'all_enemies'
+        target: 'all_enemies',
+        maxCopies: 2
     },
     self_destruct: {
         id: 'self_destruct',
@@ -357,7 +389,8 @@ const CardData = {
         minDamage: 35,
         maxDamage: 45,
         selfDamage: 20,
-        target: 'single'
+        target: 'single',
+        maxCopies: 1
     },
     mech_enhance: {
         id: 'mech_enhance',
@@ -367,7 +400,8 @@ const CardData = {
         icon: '🔧',
         description: '每打出攻击牌获得 2 护甲',
         blockOnAttack: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_charge: {
         id: 'h_charge',
@@ -377,7 +411,8 @@ const CardData = {
         icon: '🔋',
         description: '获得 3 点H能量',
         hEnergyGain: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_battery: {
         id: 'h_battery',
@@ -387,7 +422,8 @@ const CardData = {
         icon: '⚡',
         description: '每回合开始获得 1 点H能量',
         hEnergyPerTurn: 1,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     h_emergency: {
         id: 'h_emergency',
@@ -398,7 +434,8 @@ const CardData = {
         description: '获得 5 点H能量，受到 5 点伤害',
         hEnergyGain: 5,
         selfDamage: 5,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_shield: {
         id: 'h_shield',
@@ -408,7 +445,8 @@ const CardData = {
         icon: '🛡️',
         description: '消耗全部H能量，每点获得 3 护甲',
         blockPerHEnergy: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_heal: {
         id: 'h_heal',
@@ -418,7 +456,8 @@ const CardData = {
         icon: '💚',
         description: '消耗全部H能量，每点回复 2 HP',
         healPerHEnergy: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_blast: {
         id: 'h_blast',
@@ -428,7 +467,8 @@ const CardData = {
         icon: '💥',
         description: '消耗全部H能量，每点对所有敌人造成 4 伤害',
         damagePerEnergy: 4,
-        target: 'all'
+        target: 'all',
+        maxCopies: 1
     },
     h_convert: {
         id: 'h_convert',
@@ -439,7 +479,8 @@ const CardData = {
         description: '消耗 3 点H能量，获得 2 C能量',
         hEnergyCost: 3,
         energy: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     h_amplifier: {
         id: 'h_amplifier',
@@ -451,7 +492,8 @@ const CardData = {
         minDamage: 15,
         maxDamage: 15,
         requireHEnergy: 5,
-        target: 'single'
+        target: 'single',
+        maxCopies: 1
     },
     h_reactor: {
         id: 'h_reactor',
@@ -463,7 +505,8 @@ const CardData = {
         minDamage: 6,
         maxDamage: 10,
         hEnergyGain: 1,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     nano_inject: {
         id: 'nano_inject',
@@ -476,7 +519,8 @@ const CardData = {
         maxDamage: 4,
         weak: 2,
         poison: 2,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     energy_pulse: {
         id: 'energy_pulse',
@@ -486,7 +530,8 @@ const CardData = {
         icon: '🔌',
         description: '获得 1 C能量',
         energy: 1,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     defense_matrix: {
         id: 'defense_matrix',
@@ -496,7 +541,8 @@ const CardData = {
         icon: '🛡️',
         description: '每回合开始获得 5 护甲',
         blockPerTurn: 5,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     high_freq: {
         id: 'high_freq',
@@ -508,7 +554,8 @@ const CardData = {
         minDamage: 10,
         maxDamage: 14,
         weak: 3,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     system_upgrade: {
         id: 'system_upgrade',
@@ -518,7 +565,8 @@ const CardData = {
         icon: '⬆️',
         description: '所有卡牌伤害/护甲 +2',
         upgradeAll: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     quick_deploy: {
         id: 'quick_deploy',
@@ -528,7 +576,8 @@ const CardData = {
         icon: '🚀',
         description: '抽 3 张牌',
         draw: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     photon_shield: {
         id: 'photon_shield',
@@ -538,7 +587,8 @@ const CardData = {
         icon: '☀️',
         description: '获得 22 点护甲',
         block: 22,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     death_ray: {
         id: 'death_ray',
@@ -549,7 +599,8 @@ const CardData = {
         description: '造成 48~62 点伤害',
         minDamage: 48,
         maxDamage: 62,
-        target: 'single'
+        target: 'single',
+        maxCopies: 1
     },
     // === 新增卡牌 ===
     shield_bash: {
@@ -560,7 +611,8 @@ const CardData = {
         icon: '🛡️',
         description: '造成等同于护甲的伤害',
         shieldBash: true,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     time_warp: {
         id: 'time_warp',
@@ -571,7 +623,8 @@ const CardData = {
         description: '额外获得一个回合（每场战斗限1次）',
         extraTurn: true,
         unique: true,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     virus_spread: {
         id: 'virus_spread',
@@ -581,7 +634,8 @@ const CardData = {
         icon: '🦠',
         description: '对所有敌人施加 2 腐蚀',
         poisonAll: 2,
-        target: 'all_enemies'
+        target: 'all_enemies',
+        maxCopies: 2
     },
     energy_drain: {
         id: 'energy_drain',
@@ -593,7 +647,8 @@ const CardData = {
         minDamage: 3,
         maxDamage: 7,
         heal: 3,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     mirror_image: {
         id: 'mirror_image',
@@ -603,7 +658,8 @@ const CardData = {
         icon: '🪞',
         description: '复制手牌中费用最低的卡牌',
         copyCard: true,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     explosive_shot: {
         id: 'explosive_shot',
@@ -616,7 +672,8 @@ const CardData = {
         maxDamage: 14,
         minAoeDamage: 4,
         maxAoeDamage: 8,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     adaptive_armor: {
         id: 'adaptive_armor',
@@ -626,7 +683,8 @@ const CardData = {
         icon: '🔰',
         description: '每次受到伤害时获得 2 护甲',
         armorOnHit: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     power_surge: {
         id: 'power_surge',
@@ -636,7 +694,8 @@ const CardData = {
         icon: '⚡',
         description: '本回合所有卡牌费用 -1',
         costReduction: 1,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     heal_beam: {
         id: 'heal_beam',
@@ -647,7 +706,8 @@ const CardData = {
         description: '回复 15 HP，获得 5 护甲',
         heal: 15,
         block: 5,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     weaken_field: {
         id: 'weaken_field',
@@ -657,7 +717,8 @@ const CardData = {
         icon: '🌫️',
         description: '所有敌人获得 3 虚弱',
         weakAll: 3,
-        target: 'all_enemies'
+        target: 'all_enemies',
+        maxCopies: 2
     },
     critical_strike: {
         id: 'critical_strike',
@@ -669,7 +730,8 @@ const CardData = {
         minDamage: 6,
         maxDamage: 10,
         critChance: 0.5,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     shield_wall: {
         id: 'shield_wall',
@@ -680,7 +742,8 @@ const CardData = {
         description: '获得 15 护甲，下回合额外 10 护甲',
         block: 15,
         nextTurnBlock: 10,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     energy_burst: {
         id: 'energy_burst',
@@ -690,7 +753,8 @@ const CardData = {
         icon: '✨',
         description: '造成等同于手牌数的伤害',
         handDamage: true,
-        target: 'single'
+        target: 'single',
+        maxCopies: 2
     },
     toxic_cloud: {
         id: 'toxic_cloud',
@@ -701,7 +765,8 @@ const CardData = {
         description: '所有敌人获得 4 腐蚀 + 2 虚弱',
         poisonAll: 4,
         weakAll: 2,
-        target: 'all_enemies'
+        target: 'all_enemies',
+        maxCopies: 2
     },
     berserker_rage: {
         id: 'berserker_rage',
@@ -711,7 +776,8 @@ const CardData = {
         icon: '😤',
         description: 'HP 越低伤害越高（最多 +8）',
         berserkerBonus: 8,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     phase_shift: {
         id: 'phase_shift',
@@ -722,7 +788,8 @@ const CardData = {
         description: '获得 10 护甲，抽 2 张牌',
         block: 10,
         draw: 2,
-        target: 'self'
+        target: 'self',
+        maxCopies: 2
     },
     plasma_wave: {
         id: 'plasma_wave',
@@ -733,7 +800,8 @@ const CardData = {
         description: '对所有敌人造成 12~18 伤害',
         minDamage: 12,
         maxDamage: 18,
-        target: 'all'
+        target: 'all',
+        maxCopies: 2
     },
     repair_drone: {
         id: 'repair_drone',
@@ -743,7 +811,8 @@ const CardData = {
         icon: '🤖',
         description: '每回合开始回复 3 HP',
         healPerTurn: 3,
-        target: 'self'
+        target: 'self',
+        maxCopies: 1
     },
     // === 精英专属卡牌 ===
     void_strike: {
@@ -757,7 +826,8 @@ const CardData = {
         maxDamage: 14,
         weak: 2,
         target: 'single',
-        rarity: 'elite'
+        rarity: 'elite',
+        maxCopies: 1
     },
     plasma_burst: {
         id: 'plasma_burst',
@@ -769,7 +839,8 @@ const CardData = {
         minDamage: 10,
         maxDamage: 14,
         target: 'all',
-        rarity: 'elite'
+        rarity: 'elite',
+        maxCopies: 1
     },
     time_lock: {
         id: 'time_lock',
@@ -781,7 +852,8 @@ const CardData = {
         block: 15,
         weakAll: 1,
         target: 'self',
-        rarity: 'elite'
+        rarity: 'elite',
+        maxCopies: 1
     },
     energy_nova: {
         id: 'energy_nova',
@@ -793,7 +865,8 @@ const CardData = {
         energy: 2,
         draw: 1,
         target: 'self',
-        rarity: 'elite'
+        rarity: 'elite',
+        maxCopies: 1
     },
     titan_fist: {
         id: 'titan_fist',
@@ -806,7 +879,8 @@ const CardData = {
         maxDamage: 29,
         ignoreBlock: true,
         target: 'single',
-        rarity: 'elite'
+        rarity: 'elite',
+        maxCopies: 1
     },
     // === Boss专属卡牌 ===
     // Boss 1: 守卫核心
@@ -821,7 +895,8 @@ const CardData = {
         nextTurnBlock: 15,
         target: 'self',
         rarity: 'boss',
-        bossId: 'boss_guardian'
+        bossId: 'boss_guardian',
+        maxCopies: 1
     },
     // Boss 2: 虫族女王
     queen_toxin: {
@@ -836,7 +911,8 @@ const CardData = {
         poisonAll: 5,
         target: 'all',
         rarity: 'boss',
-        bossId: 'boss_queen'
+        bossId: 'boss_queen',
+        maxCopies: 1
     },
     // Boss 3: 主控AI·奥米伽
     omega_beam: {
@@ -852,7 +928,8 @@ const CardData = {
         maxAoeDamage: 12,
         target: 'single',
         rarity: 'boss',
-        bossId: 'boss_omega'
+        bossId: 'boss_omega',
+        maxCopies: 1
     },
     // Boss 4: 机械巨龙
     dragon_breath: {
@@ -867,7 +944,8 @@ const CardData = {
         poisonAll: 4,
         target: 'all',
         rarity: 'boss',
-        bossId: 'boss_dragon'
+        bossId: 'boss_dragon',
+        maxCopies: 1
     },
     // Boss 5: 核心枢纽
     nexus_core: {
@@ -881,7 +959,8 @@ const CardData = {
         energyPerTurn: 2,
         target: 'self',
         rarity: 'boss',
-        bossId: 'boss_nexus'
+        bossId: 'boss_nexus',
+        maxCopies: 1
     },
     quantum_resurrection: {
         id: 'quantum_resurrection',
@@ -895,7 +974,8 @@ const CardData = {
         draw: 2,
         target: 'self',
         rarity: 'boss',
-        bossId: 'boss_omega'
+        bossId: 'boss_omega',
+        maxCopies: 1
     },
     void_annihilation: {
         id: 'void_annihilation',
@@ -910,7 +990,8 @@ const CardData = {
         poison: 5,
         target: 'single',
         rarity: 'boss',
-        bossId: 'boss_nexus'
+        bossId: 'boss_nexus',
+        maxCopies: 1
     },
     // Boss 6: 幻影领主
     phantom_strike: {
@@ -926,7 +1007,8 @@ const CardData = {
         weak: 3,
         target: 'single',
         rarity: 'boss',
-        bossId: 'boss_phantom'
+        bossId: 'boss_phantom',
+        maxCopies: 1
     },
     // Boss 7: 泰坦巨像
     titan_crush: {
@@ -941,7 +1023,8 @@ const CardData = {
         ignoreBlock: true,
         target: 'single',
         rarity: 'boss',
-        bossId: 'boss_titan'
+        bossId: 'boss_titan',
+        maxCopies: 1
     },
     // Boss 8: 虚空皇帝
     void_decree: {
@@ -956,7 +1039,8 @@ const CardData = {
         draw: 3,
         target: 'all_enemies',
         rarity: 'boss',
-        bossId: 'boss_void_emperor'
+        bossId: 'boss_void_emperor',
+        maxCopies: 1
     },
     // Boss 9: 宇宙恐惧
     cosmic_madness: {
@@ -972,7 +1056,8 @@ const CardData = {
         weakAll: 3,
         target: 'all',
         rarity: 'boss',
-        bossId: 'boss_cosmic_horror'
+        bossId: 'boss_cosmic_horror',
+        maxCopies: 1
     },
     // Boss 10: 终焉之神
     divine_judgment: {
@@ -988,7 +1073,8 @@ const CardData = {
         maxAoeDamage: 35,
         target: 'single',
         rarity: 'boss',
-        bossId: 'boss_final_god'
+        bossId: 'boss_final_god',
+        maxCopies: 1
     }
 };
 
@@ -1273,6 +1359,20 @@ const Cards = {
     },
 
     canAddToDeck(deck, card) {
+        // Initial cards are unlimited
+        const initialCards = ['laser_shot', 'energy_shield', 'plasma_cannon'];
+        if (initialCards.includes(card.id)) {
+            return true;
+        }
+        
+        // Check maxCopies limit from CardLimits settings
+        const maxCopies = CardLimits.getCardLimit(card.id);
+        const currentCount = deck.filter(c => c.id === card.id).length;
+        if (currentCount >= maxCopies) {
+            return false;
+        }
+        
+        // Legacy check for elite/unique cards
         if (card.rarity === 'elite' || card.unique) {
             const hasCopy = deck.some(c => c.id === card.id);
             return !hasCopy;
