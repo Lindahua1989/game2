@@ -1075,6 +1075,246 @@ const CardData = {
         rarity: 'boss',
         bossId: 'boss_final_god',
         maxCopies: 1
+    },
+    // === 新机制卡牌 ===
+    // 连击机制 - 本回合打出其他卡牌后增强
+    combo_strike: {
+        id: 'combo_strike',
+        name: '连击',
+        type: 'attack',
+        cost: 1,
+        icon: '⚡',
+        description: '造成 4~6 伤害，本回合每打出1张其他卡牌+3伤害',
+        minDamage: 4,
+        maxDamage: 6,
+        comboBonus: 3,
+        target: 'single',
+        maxCopies: 2
+    },
+    chain_attack: {
+        id: 'chain_attack',
+        name: '连锁攻击',
+        type: 'attack',
+        cost: 2,
+        icon: '🔗',
+        description: '造成 8~12 伤害，本回合每打出1张其他卡牌+4伤害',
+        minDamage: 8,
+        maxDamage: 12,
+        comboBonus: 4,
+        target: 'single',
+        maxCopies: 2
+    },
+    // 消耗机制 - 使用后从牌组移除
+    overload_blast: {
+        id: 'overload_blast',
+        name: '过载爆破',
+        type: 'attack',
+        cost: 0,
+        icon: '💣',
+        description: '造成 15~20 伤害，消耗此卡',
+        minDamage: 15,
+        maxDamage: 20,
+        exhaust: true,
+        target: 'single',
+        maxCopies: 2
+    },
+    emergency_shield: {
+        id: 'emergency_shield',
+        name: '应急护盾',
+        type: 'skill',
+        cost: 0,
+        icon: '🛡️',
+        description: '获得 12 护甲，消耗此卡',
+        block: 12,
+        exhaust: true,
+        target: 'self',
+        maxCopies: 2
+    },
+    power_surge: {
+        id: 'power_surge',
+        name: '能量涌动',
+        type: 'skill',
+        cost: 0,
+        icon: '⚡',
+        description: '获得 2 能量，消耗此卡',
+        energy: 2,
+        exhaust: true,
+        target: 'self',
+        maxCopies: 2
+    },
+    // 回响机制 - 下回合开始时再次触发
+    echo_shield: {
+        id: 'echo_shield',
+        name: '回响护盾',
+        type: 'skill',
+        cost: 1,
+        icon: '🔊',
+        description: '获得 8 护甲，下回合开始时再获得 8 护甲',
+        block: 8,
+        echo: { block: 8 },
+        target: 'self',
+        maxCopies: 2
+    },
+    echo_strike: {
+        id: 'echo_strike',
+        name: '回响打击',
+        type: 'attack',
+        cost: 1,
+        icon: '🔊',
+        description: '造成 6~8 伤害，下回合开始时再造成 6~8 伤害',
+        minDamage: 6,
+        maxDamage: 8,
+        echo: { minDamage: 6, maxDamage: 8 },
+        target: 'single',
+        maxCopies: 2
+    },
+    echo_draw: {
+        id: 'echo_draw',
+        name: '回响抽取',
+        type: 'skill',
+        cost: 1,
+        icon: '🔊',
+        description: '抽 1 张牌，下回合开始时再抽 1 张牌',
+        draw: 1,
+        echo: { draw: 1 },
+        target: 'self',
+        maxCopies: 2
+    },
+    // 协同机制 - 根据手牌中其他卡牌类型增强
+    synergy_attack: {
+        id: 'synergy_attack',
+        name: '协同打击',
+        type: 'attack',
+        cost: 1,
+        icon: '🤝',
+        description: '造成 5~7 伤害，手牌中每有1张技能牌+3伤害',
+        minDamage: 5,
+        maxDamage: 7,
+        synergySkill: 3,
+        target: 'single',
+        maxCopies: 2
+    },
+    synergy_defense: {
+        id: 'synergy_defense',
+        name: '协同防御',
+        type: 'skill',
+        cost: 1,
+        icon: '🤝',
+        description: '获得 6 护甲，手牌中每有1张攻击牌+3护甲',
+        block: 6,
+        synergyAttack: 3,
+        target: 'self',
+        maxCopies: 2
+    },
+    synergy_power: {
+        id: 'synergy_power',
+        name: '协同能量',
+        type: 'skill',
+        cost: 1,
+        icon: '🤝',
+        description: '获得 1 能量，手牌中每有1张能力牌+1能量',
+        energy: 1,
+        synergyPower: 1,
+        target: 'self',
+        maxCopies: 2
+    },
+    // 反击机制 - 受到伤害时触发
+    counter_attack: {
+        id: 'counter_attack',
+        name: '反击',
+        type: 'skill',
+        cost: 1,
+        icon: '⚔️',
+        description: '本回合受到伤害时，对攻击者造成 5 伤害',
+        counterDamage: 5,
+        target: 'self',
+        maxCopies: 2
+    },
+    thorn_armor: {
+        id: 'thorn_armor',
+        name: '荆棘装甲',
+        type: 'skill',
+        cost: 1,
+        icon: '🌵',
+        description: '获得 6 护甲，本回合受到伤害时反弹 4 伤害',
+        block: 6,
+        counterDamage: 4,
+        target: 'self',
+        maxCopies: 2
+    },
+    // 其他新机制卡牌
+    double_tap: {
+        id: 'double_tap',
+        name: '双重射击',
+        type: 'attack',
+        cost: 1,
+        icon: '🎯',
+        description: '造成 4~6 伤害 x2，如果本回合打出过其他攻击牌则再造成 4~6 伤害',
+        minDamage: 4,
+        maxDamage: 6,
+        hits: 2,
+        comboAttack: true,
+        target: 'single',
+        maxCopies: 2
+    },
+    adaptive_shield: {
+        id: 'adaptive_shield',
+        name: '自适应护盾',
+        type: 'skill',
+        cost: 1,
+        icon: '🛡️',
+        description: '获得 5 护甲，本回合每受到1次伤害+3护甲',
+        block: 5,
+        shieldOnHit: 3,
+        target: 'self',
+        maxCopies: 2
+    },
+    energy_leech: {
+        id: 'energy_leech',
+        name: '能量汲取',
+        type: 'attack',
+        cost: 1,
+        icon: '🔋',
+        description: '造成 5~7 伤害，每造成1点伤害获得 0.5 能量',
+        minDamage: 5,
+        maxDamage: 7,
+        energyOnDamage: 0.5,
+        target: 'single',
+        maxCopies: 2
+    },
+    shield_bash: {
+        id: 'shield_bash',
+        name: '护盾猛击',
+        type: 'attack',
+        cost: 1,
+        icon: '🛡️',
+        description: '造成等同于当前护甲的伤害',
+        damageFromBlock: true,
+        target: 'single',
+        maxCopies: 2
+    },
+    momentum: {
+        id: 'momentum',
+        name: '动能积累',
+        type: 'power',
+        cost: 1,
+        icon: '📈',
+        description: '每打出1张卡牌，本回合攻击力+1',
+        momentumBonus: 1,
+        target: 'self',
+        maxCopies: 2
+    },
+    overcharge: {
+        id: 'overcharge',
+        name: '超充能',
+        type: 'skill',
+        cost: 1,
+        icon: '⚡',
+        description: '本回合能量上限+2，但下回合能量上限-1',
+        energyBoost: 2,
+        nextTurnEnergyPenalty: 1,
+        target: 'self',
+        maxCopies: 2
     }
 };
 

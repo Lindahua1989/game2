@@ -32,6 +32,10 @@ const Combat = {
             firstAttackUsed: false,
             firstAttackBonus: 0,
             cardsPlayedThisTurn: 0,
+            attacksPlayedThisTurn: 0,
+            counterDamage: 0,
+            shieldOnHit: 0,
+            echoEffects: [],
             extraDraw: 0,
             discardCount: 0,
             combatOver: false,
@@ -60,6 +64,15 @@ const Combat = {
         this.state.firstAttackUsed = false;
         this.state.firstAttackBonus = 0;
         this.state.cardsPlayedThisTurn = 0;
+        this.state.attacksPlayedThisTurn = 0;
+        this.state.counterDamage = 0;
+        this.state.shieldOnHit = 0;
+
+        // 应用下回合能量惩罚
+        if (this.state.playerPowers.nextTurnEnergyPenalty > 0) {
+            this.state.maxEnergy = Math.max(1, this.state.maxEnergy - this.state.playerPowers.nextTurnEnergyPenalty);
+            this.state.playerPowers.nextTurnEnergyPenalty = 0;
+        }
 
         this.state.energy = this.state.maxEnergy + this.state.playerPowers.energyPerTurn;
 
@@ -67,6 +80,31 @@ const Combat = {
         const hEnergyGain = this.state.playerPowers.hEnergyPerTurn;
         this.state.hEnergy = Math.min(this.state.maxHEnergy, this.state.hEnergy + hEnergyGain);
         UI.showHEnergyGain(hEnergyGain);
+
+        // 处理回响效果
+        if (this.state.echoEffects && this.state.echoEffects.length > 0) {
+            this.state.echoEffects.forEach(echo => {
+                if (echo.block) {
+                    this.state.playerBlock += echo.block;
+                    UI.showBlockGain(echo.block);
+                    UI.showCombatLog(`回响：获得 ${echo.block} 护甲`, 'system');
+                }
+                if (echo.draw) {
+                    this.drawCards(echo.draw);
+                    UI.showCombatLog(`回响：抽 ${echo.draw} 张牌`, 'system');
+                }
+                if (echo.minDamage && echo.maxDamage) {
+                    const echoDmg = Utils.randomInt(echo.minDamage, echo.maxDamage);
+                    const alive = this.state.enemies.filter(e => e.hp > 0);
+                    if (alive.length > 0) {
+                        const target = Utils.randomChoice(alive);
+                        this.dealDamageToEnemy(target, echoDmg, false, 'medium');
+                        UI.showCombatLog(`回响：造成 ${echoDmg} 伤害`, 'damage');
+                    }
+                }
+            });
+            this.state.echoEffects = [];
+        }
 
         if (this.state.playerPowers.blockPerTurn > 0) {
             this.state.playerBlock += this.state.playerPowers.blockPerTurn;
@@ -206,6 +244,7 @@ const Combat = {
         this.state.targetingCard = null;
         this.state.energy -= cost;
         this.state.hand.splice(cardIndex, 1);
+        this.state.cardsPlayedThisTurn++;
 
         UI.animateCardPlay(cardIndex, card.type, targetIndex);
         UI.showCombatLog(`使用 ${card.name}`, 'system');
@@ -228,7 +267,12 @@ const Combat = {
             card.used = true;
         }
         
-        this.state.discardPile.push(card);
+        // Handle exhaust cards - don't add to discard pile
+        if (card.exhaust) {
+            // Card is removed from the game
+        } else {
+            this.state.discardPile.push(card);
+        }
         this.state.animating = false;
 
         if (this.checkCombatEnd()) return;
@@ -240,6 +284,25 @@ const Combat = {
         let bonusDmg = this.state.playerPowers.strength + this.state.playerPowers.attackBonus + this.state.firstAttackBonus;
         const cardBonus = Relics.getCardBonus(Game.state.player.relics);
         
+        // 连击加成 - 本回合每打出1张其他卡牌增加伤害
+        if (card.comboBonus) {
+            bonusDmg += card.comboBonus * this.state.cardsPlayedThisTurn;
+        }
+        
+        // 协同加成 - 根据手牌中其他卡牌类型增加伤害
+        if (card.synergySkill) {
+            const skillCount = this.state.hand.filter(c => c.type === 'skill').length;
+            bonusDmg += card.synergySkill * skillCount;
+        }
+        if (card.synergyAttack) {
+            const attackCount = this.state.hand.filter(c => c.type === 'attack').length;
+            bonusDmg += card.synergyAttack * attackCount;
+        }
+        if (card.synergyPower) {
+            const powerCount = this.state.hand.filter(c => c.type === 'power').length;
+            bonusDmg += card.synergyPower * powerCount;
+        }
+        
         if (this.state.playerPowers.berserkerBonus && card.type === 'attack') {
             const hpPercent = Game.state.player.hp / Game.state.player.maxHp;
             const berserkerDmg = Math.floor(this.state.playerPowers.berserkerBonus * (1 - hpPercent));
@@ -248,8 +311,8 @@ const Combat = {
 
         if (card.minDamage && card.maxDamage) {
             const hits = card.hits || 1;
-            const avgDmg = Math.floor((card.minDamage + card.maxDamage) / 2) + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
-            const totalDmg = avgDmg * hits;
+            const baseDmg = Utils.randomInt(card.minDamage, card.maxDamage);
+            const totalDmg = baseDmg + bonusDmg + cardBonus;
 
             let hitLevel;
             if (card.poison) {
@@ -264,15 +327,10 @@ const Combat = {
                 hitLevel = 'light';
             }
 
-            const rollDamage = () => {
-                const base = Utils.randomInt(card.minDamage, card.maxDamage);
-                return base + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
-            };
-
             if (card.target === 'all') {
                 for (const enemy of this.state.enemies) {
                     for (let h = 0; h < hits; h++) {
-                        this.dealDamageToEnemy(enemy, rollDamage(), card.ignoreBlock, hitLevel);
+                        this.dealDamageToEnemy(enemy, totalDmg, card.ignoreBlock, hitLevel);
                         if (hits > 1) await Utils.delay(100);
                     }
                 }
@@ -280,7 +338,7 @@ const Combat = {
                 for (let h = 0; h < hits; h++) {
                     const alive = this.state.enemies.filter(e => e.hp > 0);
                     if (alive.length > 0) {
-                        this.dealDamageToEnemy(Utils.randomChoice(alive), rollDamage(), card.ignoreBlock, hitLevel);
+                        this.dealDamageToEnemy(Utils.randomChoice(alive), totalDmg, card.ignoreBlock, hitLevel);
                         if (hits > 1) await Utils.delay(100);
                     }
                 }
@@ -288,13 +346,13 @@ const Combat = {
                 const target = this.state.enemies[targetIndex];
                 if (target) {
                     for (let h = 0; h < hits; h++) {
-                        this.dealDamageToEnemy(target, rollDamage(), card.ignoreBlock, hitLevel);
+                        this.dealDamageToEnemy(target, totalDmg, card.ignoreBlock, hitLevel);
                         if (hits > 1) await Utils.delay(100);
                     }
                 }
             }
         } else if (card.damage) {
-            let dmg = card.damage + (card.type === 'attack' ? bonusDmg : 0) + cardBonus;
+            let dmg = card.damage + bonusDmg + cardBonus;
             if (dmg < 0) dmg = 0;
             const hits = card.hits || 1;
             const totalDmg = dmg * hits;
@@ -559,6 +617,133 @@ const Combat = {
 
         if (card.healPerTurn) {
             this.state.playerPowers.healPerTurn = (this.state.playerPowers.healPerTurn || 0) + card.healPerTurn;
+        }
+
+        // 连击机制 - 本回合每打出1张其他卡牌增加伤害
+        if (card.comboBonus) {
+            const comboDmg = card.comboBonus * this.state.cardsPlayedThisTurn;
+            if (comboDmg > 0 && card.target === 'single') {
+                const target = this.state.enemies[targetIndex];
+                if (target) {
+                    this.dealDamageToEnemy(target, comboDmg, false, 'medium');
+                    UI.showCombatLog(`连击加成：额外造成 ${comboDmg} 伤害`, 'damage');
+                }
+            }
+        }
+
+        // 消耗机制 - 使用后从牌组移除
+        if (card.exhaust) {
+            card.exhausted = true;
+            UI.showCombatLog(`${card.name} 已被消耗`, 'system');
+        }
+
+        // 回响机制 - 下回合开始时再次触发
+        if (card.echo) {
+            this.state.echoEffects = this.state.echoEffects || [];
+            this.state.echoEffects.push(card.echo);
+            UI.showCombatLog(`${card.name} 将在下回合回响`, 'system');
+        }
+
+        // 协同机制 - 根据手牌中其他卡牌类型增强
+        if (card.synergySkill) {
+            const skillCount = this.state.hand.filter(c => c.type === 'skill').length;
+            const synergyDmg = card.synergySkill * skillCount;
+            if (synergyDmg > 0 && card.target === 'single') {
+                const target = this.state.enemies[targetIndex];
+                if (target) {
+                    this.dealDamageToEnemy(target, synergyDmg, false, 'medium');
+                    UI.showCombatLog(`协同加成：额外造成 ${synergyDmg} 伤害`, 'damage');
+                }
+            }
+        }
+
+        if (card.synergyAttack) {
+            const attackCount = this.state.hand.filter(c => c.type === 'attack').length;
+            const synergyBlock = card.synergyAttack * attackCount;
+            if (synergyBlock > 0) {
+                this.state.playerBlock += synergyBlock;
+                UI.showBlockGain(synergyBlock);
+                UI.showCombatLog(`协同加成：额外获得 ${synergyBlock} 护甲`, 'system');
+            }
+        }
+
+        if (card.synergyPower) {
+            const powerCount = this.state.hand.filter(c => c.type === 'power').length;
+            const synergyEnergy = card.synergyPower * powerCount;
+            if (synergyEnergy > 0) {
+                this.state.energy += synergyEnergy;
+                UI.showEnergyPulse();
+                UI.showCombatLog(`协同加成：额外获得 ${synergyEnergy} 能量`, 'system');
+            }
+        }
+
+        // 反击机制 - 本回合受到伤害时触发
+        if (card.counterDamage) {
+            this.state.counterDamage = (this.state.counterDamage || 0) + card.counterDamage;
+            UI.showCombatLog(`反击已激活：受到攻击时反弹 ${card.counterDamage} 伤害`, 'system');
+        }
+
+        // 双重射击 - 如果本回合打出过其他攻击牌则再造成一次伤害
+        if (card.comboAttack && this.state.attacksPlayedThisTurn > 0) {
+            const target = this.state.enemies[targetIndex];
+            if (target && card.minDamage && card.maxDamage) {
+                const extraDmg = Utils.randomInt(card.minDamage, card.maxDamage) + bonusDmg;
+                this.dealDamageToEnemy(target, extraDmg, card.ignoreBlock, 'medium');
+                UI.showCombatLog(`双重射击：额外造成 ${extraDmg} 伤害`, 'damage');
+            }
+        }
+
+        // 自适应护盾 - 本回合每受到1次伤害增加护甲
+        if (card.shieldOnHit) {
+            this.state.shieldOnHit = (this.state.shieldOnHit || 0) + card.shieldOnHit;
+            UI.showCombatLog(`自适应护盾：每次受击+${card.shieldOnHit}护甲`, 'system');
+        }
+
+        // 能量汲取 - 每造成1点伤害获得能量
+        if (card.energyOnDamage && card.minDamage && card.maxDamage) {
+            const dmgDealt = Utils.randomInt(card.minDamage, card.maxDamage);
+            const energyGained = Math.floor(dmgDealt * card.energyOnDamage);
+            if (energyGained > 0) {
+                this.state.energy += energyGained;
+                UI.showEnergyPulse();
+                UI.showCombatLog(`能量汲取：获得 ${energyGained} 能量`, 'system');
+            }
+        }
+
+        // 护盾猛击 - 造成等同于当前护甲的伤害
+        if (card.damageFromBlock) {
+            const dmg = this.state.playerBlock + bonusDmg;
+            const target = this.state.enemies[targetIndex];
+            if (target && dmg > 0) {
+                this.dealDamageToEnemy(target, dmg, false, 'medium');
+                UI.showCombatLog(`护盾猛击：造成 ${dmg} 伤害`, 'damage');
+            }
+        }
+
+        // 动能积累 - 每打出1张卡牌增加攻击力
+        if (card.momentumBonus) {
+            this.state.playerPowers.momentumBonus = (this.state.playerPowers.momentumBonus || 0) + card.momentumBonus;
+            UI.showCombatLog(`动能积累：每打出1张卡牌+${card.momentumBonus}攻击力`, 'system');
+        }
+
+        // 超充能 - 本回合能量上限增加，下回合减少
+        if (card.energyBoost) {
+            this.state.energy += card.energyBoost;
+            UI.showEnergyPulse();
+            UI.showCombatLog(`超充能：本回合能量+${card.energyBoost}`, 'system');
+        }
+        if (card.nextTurnEnergyPenalty) {
+            this.state.playerPowers.nextTurnEnergyPenalty = (this.state.playerPowers.nextTurnEnergyPenalty || 0) + card.nextTurnEnergyPenalty;
+        }
+
+        // 更新本回合打出的攻击牌计数
+        if (card.type === 'attack') {
+            this.state.attacksPlayedThisTurn = (this.state.attacksPlayedThisTurn || 0) + 1;
+        }
+
+        // 动能积累效果 - 每打出1张卡牌增加攻击力
+        if (this.state.playerPowers.momentumBonus) {
+            this.state.playerPowers.attackBonus += this.state.playerPowers.momentumBonus;
         }
 
         this.state.firstAttackBonus = 0;
