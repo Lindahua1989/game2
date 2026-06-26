@@ -65,6 +65,18 @@ const UI = {
         document.getElementById('energy-current').textContent = state.energy;
         document.getElementById('energy-max').textContent = state.maxEnergy;
 
+        // H能量渲染
+        const hEnergyPercent = (state.hEnergy / state.maxHEnergy * 100).toFixed(0);
+        document.getElementById('h-energy-current').textContent = state.hEnergy;
+        document.getElementById('h-energy-max').textContent = state.maxHEnergy;
+        const hEnergyFill = document.getElementById('h-energy-fill');
+        hEnergyFill.style.width = hEnergyPercent + '%';
+        if (state.hEnergy === state.maxHEnergy) {
+            hEnergyFill.classList.add('full');
+        } else {
+            hEnergyFill.classList.remove('full');
+        }
+
         const playerStatus = document.getElementById('player-status');
         let playerStatusHtml = '';
         if (state.playerPoison > 0) {
@@ -689,6 +701,26 @@ const UI = {
             el.classList.add('energy-pulse');
             setTimeout(() => el.classList.remove('energy-pulse'), 400);
             Particles.spawn(el, 'energy', 12);
+        }
+    },
+
+    showHEnergyGain(amount) {
+        const el = document.querySelector('.player-h-energy');
+        if (el) {
+            el.classList.add('h-energy-gain');
+            setTimeout(() => el.classList.remove('h-energy-gain'), 600);
+            Particles.spawn(el, 'energy', 8);
+            this.showCombatLog(`H能量 +${amount}`, 'system');
+        }
+    },
+
+    showHEnergyConsume(amount) {
+        const el = document.querySelector('.player-h-energy');
+        if (el) {
+            el.classList.add('h-energy-consume');
+            setTimeout(() => el.classList.remove('h-energy-consume'), 800);
+            Particles.spawn(el, 'damage', 15);
+            this.showCombatLog(`消耗 ${amount} H能量`, 'system');
         }
     },
 

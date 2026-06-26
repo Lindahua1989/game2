@@ -375,7 +375,7 @@ const CardData = {
         type: 'attack',
         cost: -1,
         icon: '💾',
-        description: '造成 X*5 伤害，消耗 X 能量',
+        description: '消耗全部H能量，每点造成 5 伤害',
         damagePerEnergy: 5,
         target: 'single'
     },
@@ -957,8 +957,8 @@ const Cards = {
     buildDescription(card) {
         const parts = [];
 
-        if (card.damage && card.damagePerEnergy) {
-            parts.push(`造成 X*${card.damagePerEnergy} 伤害，消耗 X 能量`);
+        if (card.cost === -1 && card.damagePerEnergy) {
+            parts.push(`消耗全部H能量，每点造成 ${card.damagePerEnergy} 伤害`);
         } else if (card.minDamage && card.maxDamage) {
             const hits = card.hits || 1;
             if (hits > 1) {

@@ -13,6 +13,8 @@ const Combat = {
             playerPoison: 0,
             energy: 3 + Relics.getExtraEnergy(Game.state.player.relics),
             maxEnergy: 3 + Relics.getExtraEnergy(Game.state.player.relics),
+            hEnergy: 0,
+            maxHEnergy: 10,
             turn: 1,
             playerPowers: {
                 strength: 0,
@@ -23,7 +25,8 @@ const Combat = {
                 attackBonus: 0,
                 blockOnAttack: 0,
                 thorns: 0,
-                nextTurnBlock: 0
+                nextTurnBlock: 0,
+                hEnergyPerTurn: 1
             },
             targetingCard: null,
             firstAttackUsed: false,
@@ -58,6 +61,11 @@ const Combat = {
         this.state.cardsPlayedThisTurn = 0;
 
         this.state.energy = this.state.maxEnergy + this.state.playerPowers.energyPerTurn;
+
+        // H能量每回合增长
+        const hEnergyGain = this.state.playerPowers.hEnergyPerTurn;
+        this.state.hEnergy = Math.min(this.state.maxHEnergy, this.state.hEnergy + hEnergyGain);
+        UI.showHEnergyGain(hEnergyGain);
 
         if (this.state.playerPowers.blockPerTurn > 0) {
             this.state.playerBlock += this.state.playerPowers.blockPerTurn;
@@ -307,8 +315,10 @@ const Combat = {
         }
 
         if (card.cost === -1) {
-            const spentEnergy = this.state.maxEnergy;
-            const dmg = spentEnergy * (card.damagePerEnergy || 5) + bonusDmg;
+            const spentHEnergy = this.state.hEnergy;
+            const dmg = spentHEnergy * (card.damagePerEnergy || 5) + bonusDmg;
+            this.state.hEnergy = 0;
+            UI.showHEnergyConsume(spentHEnergy);
             const target = this.state.enemies[targetIndex];
             if (target) this.dealDamageToEnemy(target, dmg, false, 'heavy');
         }
