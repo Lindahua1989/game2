@@ -142,6 +142,7 @@ const Combat = {
     cancelTargeting() {
         if (this.state && this.state.targetingCard !== null) {
             this.state.targetingCard = null;
+            Targeting.stopTargeting();
             UI.renderCombat();
         }
     },
@@ -169,6 +170,7 @@ const Combat = {
 
         if (card.target === 'single' && targetIndex === undefined) {
             this.state.targetingCard = cardIndex;
+            Targeting.startTargeting(cardIndex, card.type);
             UI.renderCombat();
             return;
         }

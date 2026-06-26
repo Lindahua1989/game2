@@ -24,7 +24,10 @@ const UI = {
                     e.stopPropagation();
                     const cardIdx = state.targetingCard;
                     state.targetingCard = null;
-                    Combat.playCard(cardIdx, idx);
+                    
+                    Targeting.showBeamFlash(() => {
+                        Combat.playCard(cardIdx, idx);
+                    });
                 };
             }
 
