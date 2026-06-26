@@ -146,6 +146,11 @@ const UI = {
             card.tempCostZero = false;
         }
 
+        // Apply cost reduction from power_surge (能量激增)
+        if (!isHEnergyCard && Combat.state && Combat.state.costReduction && cost > 0) {
+            cost = Math.max(0, cost - Combat.state.costReduction);
+        }
+
         const costClass = isHEnergyCard ? 'card-cost h-cost' : 'card-cost';
         const costDisplay = isHEnergyCard ? 'X' : cost;
 
