@@ -176,6 +176,11 @@ const Combat = {
         
         if (cost > this.state.energy) return;
 
+        if (card.requireHEnergy && this.state.hEnergy < card.requireHEnergy) {
+            UI.showCombatLog(`需要至少 ${card.requireHEnergy} 点H能量`, 'system');
+            return;
+        }
+
         if (card.target === 'single' && targetIndex === undefined) {
             this.state.targetingCard = cardIndex;
             Targeting.startTargeting(cardIndex, card.type);
@@ -407,6 +412,47 @@ const Combat = {
 
         if (card.nextTurnBlock) {
             this.state.playerPowers.nextTurnBlock += card.nextTurnBlock;
+        }
+
+        if (card.hEnergyGain) {
+            const oldHEnergy = this.state.hEnergy;
+            this.state.hEnergy = Math.min(this.state.maxHEnergy, this.state.hEnergy + card.hEnergyGain);
+            const gained = this.state.hEnergy - oldHEnergy;
+            if (gained > 0) {
+                UI.showHEnergyGain(gained);
+            }
+        }
+
+        if (card.hEnergyPerTurn) {
+            this.state.playerPowers.hEnergyPerTurn = (this.state.playerPowers.hEnergyPerTurn || 1) + card.hEnergyPerTurn;
+            UI.showCombatLog(`每回合H能量 +${card.hEnergyPerTurn}`, 'system');
+        }
+
+        if (card.hEnergyCost) {
+            if (this.state.hEnergy >= card.hEnergyCost) {
+                this.state.hEnergy -= card.hEnergyCost;
+                UI.showHEnergyConsume(card.hEnergyCost);
+            }
+        }
+
+        if (card.blockPerHEnergy) {
+            const spentHEnergy = this.state.hEnergy;
+            const blockValue = spentHEnergy * card.blockPerHEnergy;
+            this.state.hEnergy = 0;
+            this.state.playerBlock += blockValue;
+            UI.showHEnergyConsume(spentHEnergy);
+            UI.showBlockGain(blockValue);
+            Sound.play('block');
+        }
+
+        if (card.healPerHEnergy) {
+            const spentHEnergy = this.state.hEnergy;
+            const healValue = spentHEnergy * card.healPerHEnergy;
+            this.state.hEnergy = 0;
+            Game.state.player.hp = Math.min(Game.state.player.maxHp, Game.state.player.hp + healValue);
+            UI.showHEnergyConsume(spentHEnergy);
+            UI.showPlayerHeal(healValue);
+            Sound.play('heal');
         }
 
         if (card.reboot) {

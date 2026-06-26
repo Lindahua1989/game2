@@ -136,14 +136,20 @@ const UI = {
         if (card.upgraded) div.classList.add('upgraded');
 
         let cost = card.cost;
-        if (cost === -1) cost = Combat.state ? Combat.state.energy : 'X';
+        if (cost === -1) {
+            cost = 'X';
+            // For H energy cards, check if player has at least 1 H energy
+            const canPlayHEnergy = Combat.state && Combat.state.hEnergy > 0 && !Combat.state.combatOver;
+            if (!canPlayHEnergy && Combat.state) div.classList.add('unplayable');
+        }
         if (card.tempCostZero) {
             cost = 0;
             card.tempCostZero = false;
         }
 
-        const canPlay = Combat.state && cost <= Combat.state.energy && !Combat.state.combatOver;
-        if (!canPlay && Combat.state) div.classList.add('unplayable');
+        const canPlay = Combat.state && (card.cost === -1 ? Combat.state.hEnergy > 0 : cost <= Combat.state.energy) && !Combat.state.combatOver && 
+                        (!card.requireHEnergy || Combat.state.hEnergy >= card.requireHEnergy);
+        if (!canPlay && Combat.state && card.cost !== -1) div.classList.add('unplayable');
 
         div.innerHTML = `
             <div class="card-cost">${cost}</div>
@@ -158,7 +164,17 @@ const UI = {
         } else if (canPlay && Combat.state) {
             div.onclick = (e) => {
                 e.stopPropagation();
+                // If we're in targeting mode and click another card, cancel targeting first
+                if (Combat.state.targetingCard !== null) {
+                    Combat.cancelTargeting();
+                }
                 Combat.playCard(index);
+            };
+        } else if (Combat.state && Combat.state.targetingCard !== null) {
+            // Clicking unplayable card while targeting should cancel targeting
+            div.onclick = (e) => {
+                e.stopPropagation();
+                Combat.cancelTargeting();
             };
         }
 

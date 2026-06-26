@@ -379,6 +379,102 @@ const CardData = {
         damagePerEnergy: 5,
         target: 'single'
     },
+    h_charge: {
+        id: 'h_charge',
+        name: 'H充能',
+        type: 'skill',
+        cost: 1,
+        icon: '🔋',
+        description: '获得 3 点H能量',
+        hEnergyGain: 3,
+        target: 'self'
+    },
+    h_battery: {
+        id: 'h_battery',
+        name: 'H能量电池',
+        type: 'power',
+        cost: 2,
+        icon: '⚡',
+        description: '每回合开始获得 1 点H能量',
+        hEnergyPerTurn: 1,
+        target: 'self'
+    },
+    h_emergency: {
+        id: 'h_emergency',
+        name: '紧急充能',
+        type: 'skill',
+        cost: 0,
+        icon: '⚠️',
+        description: '获得 5 点H能量，受到 5 点伤害',
+        hEnergyGain: 5,
+        selfDamage: 5,
+        target: 'self'
+    },
+    h_shield: {
+        id: 'h_shield',
+        name: 'H能量护盾',
+        type: 'skill',
+        cost: -1,
+        icon: '🛡️',
+        description: '消耗全部H能量，每点获得 3 护甲',
+        blockPerHEnergy: 3,
+        target: 'self'
+    },
+    h_heal: {
+        id: 'h_heal',
+        name: 'H能量修复',
+        type: 'skill',
+        cost: -1,
+        icon: '💚',
+        description: '消耗全部H能量，每点回复 2 HP',
+        healPerHEnergy: 2,
+        target: 'self'
+    },
+    h_blast: {
+        id: 'h_blast',
+        name: 'H能量爆破',
+        type: 'attack',
+        cost: -1,
+        icon: '💥',
+        description: '消耗全部H能量，每点对所有敌人造成 4 伤害',
+        damagePerEnergy: 4,
+        target: 'all'
+    },
+    h_convert: {
+        id: 'h_convert',
+        name: 'H能量转换',
+        type: 'skill',
+        cost: 0,
+        icon: '🔄',
+        description: '消耗 3 点H能量，获得 2 能量',
+        hEnergyCost: 3,
+        energy: 2,
+        target: 'self'
+    },
+    h_amplifier: {
+        id: 'h_amplifier',
+        name: 'H能量放大器',
+        type: 'attack',
+        cost: 1,
+        icon: '🔆',
+        description: '若H能量>=5，造成 15 伤害',
+        minDamage: 15,
+        maxDamage: 15,
+        requireHEnergy: 5,
+        target: 'single'
+    },
+    h_reactor: {
+        id: 'h_reactor',
+        name: 'H能量反应堆',
+        type: 'attack',
+        cost: 1,
+        icon: '⚛️',
+        description: '造成 6~10 伤害，获得 1 点H能量',
+        minDamage: 6,
+        maxDamage: 10,
+        hEnergyGain: 1,
+        target: 'single'
+    },
     nano_inject: {
         id: 'nano_inject',
         name: '纳米注入',

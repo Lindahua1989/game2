@@ -84,13 +84,13 @@
                         </div>
                         <div class="player-status" id="player-status"></div>
                     </div>
-                    <div id="hand-area" onclick="event.stopPropagation()"></div>
-                    <div class="combat-bottom" onclick="event.stopPropagation()">
+                    <div id="hand-area" onclick="Combat.cancelTargeting()"></div>
+                    <div class="combat-bottom" onclick="Combat.cancelTargeting()">
                         <div class="pile-info">
-                            <button class="btn btn-small" onclick="UI.showPile('draw')">抽牌堆 (<span id="draw-count">0</span>)</button>
-                            <button class="btn btn-small" onclick="UI.showPile('discard')">弃牌堆 (<span id="discard-count">0</span>)</button>
+                            <button class="btn btn-small" onclick="event.stopPropagation(); UI.showPile('draw')">抽牌堆 (<span id="draw-count">0</span>)</button>
+                            <button class="btn btn-small" onclick="event.stopPropagation(); UI.showPile('discard')">弃牌堆 (<span id="discard-count">0</span>)</button>
                         </div>
-                        <button id="end-turn-btn" class="btn btn-end-turn" onclick="Combat.endTurn()">结束回合</button>
+                        <button id="end-turn-btn" class="btn btn-end-turn" onclick="event.stopPropagation(); Combat.endTurn()">结束回合</button>
                     </div>
                 </div>
             </div>
