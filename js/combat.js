@@ -35,6 +35,7 @@ const Combat = {
             extraDraw: 0,
             discardCount: 0,
             combatOver: false,
+            costReduction: 0,
             enemyTier: enemies[0]?.tier || 'normal'
         };
 
@@ -620,6 +621,7 @@ const Combat = {
         if (this.state.extraTurns && this.state.extraTurns > 0) {
             this.state.extraTurns--;
             this.state.turn++;
+            this.state.costReduction = 0;
             UI.showCombatLog(`额外回合！`, 'system');
             this.startPlayerTurn();
             return;
