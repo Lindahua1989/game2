@@ -471,6 +471,7 @@ const Relics = {
             }
             if (r.id === 'boss_void_crown') {
                 combatState.extraDraw = (combatState.extraDraw || 0) + 2;
+                combatState.energy = (combatState.energy || 0) + 3;
             }
         });
     },

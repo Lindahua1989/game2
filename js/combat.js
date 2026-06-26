@@ -102,6 +102,17 @@ const Combat = {
         Relics.onTurnStart(Game.state.player.relics, this.state);
 
         let drawCount = 5 + this.state.extraDraw;
+        
+        const hasBossVoidCrown = Game.state.player.relics.some(r => r.id === 'boss_void_crown');
+        if (hasBossVoidCrown) {
+            drawCount = 7;
+        }
+        
+        const hasBossDivineSpark = Game.state.player.relics.some(r => r.id === 'boss_divine_spark');
+        if (hasBossDivineSpark) {
+            drawCount = 8;
+        }
+        
         this.state.extraDraw = 0;
         this.drawCards(drawCount);
 
@@ -110,18 +121,22 @@ const Combat = {
     },
 
     drawCards(count) {
+        let drawn = 0;
         for (let i = 0; i < count; i++) {
             if (this.state.drawPile.length === 0) {
-                if (this.state.discardPile.length === 0) return;
+                if (this.state.discardPile.length === 0) break;
                 this.state.drawPile = Utils.shuffle([...this.state.discardPile]);
                 this.state.discardPile = [];
             }
             this.state.hand.push(this.state.drawPile.pop());
+            drawn++;
         }
-        setTimeout(() => {
-            UI.animateCardDraw();
-            Sound.play('draw');
-        }, 50);
+        if (drawn > 0) {
+            setTimeout(() => {
+                UI.animateCardDraw();
+                Sound.play('draw');
+            }, 50);
+        }
     },
 
     cancelTargeting() {
@@ -133,6 +148,7 @@ const Combat = {
 
     async playCard(cardIndex, targetIndex) {
         if (this.state.combatOver) return;
+        if (this.state.animating) return;
 
         const card = this.state.hand[cardIndex];
         if (!card) return;
@@ -157,14 +173,18 @@ const Combat = {
             return;
         }
 
+        this.state.animating = true;
         this.state.targetingCard = null;
+        this.state.energy -= cost;
+        this.state.hand.splice(cardIndex, 1);
+
         UI.animateCardPlay(cardIndex, card.type, targetIndex);
         UI.showCombatLog(`使用 ${card.name}`, 'system');
         Sound.play('card_play');
         GameStats.recordCardPlayed();
+        UI.renderCombat();
+
         await Utils.delay(300);
-        this.state.energy -= cost;
-        this.state.hand.splice(cardIndex, 1);
 
         Relics.onCardPlayed(Game.state.player.relics, card, this.state);
 
@@ -175,6 +195,7 @@ const Combat = {
         }
 
         this.state.discardPile.push(card);
+        this.state.animating = false;
 
         if (this.checkCombatEnd()) return;
 
@@ -311,6 +332,10 @@ const Combat = {
             this.state.energy += card.energy;
             UI.showEnergyPulse();
             Sound.play('energy');
+        }
+
+        if (card.energyCost) {
+            this.state.energy = Math.max(0, this.state.energy - card.energyCost);
         }
 
         if (card.selfDamage) {
@@ -487,8 +512,24 @@ const Combat = {
     async endTurn() {
         if (this.state.combatOver) return;
 
+        const discardedCount = this.state.hand.length;
         this.state.discardPile.push(...this.state.hand);
         this.state.hand = [];
+
+        const hasEnergyRecycler = Game.state.player.relics.some(r => r.id === 'energy_recycler');
+        if (hasEnergyRecycler && discardedCount > 0) {
+            const energyGained = Math.floor(discardedCount / 3);
+            if (energyGained > 0) {
+                this.state.energy += energyGained;
+                UI.showCombatLog(`能量回收器：回收 ${discardedCount} 张牌，获得 ${energyGained} 能量`, 'system');
+            }
+        }
+
+        const hasOverclockEngine = Game.state.player.relics.some(r => r.id === 'overclock_engine');
+        let carriedEnergy = 0;
+        if (hasOverclockEngine && this.state.energy > 0) {
+            carriedEnergy = Math.min(1, this.state.energy);
+        }
 
         if (this.state.extraTurns && this.state.extraTurns > 0) {
             this.state.extraTurns--;
@@ -505,6 +546,12 @@ const Combat = {
         this.state.turn++;
         this.state.costReduction = 0;
         this.startPlayerTurn();
+
+        if (carriedEnergy > 0) {
+            this.state.energy += carriedEnergy;
+            UI.showCombatLog(`超频引擎：保留 ${carriedEnergy} 能量`, 'system');
+            UI.renderCombat();
+        }
     },
 
     async enemyTurn() {
