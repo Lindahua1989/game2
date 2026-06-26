@@ -136,23 +136,40 @@ const UI = {
         if (card.upgraded) div.classList.add('upgraded');
 
         let cost = card.cost;
-        if (cost === -1) {
+        const isHEnergyCard = card.cost === -1;
+        
+        if (isHEnergyCard) {
             cost = 'X';
-            // For H energy cards, check if player has at least 1 H energy
-            const canPlayHEnergy = Combat.state && Combat.state.hEnergy > 0 && !Combat.state.combatOver;
-            if (!canPlayHEnergy && Combat.state) div.classList.add('unplayable');
         }
         if (card.tempCostZero) {
             cost = 0;
             card.tempCostZero = false;
         }
 
-        const canPlay = Combat.state && (card.cost === -1 ? Combat.state.hEnergy > 0 : cost <= Combat.state.energy) && !Combat.state.combatOver && 
-                        (!card.requireHEnergy || Combat.state.hEnergy >= card.requireHEnergy);
-        if (!canPlay && Combat.state && card.cost !== -1) div.classList.add('unplayable');
+        const costClass = isHEnergyCard ? 'card-cost h-cost' : 'card-cost';
+        const costDisplay = isHEnergyCard ? 'X' : cost;
+
+        let canPlay = false;
+        if (Combat.state && !Combat.state.combatOver) {
+            if (isHEnergyCard) {
+                canPlay = Combat.state.hEnergy > 0;
+            } else {
+                canPlay = cost <= Combat.state.energy;
+            }
+            
+            if (card.requireHEnergy && Combat.state.hEnergy < card.requireHEnergy) {
+                canPlay = false;
+            }
+            
+            if (card.hEnergyCost && Combat.state.hEnergy < card.hEnergyCost) {
+                canPlay = false;
+            }
+        }
+        
+        if (!canPlay && Combat.state) div.classList.add('unplayable');
 
         div.innerHTML = `
-            <div class="card-cost">${cost}</div>
+            <div class="${costClass}">${costDisplay}</div>
             <div class="card-icon">${card.icon}</div>
             <div class="card-name">${card.name}</div>
             <div class="card-desc">${card.description}</div>

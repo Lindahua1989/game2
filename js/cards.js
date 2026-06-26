@@ -136,7 +136,7 @@ const CardData = {
         type: 'skill',
         cost: 0,
         icon: '⚡',
-        description: '获得 2 能量，受到 3 伤害',
+        description: '获得 2 C能量，受到 3 伤害',
         energy: 2,
         selfDamage: 3,
         target: 'self'
@@ -210,7 +210,7 @@ const CardData = {
         type: 'attack',
         cost: 1,
         icon: '🌀',
-        description: '造成 4~8 伤害，获得 1 能量',
+        description: '造成 4~8 伤害，获得 1 C能量',
         minDamage: 4,
         maxDamage: 8,
         energy: 1,
@@ -233,7 +233,7 @@ const CardData = {
         type: 'power',
         cost: 1,
         icon: '⚠️',
-        description: '每回合 +1 能量，受 2 伤害',
+        description: '每回合 +1 C能量，受 2 伤害',
         energyPerTurn: 1,
         damagePerTurnSelf: 2,
         target: 'self'
@@ -311,7 +311,7 @@ const CardData = {
         type: 'skill',
         cost: 1,
         icon: '🔋',
-        description: '将 2 点能量转化为 10 护甲',
+        description: '将 2 点C能量转化为 10 护甲',
         energyCost: 2,
         block: 10,
         target: 'self'
@@ -446,7 +446,7 @@ const CardData = {
         type: 'skill',
         cost: 0,
         icon: '🔄',
-        description: '消耗 3 点H能量，获得 2 能量',
+        description: '消耗 3 点H能量，获得 2 C能量',
         hEnergyCost: 3,
         energy: 2,
         target: 'self'
@@ -494,7 +494,7 @@ const CardData = {
         type: 'skill',
         cost: 0,
         icon: '🔌',
-        description: '获得 1 能量',
+        description: '获得 1 C能量',
         energy: 1,
         target: 'self'
     },
@@ -798,7 +798,7 @@ const CardData = {
         type: 'skill',
         cost: 0,
         icon: '🌟',
-        description: '获得 2 能量，抽 1 张牌',
+        description: '获得 2 C能量，抽 1 张牌',
         energy: 2,
         draw: 1,
         target: 'self',
@@ -885,7 +885,7 @@ const CardData = {
         type: 'power',
         cost: 2,
         icon: '💎',
-        description: '每回合开始获得 10 护甲，+2 能量',
+        description: '每回合开始获得 10 护甲，+2 C能量',
         blockPerTurn: 10,
         energyPerTurn: 2,
         target: 'self',
@@ -1084,7 +1084,7 @@ const Cards = {
         }
 
         if (card.energy && !card.damagePerEnergy) {
-            parts.push(`获得 ${card.energy} 能量`);
+            parts.push(`获得 ${card.energy} C能量`);
         }
 
         if (card.poison) {

@@ -163,7 +163,7 @@ const Combat = {
         if (!card) return;
 
         let cost = card.cost;
-        if (cost === -1) cost = this.state.energy;
+        if (cost === -1) cost = 0;
         
         if (this.state.firstCardDiscount && cost > 0) {
             cost = Math.max(0, cost - 1);
@@ -175,6 +175,16 @@ const Combat = {
         }
         
         if (cost > this.state.energy) return;
+
+        if (card.cost === -1 && this.state.hEnergy <= 0) {
+            UI.showCombatLog(`需要至少 1 点H能量`, 'system');
+            return;
+        }
+
+        if (card.hEnergyCost && this.state.hEnergy < card.hEnergyCost) {
+            UI.showCombatLog(`需要至少 ${card.hEnergyCost} 点H能量`, 'system');
+            return;
+        }
 
         if (card.requireHEnergy && this.state.hEnergy < card.requireHEnergy) {
             UI.showCombatLog(`需要至少 ${card.requireHEnergy} 点H能量`, 'system');
@@ -319,13 +329,23 @@ const Combat = {
             }
         }
 
-        if (card.cost === -1) {
+        if (card.cost === -1 && card.damagePerEnergy) {
             const spentHEnergy = this.state.hEnergy;
-            const dmg = spentHEnergy * (card.damagePerEnergy || 5) + bonusDmg;
+            const dmg = spentHEnergy * card.damagePerEnergy + bonusDmg;
             this.state.hEnergy = 0;
             UI.showHEnergyConsume(spentHEnergy);
-            const target = this.state.enemies[targetIndex];
-            if (target) this.dealDamageToEnemy(target, dmg, false, 'heavy');
+            
+            if (card.target === 'all') {
+                for (const enemy of this.state.enemies) {
+                    if (enemy.hp > 0) {
+                        this.dealDamageToEnemy(enemy, dmg, false, 'heavy');
+                        await Utils.delay(100);
+                    }
+                }
+            } else {
+                const target = this.state.enemies[targetIndex];
+                if (target) this.dealDamageToEnemy(target, dmg, false, 'heavy');
+            }
         }
 
         if (card.block) {
