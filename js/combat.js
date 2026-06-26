@@ -401,6 +401,7 @@ const Combat = {
             const dmg = spentHEnergy * card.damagePerEnergy + bonusDmg;
             this.state.hEnergy = 0;
             UI.showHEnergyConsume(spentHEnergy);
+            GameStats.recordHEnergyUsed(spentHEnergy);
             
             if (card.target === 'all') {
                 for (const enemy of this.state.enemies) {
@@ -530,6 +531,7 @@ const Combat = {
             UI.showHEnergyConsume(spentHEnergy);
             UI.showBlockGain(blockValue);
             Sound.play('block');
+            GameStats.recordHEnergyUsed(spentHEnergy);
         }
 
         if (card.healPerHEnergy) {
@@ -540,6 +542,7 @@ const Combat = {
             UI.showHEnergyConsume(spentHEnergy);
             UI.showPlayerHeal(healValue);
             Sound.play('heal');
+            GameStats.recordHEnergyUsed(spentHEnergy);
         }
 
         if (card.reboot) {
@@ -627,6 +630,7 @@ const Combat = {
                 if (target) {
                     this.dealDamageToEnemy(target, comboDmg, false, 'medium');
                     UI.showCombatLog(`连击加成：额外造成 ${comboDmg} 伤害`, 'damage');
+                    GameStats.recordComboTriggered();
                 }
             }
         }
@@ -635,6 +639,7 @@ const Combat = {
         if (card.exhaust) {
             card.exhausted = true;
             UI.showCombatLog(`${card.name} 已被消耗`, 'system');
+            GameStats.recordExhaustCardUsed();
         }
 
         // 回响机制 - 下回合开始时再次触发
@@ -642,6 +647,7 @@ const Combat = {
             this.state.echoEffects = this.state.echoEffects || [];
             this.state.echoEffects.push(card.echo);
             UI.showCombatLog(`${card.name} 将在下回合回响`, 'system');
+            GameStats.recordEchoEffect();
         }
 
         // 协同机制 - 根据手牌中其他卡牌类型增强
@@ -653,6 +659,7 @@ const Combat = {
                 if (target) {
                     this.dealDamageToEnemy(target, synergyDmg, false, 'medium');
                     UI.showCombatLog(`协同加成：额外造成 ${synergyDmg} 伤害`, 'damage');
+                    GameStats.recordSynergyBonus();
                 }
             }
         }
@@ -664,6 +671,7 @@ const Combat = {
                 this.state.playerBlock += synergyBlock;
                 UI.showBlockGain(synergyBlock);
                 UI.showCombatLog(`协同加成：额外获得 ${synergyBlock} 护甲`, 'system');
+                GameStats.recordSynergyBonus();
             }
         }
 
@@ -674,6 +682,7 @@ const Combat = {
                 this.state.energy += synergyEnergy;
                 UI.showEnergyPulse();
                 UI.showCombatLog(`协同加成：额外获得 ${synergyEnergy} 能量`, 'system');
+                GameStats.recordSynergyBonus();
             }
         }
 
@@ -983,6 +992,13 @@ const Combat = {
             if (this.state.playerPowers.armorOnHit > 0) {
                 this.state.playerBlock += this.state.playerPowers.armorOnHit;
                 UI.showCombatLog(`自适应装甲获得 ${this.state.playerPowers.armorOnHit} 护甲`, 'block');
+            }
+            
+            // 反击机制 - 受到攻击时反弹伤害
+            if (this.state.counterDamage > 0 && this.state.currentAttacker) {
+                this.dealDamageToEnemy(this.state.currentAttacker, this.state.counterDamage, false, 'light');
+                UI.showCombatLog(`反击造成了 ${this.state.counterDamage} 伤害`, 'damage');
+                GameStats.recordCounterDamage(this.state.counterDamage);
             }
             
             const reflectedDamage = Relics.onPlayerDamaged(Game.state.player.relics, remaining, this.state);
