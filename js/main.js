@@ -42,7 +42,8 @@ const SaveManager = {
             currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
             stats: Utils.deepClone(Game.state.stats),
             mapData: Utils.deepClone(Map.data),
-            gameModeId: GameModes.getMode().id
+            gameModeId: GameModes.getMode().id,
+            saveVersion: 2
         };
         try {
             localStorage.setItem(SAVE_PREFIX + id, JSON.stringify(saveData));
@@ -67,7 +68,8 @@ const SaveManager = {
                 currentNode: Game.state.currentNode ? Utils.deepClone(Game.state.currentNode) : null,
                 stats: Utils.deepClone(Game.state.stats),
                 mapData: Utils.deepClone(Map.data),
-                gameModeId: GameModes.getMode().id
+                gameModeId: GameModes.getMode().id,
+                saveVersion: 2
             };
             try {
                 localStorage.setItem(Game.currentSaveKey, JSON.stringify(saveData));
@@ -82,39 +84,32 @@ const SaveManager = {
             const raw = localStorage.getItem(key);
             if (!raw) return false;
             const d = JSON.parse(raw);
+            
             Game.state = {
                 player: d.player,
                 currentFloor: d.currentFloor,
                 currentNode: d.currentNode,
-                stats: d.stats
+                stats: d.stats || { battlesWon: 0, floorsCleared: 0 }
             };
+            
+            if (!Game.state.player.relics) {
+                Game.state.player.relics = [];
+            }
+            if (!Game.state.player.deck) {
+                Game.state.player.deck = Cards.getInitialDeck();
+            }
+            
             Map.data = d.mapData;
             Game.currentSaveKey = key;
             Game.currentSaveName = d.name;
+            
             if (d.gameModeId && GameModes.modes[d.gameModeId]) {
                 GameModes.setMode(d.gameModeId);
+            } else {
+                GameModes.setMode('normal');
             }
             
-            const hasAvailableNodes = Map.data && Map.data.some(row => 
-                row.some(node => node.available && !node.visited)
-            );
-            
-            if (!hasAvailableNodes && d.currentNode) {
-                const isLastRow = d.currentNode.row === Map.data.length - 1;
-                if (isLastRow) {
-                    GameModes.onFloorComplete(Game.state.currentFloor);
-                    
-                    if (GameModes.isVictory()) {
-                        return true;
-                    }
-                    
-                    Game.state.currentFloor++;
-                    Game.state.stats.floorsCleared++;
-                    GameStats.recordFloorReached(Game.state.currentFloor);
-                    Map.generate(Game.state.currentFloor);
-                    Game.state.currentNode = null;
-                }
-            }
+            this.recoverFromStuckState();
             
             return true;
         } catch (e) {
