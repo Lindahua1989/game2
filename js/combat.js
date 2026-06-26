@@ -133,8 +133,11 @@ const Combat = {
         for (let i = 0; i < count; i++) {
             if (this.state.drawPile.length === 0) {
                 if (this.state.discardPile.length === 0) break;
-                this.state.drawPile = Utils.shuffle([...this.state.discardPile]);
-                this.state.discardPile = [];
+                // Filter out used cards (like time_warp) when reshuffling
+                const reusableCards = this.state.discardPile.filter(c => !c.used);
+                if (reusableCards.length === 0) break;
+                this.state.drawPile = Utils.shuffle(reusableCards);
+                this.state.discardPile = this.state.discardPile.filter(c => c.used);
             }
             this.state.hand.push(this.state.drawPile.pop());
             drawn++;
@@ -219,6 +222,11 @@ const Combat = {
             this.state.playerBlock += this.state.playerPowers.blockOnAttack;
         }
 
+        // Mark unique cards as used so they won't be reshuffled
+        if (card.unique) {
+            card.used = true;
+        }
+        
         this.state.discardPile.push(card);
         this.state.animating = false;
 

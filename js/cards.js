@@ -568,8 +568,9 @@ const CardData = {
         type: 'skill',
         cost: 2,
         icon: '⏰',
-        description: '额外获得一个回合',
+        description: '额外获得一个回合（每场战斗限1次）',
         extraTurn: true,
+        unique: true,
         target: 'self'
     },
     virus_spread: {
@@ -1272,9 +1273,9 @@ const Cards = {
     },
 
     canAddToDeck(deck, card) {
-        if (card.rarity === 'elite') {
-            const hasEliteCopy = deck.some(c => c.id === card.id);
-            return !hasEliteCopy;
+        if (card.rarity === 'elite' || card.unique) {
+            const hasCopy = deck.some(c => c.id === card.id);
+            return !hasCopy;
         }
         return true;
     },
