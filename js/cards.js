@@ -369,16 +369,6 @@ const CardData = {
         blockOnAttack: 2,
         target: 'self'
     },
-    data_overflow: {
-        id: 'data_overflow',
-        name: '数据溢出',
-        type: 'attack',
-        cost: -1,
-        icon: '💾',
-        description: '消耗全部H能量，每点造成 5 伤害',
-        damagePerEnergy: 5,
-        target: 'single'
-    },
     h_charge: {
         id: 'h_charge',
         name: 'H充能',
@@ -1275,6 +1265,9 @@ const Cards = {
         if (card.weakAll) card.weakAll += 1;
         if (card.healPerTurn) card.healPerTurn = Math.ceil(card.healPerTurn * 1.3);
         if (card.berserkerBonus) card.berserkerBonus += 2;
+        if (card.damagePerEnergy) card.damagePerEnergy = Math.ceil(card.damagePerEnergy * 1.3);
+        if (card.blockPerHEnergy) card.blockPerHEnergy = Math.ceil(card.blockPerHEnergy * 1.3);
+        if (card.healPerHEnergy) card.healPerHEnergy = Math.ceil(card.healPerHEnergy * 1.3);
         card.description = this.buildDescription(card);
     },
 
