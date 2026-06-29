@@ -81,6 +81,10 @@ const Unlocks = {
     },
 
     checkUnlocks() {
+        if (!GameStats.achievements) {
+            console.warn('GameStats.achievements not initialized yet');
+            return;
+        }
         Object.keys(this.decks).forEach(deckId => {
             const deck = this.decks[deckId];
             if (deck.requireAchievement && GameStats.achievements[deck.requireAchievement]) {
@@ -111,8 +115,8 @@ const Unlocks = {
             const deck = this.decks[deckId];
             const locked = !deck.unlocked;
             const lockedClass = locked ? 'locked' : '';
-            const achievementName = deck.requireAchievement ? 
-                GameStats.achievements[deck.requireAchievement]?.name : '';
+            const achievementName = deck.requireAchievement && GameStats.achievements && GameStats.achievements[deck.requireAchievement] ? 
+                GameStats.achievements[deck.requireAchievement].name : '';
             
             html += `
                 <div class="deck-option ${lockedClass}" onclick="Unlocks.onDeckSelect('${deckId}')">
@@ -137,6 +141,4 @@ const Unlocks = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => Unlocks.init(), 100);
-});
+Unlocks.init();

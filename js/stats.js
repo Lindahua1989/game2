@@ -387,4 +387,4 @@ const GameStats = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => GameStats.init());
+GameStats.init();
