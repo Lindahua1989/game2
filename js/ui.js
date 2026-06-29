@@ -43,14 +43,22 @@ const UI = {
             if (enemy.status.poison > 0) spriteAura += ' status-aura-poison';
             if (enemy.status.weak > 0) spriteAura += ' status-aura-weak';
             if (enemy.status.strength > 0) spriteAura += ' status-aura-strength';
+            if (enemy.stealthTurns > 0) spriteAura += ' enemy-stealthed';
+
+            let affixHtml = '';
+            if (enemy.affix && ENEMY_AFFIXES[enemy.affix]) {
+                affixHtml = `<div class="enemy-affix">${ENEMY_AFFIXES[enemy.affix].name}</div>`;
+            }
 
             div.innerHTML = `
                 <div class="enemy-intent">${intentText}</div>
                 <div class="enemy-sprite${spriteAura}">
                     ${enemy.icon}
                     ${enemy.block > 0 ? `<span class="enemy-block">${enemy.block}</span>` : ''}
+                    ${enemy.stealthTurns > 0 ? '<span class="enemy-stealth-icon">👁️</span>' : ''}
                 </div>
                 <div class="enemy-name">${enemy.name}</div>
+                ${affixHtml}
                 <div class="enemy-hp-bar">
                     <div class="enemy-hp-fill" style="width: ${hpPercent}%"></div>
                 </div>

@@ -1,3 +1,14 @@
+const ENEMY_AFFIXES = {
+    strong: { name: '强壮的', hpMult: 1.0, atkMult: 1.3 },
+    tough: { name: '坚韧的', hpMult: 1.4, atkMult: 1.0 },
+    swift: { name: '迅捷的', extraAction: true },
+    thorny: { name: '带刺的', reflectDamage: 3 },
+    regenerating: { name: '再生的', healPerTurn: 3 },
+    hidden: { name: '隐蔽的', stealthTurns: 1 },
+    furious: { name: '狂怒的', strengthPerTurn: 1 },
+    shielded: { name: '护盾的', blockPerTurn: 5 }
+};
+
 const EnemyData = {
     patrol_drone: {
         id: 'patrol_drone',
@@ -6,8 +17,9 @@ const EnemyData = {
         hp: 20,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 6 },
-            { type: 'attack', value: 8 }
+            { type: 'attack', value: 6, weight: 50 },
+            { type: 'attack', value: 8, weight: 30 },
+            { type: 'block', value: 4, weight: 20 }
         ]
     },
     infected_bot: {
@@ -17,9 +29,9 @@ const EnemyData = {
         hp: 28,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 7 },
-            { type: 'block', value: 5 },
-            { type: 'attack', value: 10 }
+            { type: 'attack', value: 7, weight: 40 },
+            { type: 'block', value: 5, weight: 25 },
+            { type: 'attack', value: 10, weight: 35 }
         ]
     },
     mutant: {
@@ -29,9 +41,10 @@ const EnemyData = {
         hp: 35,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 8 },
-            { type: 'attack', value: 12 },
-            { type: 'attack', value: 10 }
+            { type: 'attack', value: 8, weight: 35 },
+            { type: 'attack', value: 12, weight: 25 },
+            { type: 'attack', value: 10, weight: 25 },
+            { type: 'enrage', value: 2, weight: 15 }
         ]
     },
     em_spider: {
@@ -41,8 +54,9 @@ const EnemyData = {
         hp: 22,
         tier: 'normal',
         pattern: [
-            { type: 'attack_weak', value: 5, weak: 1 },
-            { type: 'attack', value: 9 }
+            { type: 'attack_weak', value: 5, weak: 1, weight: 40 },
+            { type: 'attack', value: 9, weight: 35 },
+            { type: 'block', value: 6, weight: 25 }
         ]
     },
     nano_swarm_enemy: {
@@ -52,8 +66,10 @@ const EnemyData = {
         hp: 22,
         tier: 'normal',
         pattern: [
-            { type: 'attack_poison', value: 4, poison: 2, hits: 2 },
-            { type: 'attack_poison', value: 3, poison: 2 }
+            { type: 'attack_poison', value: 4, poison: 2, hits: 2, weight: 40 },
+            { type: 'attack_poison', value: 3, poison: 2, weight: 30 },
+            { type: 'split', value: 2, weight: 15, condition: 'hp_below_30' },
+            { type: 'attack', value: 6, weight: 15 }
         ]
     },
     sentry_turret: {
@@ -63,8 +79,9 @@ const EnemyData = {
         hp: 30,
         tier: 'normal',
         pattern: [
-            { type: 'charge' },
-            { type: 'attack', value: 18 }
+            { type: 'charge', weight: 30 },
+            { type: 'attack', value: 18, weight: 40 },
+            { type: 'block', value: 8, weight: 30 }
         ]
     },
     repair_bot: {
@@ -74,8 +91,10 @@ const EnemyData = {
         hp: 25,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 6 },
-            { type: 'heal', value: 5 }
+            { type: 'attack', value: 6, weight: 35 },
+            { type: 'heal', value: 5, weight: 30 },
+            { type: 'shield_ally', value: 6, weight: 20, condition: 'has_allies' },
+            { type: 'block', value: 5, weight: 15 }
         ]
     },
     laser_trap: {
@@ -85,8 +104,9 @@ const EnemyData = {
         hp: 20,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 7 },
-            { type: 'attack', value: 7 }
+            { type: 'attack', value: 7, weight: 45 },
+            { type: 'attack', value: 7, weight: 35 },
+            { type: 'attack', value: 12, weight: 20, condition: 'turn_3_plus' }
         ]
     },
     data_ghost: {
@@ -96,8 +116,9 @@ const EnemyData = {
         hp: 20,
         tier: 'normal',
         pattern: [
-            { type: 'attack_weak', value: 5, weak: 1 },
-            { type: 'attack', value: 10 }
+            { type: 'attack_weak', value: 5, weak: 1, weight: 35 },
+            { type: 'attack', value: 10, weight: 35 },
+            { type: 'block', value: 8, weight: 30 }
         ]
     },
     mech_spider: {
@@ -107,8 +128,10 @@ const EnemyData = {
         hp: 24,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 6 },
-            { type: 'attack_poison', value: 6, poison: 2 }
+            { type: 'attack', value: 6, weight: 35 },
+            { type: 'attack_poison', value: 6, poison: 2, weight: 30 },
+            { type: 'block', value: 5, weight: 20 },
+            { type: 'attack', value: 10, weight: 15, condition: 'hp_below_50' }
         ]
     },
     battle_mech: {
@@ -118,10 +141,11 @@ const EnemyData = {
         hp: 65,
         tier: 'elite',
         pattern: [
-            { type: 'attack', value: 12 },
-            { type: 'block_attack', value: 18, block: 10 },
-            { type: 'charge' },
-            { type: 'attack', value: 25 }
+            { type: 'attack', value: 12, weight: 30 },
+            { type: 'block_attack', value: 18, block: 10, weight: 25 },
+            { type: 'charge', weight: 15 },
+            { type: 'attack', value: 25, weight: 20 },
+            { type: 'enrage', value: 3, weight: 10, condition: 'hp_below_50' }
         ]
     },
     stealth_hunter: {
@@ -131,9 +155,11 @@ const EnemyData = {
         hp: 50,
         tier: 'elite',
         pattern: [
-            { type: 'attack', value: 15 },
-            { type: 'block', value: 12 },
-            { type: 'attack', value: 20 }
+            { type: 'attack', value: 15, weight: 30 },
+            { type: 'block', value: 12, weight: 20 },
+            { type: 'attack', value: 20, weight: 25 },
+            { type: 'discard_attack', value: 12, weight: 15, condition: 'turn_3_plus' },
+            { type: 'energy_drain', value: 1, weight: 10, condition: 'player_high_block' }
         ]
     },
     quantum_mage: {
@@ -143,9 +169,11 @@ const EnemyData = {
         hp: 55,
         tier: 'elite',
         pattern: [
-            { type: 'attack_weak', value: 10, weak: 2 },
-            { type: 'attack', value: 8, hits: 2 },
-            { type: 'block', value: 15 }
+            { type: 'attack_weak', value: 10, weak: 2, weight: 25 },
+            { type: 'attack', value: 8, hits: 2, weight: 25 },
+            { type: 'block', value: 15, weight: 20 },
+            { type: 'summon', value: 1, weight: 15, condition: 'has_allies' },
+            { type: 'energy_drain', value: 1, weight: 15, condition: 'turn_3_plus' }
         ]
     },
     heavy_gunship: {
@@ -155,10 +183,11 @@ const EnemyData = {
         hp: 80,
         tier: 'elite',
         pattern: [
-            { type: 'charge' },
-            { type: 'attack', value: 30 },
-            { type: 'attack', value: 10 },
-            { type: 'block', value: 20 }
+            { type: 'charge', weight: 20 },
+            { type: 'attack', value: 30, weight: 30 },
+            { type: 'attack', value: 10, weight: 25 },
+            { type: 'block', value: 20, weight: 15 },
+            { type: 'enrage', value: 4, weight: 10, condition: 'hp_below_30' }
         ]
     },
     infection_core: {
@@ -168,9 +197,11 @@ const EnemyData = {
         hp: 70,
         tier: 'elite',
         pattern: [
-            { type: 'summon', value: 2 },
-            { type: 'attack_poison', value: 12, poison: 3 },
-            { type: 'heal', value: 10 }
+            { type: 'summon', value: 2, weight: 25 },
+            { type: 'attack_poison', value: 12, poison: 3, weight: 30 },
+            { type: 'heal', value: 10, weight: 20 },
+            { type: 'shield_ally', value: 10, weight: 15, condition: 'has_allies' },
+            { type: 'attack', value: 15, weight: 10, condition: 'hp_below_50' }
         ]
     },
     boss_guardian: {
@@ -187,17 +218,20 @@ const EnemyData = {
             {
                 threshold: 50,
                 pattern: [
-                    { type: 'attack', value: 10 },
-                    { type: 'block_attack', value: 8, block: 15 }
+                    { type: 'attack', value: 10, weight: 35 },
+                    { type: 'block_attack', value: 8, block: 15, weight: 30 },
+                    { type: 'shield_ally', value: 10, weight: 20, condition: 'has_allies' },
+                    { type: 'block', value: 12, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 15 },
-                    { type: 'attack', value: 20 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 25 }
+                    { type: 'attack', value: 15, weight: 30 },
+                    { type: 'attack', value: 20, weight: 25 },
+                    { type: 'charge', weight: 15 },
+                    { type: 'attack', value: 25, weight: 20 },
+                    { type: 'enrage', value: 3, weight: 10 }
                 ]
             }
         ]
@@ -216,17 +250,20 @@ const EnemyData = {
             {
                 threshold: 65,
                 pattern: [
-                    { type: 'summon', value: 2 },
-                    { type: 'attack_poison', value: 8, poison: 3 },
-                    { type: 'attack', value: 12 }
+                    { type: 'summon', value: 2, weight: 30 },
+                    { type: 'attack_poison', value: 8, poison: 3, weight: 30 },
+                    { type: 'attack', value: 12, weight: 25 },
+                    { type: 'shield_ally', value: 8, weight: 15, condition: 'has_allies' }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack_poison', value: 15, poison: 5 },
-                    { type: 'attack', value: 20 },
-                    { type: 'attack_all', value: 10 }
+                    { type: 'attack_poison', value: 15, poison: 5, weight: 30 },
+                    { type: 'attack', value: 20, weight: 25 },
+                    { type: 'attack_all', value: 10, weight: 20 },
+                    { type: 'summon', value: 1, weight: 15 },
+                    { type: 'enrage', value: 4, weight: 10 }
                 ]
             }
         ]
@@ -246,26 +283,31 @@ const EnemyData = {
             {
                 threshold: 120,
                 pattern: [
-                    { type: 'attack', value: 12 },
-                    { type: 'block_attack', value: 8, block: 20 },
-                    { type: 'attack_weak', value: 10, weak: 3 }
+                    { type: 'attack', value: 12, weight: 30 },
+                    { type: 'block_attack', value: 8, block: 20, weight: 25 },
+                    { type: 'attack_weak', value: 10, weak: 3, weight: 25 },
+                    { type: 'energy_drain', value: 1, weight: 20 }
                 ]
             },
             {
                 threshold: 60,
                 pattern: [
-                    { type: 'attack', value: 18 },
-                    { type: 'attack', value: 10, hits: 2 },
-                    { type: 'block_attack', value: 15, block: 25 }
+                    { type: 'attack', value: 18, weight: 25 },
+                    { type: 'attack', value: 10, hits: 2, weight: 25 },
+                    { type: 'block_attack', value: 15, block: 25, weight: 20 },
+                    { type: 'summon', value: 1, weight: 15 },
+                    { type: 'discard_attack', value: 14, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 25 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 32 },
-                    { type: 'attack_poison', value: 15, poison: 5, weak: 3 }
+                    { type: 'attack', value: 25, weight: 25 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 32, weight: 20 },
+                    { type: 'attack_poison', value: 15, poison: 5, weak: 3, weight: 20 },
+                    { type: 'enrage', value: 5, weight: 10 },
+                    { type: 'energy_drain', value: 2, weight: 15 }
                 ]
             }
         ]
@@ -278,9 +320,10 @@ const EnemyData = {
         hp: 32,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 9 },
-            { type: 'attack', value: 7, hits: 2 },
-            { type: 'block', value: 8 }
+            { type: 'attack', value: 9, weight: 35 },
+            { type: 'attack', value: 7, hits: 2, weight: 30 },
+            { type: 'block', value: 8, weight: 20 },
+            { type: 'enrage', value: 2, weight: 15, condition: 'hp_below_50' }
         ]
     },
     void_walker: {
@@ -290,9 +333,10 @@ const EnemyData = {
         hp: 28,
         tier: 'normal',
         pattern: [
-            { type: 'attack_weak', value: 6, weak: 2 },
-            { type: 'attack', value: 11 },
-            { type: 'block', value: 10 }
+            { type: 'attack_weak', value: 6, weak: 2, weight: 30 },
+            { type: 'attack', value: 11, weight: 30 },
+            { type: 'block', value: 10, weight: 25 },
+            { type: 'energy_drain', value: 1, weight: 15, condition: 'turn_3_plus' }
         ]
     },
     cyber_assassin: {
@@ -302,9 +346,10 @@ const EnemyData = {
         hp: 26,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 10 },
-            { type: 'attack', value: 8 },
-            { type: 'attack', value: 12 }
+            { type: 'attack', value: 10, weight: 35 },
+            { type: 'attack', value: 8, weight: 25 },
+            { type: 'attack', value: 12, weight: 25 },
+            { type: 'discard_attack', value: 7, weight: 15, condition: 'turn_3_plus' }
         ]
     },
     shield_drone: {
@@ -314,9 +359,10 @@ const EnemyData = {
         hp: 18,
         tier: 'normal',
         pattern: [
-            { type: 'block', value: 12 },
-            { type: 'attack', value: 5 },
-            { type: 'block', value: 8 }
+            { type: 'block', value: 12, weight: 30 },
+            { type: 'attack', value: 5, weight: 25 },
+            { type: 'shield_ally', value: 8, weight: 30, condition: 'has_allies' },
+            { type: 'block', value: 8, weight: 15 }
         ]
     },
     toxic_spitter: {
@@ -326,9 +372,10 @@ const EnemyData = {
         hp: 24,
         tier: 'normal',
         pattern: [
-            { type: 'attack_poison', value: 5, poison: 3 },
-            { type: 'attack_poison', value: 4, poison: 2, hits: 2 },
-            { type: 'attack', value: 8 }
+            { type: 'attack_poison', value: 5, poison: 3, weight: 35 },
+            { type: 'attack_poison', value: 4, poison: 2, hits: 2, weight: 30 },
+            { type: 'attack', value: 8, weight: 20 },
+            { type: 'block', value: 5, weight: 15 }
         ]
     },
     energy_vampire: {
@@ -338,9 +385,10 @@ const EnemyData = {
         hp: 30,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 7 },
-            { type: 'heal', value: 7 },
-            { type: 'attack', value: 9 }
+            { type: 'attack', value: 7, weight: 30 },
+            { type: 'heal', value: 7, weight: 20 },
+            { type: 'attack', value: 9, weight: 25 },
+            { type: 'energy_drain', value: 1, weight: 25 }
         ]
     },
     gravity_manipulator: {
@@ -350,9 +398,10 @@ const EnemyData = {
         hp: 34,
         tier: 'normal',
         pattern: [
-            { type: 'attack_weak', value: 7, weak: 2 },
-            { type: 'block', value: 10 },
-            { type: 'attack', value: 11 }
+            { type: 'attack_weak', value: 7, weak: 2, weight: 30 },
+            { type: 'block', value: 10, weight: 25 },
+            { type: 'attack', value: 11, weight: 25 },
+            { type: 'discard_attack', value: 8, weight: 20, condition: 'player_high_block' }
         ]
     },
     phase_shifter: {
@@ -362,9 +411,10 @@ const EnemyData = {
         hp: 22,
         tier: 'normal',
         pattern: [
-            { type: 'attack', value: 8 },
-            { type: 'block', value: 15 },
-            { type: 'attack', value: 10 }
+            { type: 'attack', value: 8, weight: 30 },
+            { type: 'block', value: 15, weight: 30 },
+            { type: 'attack', value: 10, weight: 25 },
+            { type: 'block', value: 20, weight: 15, condition: 'hp_below_50' }
         ]
     },
     // === 新增精英 ===
@@ -375,11 +425,12 @@ const EnemyData = {
         hp: 90,
         tier: 'elite',
         pattern: [
-            { type: 'attack', value: 14 },
-            { type: 'block_attack', value: 16, block: 12 },
-            { type: 'attack', value: 12, hits: 2 },
-            { type: 'charge' },
-            { type: 'attack', value: 28 }
+            { type: 'attack', value: 14, weight: 25 },
+            { type: 'block_attack', value: 16, block: 12, weight: 20 },
+            { type: 'attack', value: 12, hits: 2, weight: 20 },
+            { type: 'charge', weight: 15 },
+            { type: 'attack', value: 28, weight: 10 },
+            { type: 'energy_drain', value: 2, weight: 10, condition: 'turn_3_plus' }
         ]
     },
     plasma_titan: {
@@ -389,11 +440,12 @@ const EnemyData = {
         hp: 100,
         tier: 'elite',
         pattern: [
-            { type: 'attack', value: 16 },
-            { type: 'attack', value: 12, hits: 2 },
-            { type: 'block', value: 18 },
-            { type: 'charge' },
-            { type: 'attack', value: 35 }
+            { type: 'attack', value: 16, weight: 25 },
+            { type: 'attack', value: 12, hits: 2, weight: 20 },
+            { type: 'block', value: 18, weight: 20 },
+            { type: 'charge', weight: 15 },
+            { type: 'attack', value: 35, weight: 10 },
+            { type: 'enrage', value: 5, weight: 10, condition: 'hp_below_30' }
         ]
     },
     void_empress: {
@@ -403,10 +455,11 @@ const EnemyData = {
         hp: 85,
         tier: 'elite',
         pattern: [
-            { type: 'attack_weak', value: 12, weak: 3 },
-            { type: 'summon', value: 1 },
-            { type: 'attack_poison', value: 10, poison: 4 },
-            { type: 'block', value: 20 }
+            { type: 'attack_weak', value: 12, weak: 3, weight: 25 },
+            { type: 'summon', value: 1, weight: 20 },
+            { type: 'attack_poison', value: 10, poison: 4, weight: 25 },
+            { type: 'block', value: 20, weight: 15 },
+            { type: 'energy_drain', value: 2, weight: 15, condition: 'player_high_block' }
         ]
     },
     // === 新增Boss ===
@@ -425,27 +478,31 @@ const EnemyData = {
             {
                 threshold: 100,
                 pattern: [
-                    { type: 'attack', value: 14 },
-                    { type: 'attack', value: 10, hits: 2 },
-                    { type: 'block', value: 15 }
+                    { type: 'attack', value: 14, weight: 35 },
+                    { type: 'attack', value: 10, hits: 2, weight: 30 },
+                    { type: 'block', value: 15, weight: 20 },
+                    { type: 'enrage', value: 2, weight: 15 }
                 ]
             },
             {
                 threshold: 50,
                 pattern: [
-                    { type: 'attack', value: 20 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 30 },
-                    { type: 'attack', value: 15, hits: 2 }
+                    { type: 'attack', value: 20, weight: 30 },
+                    { type: 'charge', weight: 15 },
+                    { type: 'attack', value: 30, weight: 25 },
+                    { type: 'attack', value: 15, hits: 2, weight: 20 },
+                    { type: 'enrage', value: 3, weight: 10 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 25 },
-                    { type: 'attack', value: 18, hits: 3 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 40 }
+                    { type: 'attack', value: 25, weight: 25 },
+                    { type: 'attack', value: 18, hits: 3, weight: 20 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 40, weight: 25 },
+                    { type: 'enrage', value: 5, weight: 10 },
+                    { type: 'energy_drain', value: 2, weight: 10 }
                 ]
             }
         ]
@@ -465,28 +522,31 @@ const EnemyData = {
             {
                 threshold: 150,
                 pattern: [
-                    { type: 'attack', value: 12 },
-                    { type: 'block_attack', value: 10, block: 18 },
-                    { type: 'attack_weak', value: 14, weak: 2 }
+                    { type: 'attack', value: 12, weight: 30 },
+                    { type: 'block_attack', value: 10, block: 18, weight: 25 },
+                    { type: 'attack_weak', value: 14, weak: 2, weight: 25 },
+                    { type: 'shield_ally', value: 10, weight: 20, condition: 'has_allies' }
                 ]
             },
             {
                 threshold: 80,
                 pattern: [
-                    { type: 'summon', value: 2 },
-                    { type: 'attack', value: 18 },
-                    { type: 'block', value: 22 },
-                    { type: 'attack', value: 15, hits: 2 }
+                    { type: 'summon', value: 2, weight: 25 },
+                    { type: 'attack', value: 18, weight: 25 },
+                    { type: 'block', value: 22, weight: 20 },
+                    { type: 'attack', value: 15, hits: 2, weight: 20 },
+                    { type: 'energy_drain', value: 1, weight: 10 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 28 },
-                    { type: 'attack', value: 20, hits: 2 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 45 },
-                    { type: 'attack_poison', value: 18, poison: 6 }
+                    { type: 'attack', value: 28, weight: 25 },
+                    { type: 'attack', value: 20, hits: 2, weight: 20 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 45, weight: 20 },
+                    { type: 'attack_poison', value: 18, poison: 6, weight: 15 },
+                    { type: 'enrage', value: 6, weight: 10 }
                 ]
             }
         ]
@@ -507,28 +567,32 @@ const EnemyData = {
             {
                 threshold: 180,
                 pattern: [
-                    { type: 'attack_weak', value: 15, weak: 3 },
-                    { type: 'block', value: 20 },
-                    { type: 'attack', value: 18, hits: 2 }
+                    { type: 'attack_weak', value: 15, weak: 3, weight: 30 },
+                    { type: 'block', value: 20, weight: 25 },
+                    { type: 'attack', value: 18, hits: 2, weight: 25 },
+                    { type: 'energy_drain', value: 1, weight: 20 }
                 ]
             },
             {
                 threshold: 100,
                 pattern: [
-                    { type: 'attack', value: 22 },
-                    { type: 'attack_poison', value: 16, poison: 4 },
-                    { type: 'block_attack', value: 20, block: 25 },
-                    { type: 'attack', value: 25, hits: 2 }
+                    { type: 'attack', value: 22, weight: 25 },
+                    { type: 'attack_poison', value: 16, poison: 4, weight: 20 },
+                    { type: 'block_attack', value: 20, block: 25, weight: 20 },
+                    { type: 'attack', value: 25, hits: 2, weight: 20 },
+                    { type: 'summon', value: 1, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 30 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 50 },
-                    { type: 'attack_weak', value: 28, weak: 4 },
-                    { type: 'attack_poison', value: 22, poison: 6 }
+                    { type: 'attack', value: 30, weight: 25 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 50, weight: 20 },
+                    { type: 'attack_weak', value: 28, weak: 4, weight: 15 },
+                    { type: 'attack_poison', value: 22, poison: 6, weight: 15 },
+                    { type: 'enrage', value: 6, weight: 10 },
+                    { type: 'energy_drain', value: 2, weight: 5 }
                 ]
             }
         ]
@@ -548,28 +612,31 @@ const EnemyData = {
             {
                 threshold: 210,
                 pattern: [
-                    { type: 'attack', value: 20 },
-                    { type: 'block', value: 30 },
-                    { type: 'attack', value: 25 }
+                    { type: 'attack', value: 20, weight: 35 },
+                    { type: 'block', value: 30, weight: 30 },
+                    { type: 'attack', value: 25, weight: 25 },
+                    { type: 'enrage', value: 2, weight: 10 }
                 ]
             },
             {
                 threshold: 120,
                 pattern: [
-                    { type: 'charge' },
-                    { type: 'attack', value: 40 },
-                    { type: 'block_attack', value: 30, block: 35 },
-                    { type: 'attack', value: 35, hits: 2 }
+                    { type: 'charge', weight: 15 },
+                    { type: 'attack', value: 40, weight: 25 },
+                    { type: 'block_attack', value: 30, block: 35, weight: 20 },
+                    { type: 'attack', value: 35, hits: 2, weight: 25 },
+                    { type: 'enrage', value: 4, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 45 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 60 },
-                    { type: 'attack', value: 40, hits: 3 },
-                    { type: 'block', value: 40 }
+                    { type: 'attack', value: 45, weight: 25 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 60, weight: 20 },
+                    { type: 'attack', value: 40, hits: 3, weight: 20 },
+                    { type: 'block', value: 40, weight: 10 },
+                    { type: 'enrage', value: 6, weight: 15 }
                 ]
             }
         ]
@@ -589,28 +656,32 @@ const EnemyData = {
             {
                 threshold: 240,
                 pattern: [
-                    { type: 'attack_poison', value: 18, poison: 5 },
-                    { type: 'attack_weak', value: 20, weak: 3 },
-                    { type: 'block', value: 25 }
+                    { type: 'attack_poison', value: 18, poison: 5, weight: 30 },
+                    { type: 'attack_weak', value: 20, weak: 3, weight: 25 },
+                    { type: 'block', value: 25, weight: 20 },
+                    { type: 'energy_drain', value: 1, weight: 15 },
+                    { type: 'summon', value: 1, weight: 10 }
                 ]
             },
             {
                 threshold: 140,
                 pattern: [
-                    { type: 'attack', value: 30 },
-                    { type: 'attack_poison', value: 25, poison: 6 },
-                    { type: 'summon', value: 2 },
-                    { type: 'attack', value: 35, hits: 2 }
+                    { type: 'attack', value: 30, weight: 25 },
+                    { type: 'attack_poison', value: 25, poison: 6, weight: 20 },
+                    { type: 'summon', value: 2, weight: 20 },
+                    { type: 'attack', value: 35, hits: 2, weight: 20 },
+                    { type: 'enrage', value: 4, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 50 },
-                    { type: 'attack_poison', value: 30, poison: 8 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 65 },
-                    { type: 'attack_weak', value: 40, weak: 5 }
+                    { type: 'attack', value: 50, weight: 25 },
+                    { type: 'attack_poison', value: 30, poison: 8, weight: 20 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 65, weight: 20 },
+                    { type: 'attack_weak', value: 40, weak: 5, weight: 15 },
+                    { type: 'enrage', value: 8, weight: 10 }
                 ]
             }
         ]
@@ -630,28 +701,32 @@ const EnemyData = {
             {
                 threshold: 270,
                 pattern: [
-                    { type: 'attack_weak', value: 22, weak: 4 },
-                    { type: 'attack_poison', value: 20, poison: 6 },
-                    { type: 'attack', value: 28 }
+                    { type: 'attack_weak', value: 22, weak: 4, weight: 30 },
+                    { type: 'attack_poison', value: 20, poison: 6, weight: 25 },
+                    { type: 'attack', value: 28, weight: 25 },
+                    { type: 'energy_drain', value: 1, weight: 20 }
                 ]
             },
             {
                 threshold: 160,
                 pattern: [
-                    { type: 'attack', value: 35, hits: 2 },
-                    { type: 'attack_poison', value: 28, poison: 7 },
-                    { type: 'summon', value: 3 },
-                    { type: 'block_attack', value: 35, block: 30 }
+                    { type: 'attack', value: 35, hits: 2, weight: 25 },
+                    { type: 'attack_poison', value: 28, poison: 7, weight: 20 },
+                    { type: 'summon', value: 3, weight: 20 },
+                    { type: 'block_attack', value: 35, block: 30, weight: 20 },
+                    { type: 'discard_attack', value: 20, weight: 15 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 55 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 70 },
-                    { type: 'attack_poison', value: 35, poison: 10 },
-                    { type: 'attack', value: 45, hits: 3 }
+                    { type: 'attack', value: 55, weight: 25 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 70, weight: 20 },
+                    { type: 'attack_poison', value: 35, poison: 10, weight: 15 },
+                    { type: 'attack', value: 45, hits: 3, weight: 15 },
+                    { type: 'enrage', value: 8, weight: 10 },
+                    { type: 'energy_drain', value: 2, weight: 5 }
                 ]
             }
         ]
@@ -671,30 +746,34 @@ const EnemyData = {
             {
                 threshold: 300,
                 pattern: [
-                    { type: 'attack', value: 30 },
-                    { type: 'block', value: 35 },
-                    { type: 'attack', value: 35, hits: 2 }
+                    { type: 'attack', value: 30, weight: 30 },
+                    { type: 'block', value: 35, weight: 25 },
+                    { type: 'attack', value: 35, hits: 2, weight: 25 },
+                    { type: 'energy_drain', value: 1, weight: 20 }
                 ]
             },
             {
                 threshold: 180,
                 pattern: [
-                    { type: 'attack', value: 40 },
-                    { type: 'attack_poison', value: 30, poison: 8 },
-                    { type: 'summon', value: 3 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 55 }
+                    { type: 'attack', value: 40, weight: 25 },
+                    { type: 'attack_poison', value: 30, poison: 8, weight: 20 },
+                    { type: 'summon', value: 3, weight: 15 },
+                    { type: 'charge', weight: 10 },
+                    { type: 'attack', value: 55, weight: 20 },
+                    { type: 'discard_attack', value: 25, weight: 10 }
                 ]
             },
             {
                 threshold: 0,
                 pattern: [
-                    { type: 'attack', value: 60 },
-                    { type: 'charge' },
-                    { type: 'attack', value: 80 },
-                    { type: 'attack', value: 50, hits: 3 },
-                    { type: 'attack_poison', value: 40, poison: 12 },
-                    { type: 'block', value: 50 }
+                    { type: 'attack', value: 60, weight: 20 },
+                    { type: 'charge', weight: 8 },
+                    { type: 'attack', value: 80, weight: 18 },
+                    { type: 'attack', value: 50, hits: 3, weight: 18 },
+                    { type: 'attack_poison', value: 40, poison: 12, weight: 15 },
+                    { type: 'block', value: 50, weight: 10 },
+                    { type: 'enrage', value: 10, weight: 6 },
+                    { type: 'energy_drain', value: 3, weight: 5 }
                 ]
             }
         ]
@@ -706,29 +785,47 @@ const Enemies = {
         if (type === 'boss') {
             const bosses = ['boss_guardian', 'boss_queen', 'boss_omega', 'boss_dragon', 'boss_nexus', 'boss_phantom', 'boss_titan', 'boss_void_emperor', 'boss_cosmic_horror', 'boss_final_god'];
             const bossId = bosses[Math.min(floor - 1, bosses.length - 1)];
-            return [this.createEnemy(bossId)];
+            return [this.createEnemy(bossId, floor)];
         }
 
         if (type === 'elite') {
             const elites = Object.values(EnemyData).filter(e => e.tier === 'elite');
             const elite = Utils.randomChoice(elites);
-            return [this.createEnemy(elite.id)];
+            const enemies = [this.createEnemy(elite.id, floor)];
+            if (Math.random() < 0.5) {
+                const normals = Object.values(EnemyData).filter(e => e.tier === 'normal');
+                const minion = this.createEnemy(Utils.randomChoice(normals).id, floor);
+                minion.hp = Math.floor(minion.hp * 0.5);
+                minion.maxHp = minion.hp;
+                minion.name = '弱化' + minion.name;
+                enemies.push(minion);
+            }
+            return enemies;
         }
 
         const normals = Object.values(EnemyData).filter(e => e.tier === 'normal');
-        const count = Utils.randomInt(1, 2);
+        let count;
+        if (floor <= 4) count = Utils.randomInt(1, 2);
+        else if (floor <= 8) count = Utils.randomInt(2, 3);
+        else if (floor <= 12) count = Utils.randomInt(2, 4);
+        else count = Utils.randomInt(3, 4);
         const enemies = [];
+        const usedIds = [];
         for (let i = 0; i < count; i++) {
-            enemies.push(this.createEnemy(Utils.randomChoice(normals).id));
+            const available = normals.filter(n => !usedIds.includes(n.id));
+            const pool = available.length > 0 ? available : normals;
+            const chosen = Utils.randomChoice(pool);
+            usedIds.push(chosen.id);
+            enemies.push(this.createEnemy(chosen.id, floor));
         }
         return enemies;
     },
 
-    createEnemy(id) {
+    createEnemy(id, floor) {
         const base = EnemyData[id];
         if (!base) return null;
         
-        const scaling = GameModes.getEnemyScaling(Game.state ? Game.state.currentFloor : 1);
+        const scaling = GameModes.getEnemyScaling(floor || (Game.state ? Game.state.currentFloor : 1));
         const scaledHp = Math.floor(base.hp * scaling);
         
         const enemy = {
@@ -741,12 +838,20 @@ const Enemies = {
             block: 0,
             tier: base.tier,
             patternIndex: 0,
+            lastIntentType: null,
             status: {
                 poison: 0,
                 weak: 0,
                 strength: 0
             },
-            intent: null
+            intent: null,
+            affix: null,
+            stealthTurns: 0,
+            blockPerTurn: 0,
+            healPerTurn: 0,
+            strengthPerTurn: 0,
+            reflectDamage: 0,
+            extraAction: false
         };
 
         if (base.phases) {
@@ -781,6 +886,41 @@ const Enemies = {
             }
         }
 
+        const currentFloor = floor || (Game.state ? Game.state.currentFloor : 1);
+        if (currentFloor >= 5 && (base.tier === 'normal' || base.tier === 'elite')) {
+            if (Math.random() < 0.3) {
+                const affixKeys = Object.keys(ENEMY_AFFIXES);
+                const affixKey = Utils.randomChoice(affixKeys);
+                const affix = ENEMY_AFFIXES[affixKey];
+                
+                enemy.affix = affixKey;
+                enemy.name = affix.name + enemy.name;
+                
+                if (affix.hpMult && affix.hpMult !== 1.0) {
+                    enemy.hp = Math.floor(enemy.hp * affix.hpMult);
+                    enemy.maxHp = enemy.hp;
+                }
+                if (affix.atkMult && affix.atkMult !== 1.0) {
+                    enemy.pattern.forEach(p => {
+                        if (p.value) p.value = Math.floor(p.value * affix.atkMult);
+                    });
+                    if (enemy.phases) {
+                        enemy.phases.forEach(phase => {
+                            phase.pattern.forEach(p => {
+                                if (p.value) p.value = Math.floor(p.value * affix.atkMult);
+                            });
+                        });
+                    }
+                }
+                if (affix.reflectDamage) enemy.reflectDamage = affix.reflectDamage;
+                if (affix.healPerTurn) enemy.healPerTurn = affix.healPerTurn;
+                if (affix.blockPerTurn) enemy.blockPerTurn = affix.blockPerTurn;
+                if (affix.strengthPerTurn) enemy.strengthPerTurn = affix.strengthPerTurn;
+                if (affix.stealthTurns) enemy.stealthTurns = affix.stealthTurns;
+                if (affix.extraAction) enemy.extraAction = true;
+            }
+        }
+
         this.rollIntent(enemy);
         return enemy;
     },
@@ -788,7 +928,66 @@ const Enemies = {
     rollIntent(enemy) {
         const pattern = enemy.pattern;
         if (!pattern || pattern.length === 0) return;
-        enemy.intent = pattern[enemy.patternIndex % pattern.length];
+
+        const validActions = pattern.filter(p => this.checkCondition(enemy, p.condition));
+        const actionsToUse = validActions.length > 0 ? validActions : pattern;
+
+        const hasWeights = actionsToUse.some(a => a.weight !== undefined);
+        
+        if (hasWeights) {
+            const totalWeight = actionsToUse.reduce((sum, a) => sum + (a.weight || 1), 0);
+            let random = Math.random() * totalWeight;
+            
+            let chosen = actionsToUse[0];
+            for (let i = 0; i < actionsToUse.length; i++) {
+                random -= (actionsToUse[i].weight || 1);
+                if (random <= 0) {
+                    chosen = actionsToUse[i];
+                    break;
+                }
+            }
+
+            if (actionsToUse.length > 1 && chosen.type === enemy.lastIntentType) {
+                const alternatives = actionsToUse.filter(a => a.type !== enemy.lastIntentType);
+                if (alternatives.length > 0) {
+                    chosen = Utils.randomChoice(alternatives);
+                }
+            }
+
+            enemy.intent = chosen;
+            enemy.lastIntentType = chosen.type;
+        } else {
+            enemy.intent = pattern[enemy.patternIndex % pattern.length];
+            enemy.lastIntentType = enemy.intent.type;
+        }
+    },
+
+    checkCondition(enemy, condition) {
+        if (!condition) return true;
+        
+        switch (condition) {
+            case 'hp_below_50':
+                return enemy.hp < enemy.maxHp * 0.5;
+            case 'hp_below_30':
+                return enemy.hp < enemy.maxHp * 0.3;
+            case 'player_low_hp':
+                return Game.state && Game.state.player.hp < Game.state.player.maxHp * 0.3;
+            case 'player_high_block':
+                return Combat.state && Combat.state.playerBlock > 15;
+            case 'ally_dead': {
+                const alive = Combat.state ? Combat.state.enemies.filter(e => e.hp > 0 && e !== enemy && e.tier === enemy.tier) : [];
+                const total = Combat.state ? Combat.state.enemies.filter(e => e.tier === enemy.tier) : [];
+                return total.length > 1 && alive.length < total.length - 1;
+            }
+            case 'turn_3_plus':
+                return Combat.state && Combat.state.turn >= 3;
+            case 'poisoned':
+                return enemy.status.poison > 0;
+            case 'has_allies':
+                return Combat.state ? Combat.state.enemies.filter(e => e.hp > 0 && e !== enemy).length > 0 : false;
+            default:
+                return true;
+        }
     },
 
     advancePattern(enemy) {
@@ -839,6 +1038,16 @@ const Enemies = {
                 return `💚 ${intent.value}`;
             case 'summon':
                 return `📢 召唤`;
+            case 'split':
+                return '💥 分裂';
+            case 'enrage':
+                return `😡 狂暴+${intent.value}`;
+            case 'shield_ally':
+                return `🛡️ 护盾同伴${intent.value}`;
+            case 'energy_drain':
+                return `⚡ 吸取${intent.value}`;
+            case 'discard_attack':
+                return `⚔️${intent.value} 🗑️`;
             default:
                 return '?';
         }

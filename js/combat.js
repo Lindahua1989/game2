@@ -68,6 +68,10 @@ const Combat = {
         this.state.counterDamage = 0;
         this.state.shieldOnHit = 0;
 
+        if (this.state.playerWeak && this.state.playerWeak > 0) {
+            this.state.playerWeak--;
+        }
+
         // 应用下回合能量惩罚
         if (this.state.playerPowers.nextTurnEnergyPenalty > 0) {
             this.state.maxEnergy = Math.max(1, this.state.maxEnergy - this.state.playerPowers.nextTurnEnergyPenalty);
@@ -283,6 +287,10 @@ const Combat = {
     async executeCard(card, targetIndex) {
         let bonusDmg = this.state.playerPowers.strength + this.state.playerPowers.attackBonus + this.state.firstAttackBonus;
         const cardBonus = Relics.getCardBonus(Game.state.player.relics);
+
+        if (this.state.playerWeak && this.state.playerWeak > 0) {
+            bonusDmg = Math.floor(bonusDmg * 0.75);
+        }
         
         // 连击加成 - 本回合每打出1张其他卡牌增加伤害
         if (card.comboBonus) {
@@ -781,12 +789,20 @@ const Combat = {
             Sound.play('damage');
             GameStats.recordDamage(remaining);
             Relics.onDamageDealt(Game.state.player.relics, remaining, this.state);
+
+            if (enemy.reflectDamage && enemy.reflectDamage > 0 && enemy.hp > 0) {
+                Game.state.player.hp -= enemy.reflectDamage;
+                UI.showCombatLog(`${enemy.name} 的荆棘反弹了 ${enemy.reflectDamage} 伤害`, 'damage');
+                const playerArea = document.getElementById('player-area');
+                UI.showDamageNumber(playerArea, enemy.reflectDamage, 'damage');
+            }
         }
 
         if (enemy.hp <= 0) {
             enemy.hp = 0;
             UI.showEnemyDeath(enemy.uid, enemy.tier);
             UI.showCombatLog(`${enemy.name} 被消灭了！`, 'system');
+            this.onEnemyDeath(enemy);
         }
     },
 
@@ -837,8 +853,50 @@ const Combat = {
     },
 
     async enemyTurn() {
+        const hasShieldDrone = this.state.enemies.some(e => e.id === 'shield_drone' && e.hp > 0);
+        const hasRepairBot = this.state.enemies.some(e => e.id === 'repair_bot' && e.hp > 0);
+
         for (const enemy of this.state.enemies) {
             if (enemy.hp <= 0) continue;
+
+            if (enemy.stealthTurns > 0) {
+                enemy.stealthTurns--;
+                UI.showCombatLog(`${enemy.name} 处于隐蔽状态...`, 'enemy');
+                Enemies.advancePattern(enemy);
+                Enemies.rollIntent(enemy);
+                continue;
+            }
+
+            if (enemy.blockPerTurn > 0) {
+                enemy.block += enemy.blockPerTurn;
+                UI.showCombatLog(`${enemy.name} 获得了 ${enemy.blockPerTurn} 护甲`, 'block');
+            }
+
+            if (enemy.healPerTurn > 0) {
+                const healAmount = Math.min(enemy.healPerTurn, enemy.maxHp - enemy.hp);
+                if (healAmount > 0) {
+                    enemy.hp += healAmount;
+                    UI.showCombatLog(`${enemy.name} 回复了 ${healAmount} HP`, 'heal');
+                }
+            }
+
+            if (enemy.strengthPerTurn > 0) {
+                enemy.status.strength = (enemy.status.strength || 0) + enemy.strengthPerTurn;
+                UI.showCombatLog(`${enemy.name} 力量+${enemy.strengthPerTurn}`, 'enemy');
+            }
+
+            if (hasShieldDrone && enemy.id !== 'shield_drone') {
+                enemy.block += 5;
+                UI.showCombatLog(`护盾无人机为 ${enemy.name} 提供了5护甲`, 'block');
+            }
+
+            if (hasRepairBot && enemy.id !== 'repair_bot') {
+                const healAmount = Math.min(5, enemy.maxHp - enemy.hp);
+                if (healAmount > 0) {
+                    enemy.hp += healAmount;
+                    UI.showCombatLog(`维修机器人治疗了 ${enemy.name} ${healAmount}HP`, 'heal');
+                }
+            }
 
             if (enemy.status.poison > 0) {
                 const poisonDmg = enemy.status.poison;
@@ -849,6 +907,7 @@ const Combat = {
                 if (enemy.hp <= 0) {
                     enemy.hp = 0;
                     UI.showEnemyDeath(enemy.uid, enemy.tier);
+                    this.onEnemyDeath(enemy);
                     await Utils.delay(400);
                     continue;
                 }
@@ -859,6 +918,7 @@ const Combat = {
                 this.dealDamageToEnemy(enemy, this.state.playerPowers.damagePerTurn);
                 if (enemy.hp <= 0) {
                     enemy.hp = 0;
+                    this.onEnemyDeath(enemy);
                     continue;
                 }
             }
@@ -875,6 +935,21 @@ const Combat = {
 
             await this.executeEnemyAction(enemy, intent, atkValue);
 
+            if (enemy.extraAction && enemy.hp > 0) {
+                Enemies.advancePattern(enemy);
+                Enemies.rollIntent(enemy);
+                const extraIntent = enemy.intent;
+                if (extraIntent) {
+                    let extraAtkValue = extraIntent.value || 0;
+                    if (enemy.status.strength > 0) extraAtkValue += enemy.status.strength;
+                    if (enemy.status.weak > 0) {
+                        extraAtkValue = Math.floor(extraAtkValue * 0.75);
+                        enemy.status.weak--;
+                    }
+                    await this.executeEnemyAction(enemy, extraIntent, extraAtkValue);
+                }
+            }
+
             Enemies.advancePattern(enemy);
             Enemies.rollIntent(enemy);
 
@@ -890,8 +965,17 @@ const Combat = {
         this.state.enemies = this.state.enemies.filter(e => e.hp > 0);
     },
 
+    onEnemyDeath(deadEnemy) {
+        this.state.enemies.forEach(e => {
+            if (e.hp > 0 && e !== deadEnemy) {
+                e.status.strength = (e.status.strength || 0) + 2;
+                UI.showCombatLog(`${e.name} 因同伴死亡而愤怒！力量+2`, 'enemy');
+            }
+        });
+    },
+
     async executeEnemyAction(enemy, intent, atkValue) {
-        const isAttack = ['attack', 'attack_poison', 'attack_weak', 'attack_all', 'block_attack'].includes(intent.type);
+        const isAttack = ['attack', 'attack_poison', 'attack_weak', 'attack_all', 'block_attack', 'discard_attack'].includes(intent.type);
         if (isAttack) {
             UI.showEnemyAttack(enemy.uid);
             await Utils.delay(200);
@@ -922,6 +1006,10 @@ const Combat = {
 
             case 'attack_weak':
                 this.dealDamageToPlayer(atkValue);
+                if (intent.weak) {
+                    this.state.playerWeak = (this.state.playerWeak || 0) + intent.weak;
+                    UI.showCombatLog(`${enemy.name} 施加了 ${intent.weak} 虚弱`, 'enemy');
+                }
                 break;
 
             case 'attack_all':
@@ -953,11 +1041,61 @@ const Combat = {
 
             case 'summon':
                 const summonCount = intent.value || 1;
-                for (let i = 0; i < summonCount && this.state.enemies.length < 5; i++) {
-                    const minion = Enemies.createEnemy('nano_swarm_enemy');
+                for (let i = 0; i < summonCount && this.state.enemies.length < 6; i++) {
+                    const minion = Enemies.createEnemy('nano_swarm_enemy', Game.state.currentFloor);
                     if (minion) this.state.enemies.push(minion);
                 }
                 UI.showCombatLog(`${enemy.name} 召唤了增援！`, 'enemy');
+                break;
+
+            case 'split':
+                const splitCount = intent.value || 2;
+                for (let i = 0; i < splitCount && this.state.enemies.length < 6; i++) {
+                    const split = Enemies.createEnemy(enemy.id, Game.state.currentFloor);
+                    if (split) {
+                        split.hp = Math.floor(enemy.maxHp * 0.3);
+                        split.maxHp = split.hp;
+                        split.name = '分裂体';
+                        this.state.enemies.push(split);
+                    }
+                }
+                UI.showCombatLog(`${enemy.name} 分裂了！`, 'enemy');
+                break;
+
+            case 'enrage':
+                const enrageValue = intent.value || 2;
+                enemy.status.strength = (enemy.status.strength || 0) + enrageValue;
+                UI.showCombatLog(`${enemy.name} 进入狂暴状态！力量+${enrageValue}`, 'enemy');
+                break;
+
+            case 'shield_ally':
+                const allies = this.state.enemies.filter(e => e.hp > 0 && e !== enemy);
+                if (allies.length > 0) {
+                    const ally = Utils.randomChoice(allies);
+                    ally.block += intent.value;
+                    UI.showCombatLog(`${enemy.name} 给 ${ally.name} 施加了 ${intent.value} 护甲`, 'block');
+                }
+                break;
+
+            case 'energy_drain':
+                const drainAmount = intent.value || 1;
+                this.state.energy = Math.max(0, this.state.energy - drainAmount);
+                UI.showCombatLog(`${enemy.name} 偷取了 ${drainAmount} 能量`, 'enemy');
+                UI.showEnergyPulse();
+                break;
+
+            case 'discard_attack':
+                this.dealDamageToPlayer(atkValue);
+                if (this.state.hand.length > 0) {
+                    const idx = Utils.randomInt(0, this.state.hand.length - 1);
+                    const discarded = this.state.hand.splice(idx, 1)[0];
+                    this.state.discardPile.push(discarded);
+                    UI.showCombatLog(`${enemy.name} 迫使你弃掉了 ${discarded.name}`, 'enemy');
+                }
+                if (this.state.playerPowers.thorns > 0) {
+                    enemy.hp -= this.state.playerPowers.thorns;
+                    UI.showEnemyDamage(enemy.uid, this.state.playerPowers.thorns);
+                }
                 break;
         }
         

@@ -794,6 +794,32 @@ body {
 .status-armor-on-hit { color: #44aaff; }
 .status-berserker { color: #ff8844; }
 
+.enemy-affix {
+    font-size: 11px;
+    color: #ffa500;
+    text-align: center;
+    margin-top: 2px;
+    text-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+}
+
+.enemy-stealthed {
+    opacity: 0.4;
+    filter: blur(1px);
+    animation: stealth-pulse 2s ease-in-out infinite;
+}
+
+.enemy-stealth-icon {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 16px;
+}
+
+@keyframes stealth-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+}
+
 .log-entry {
     padding: 3px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
