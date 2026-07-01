@@ -151,7 +151,6 @@ const UI = {
         }
         if (card.tempCostZero) {
             cost = 0;
-            card.tempCostZero = false;
         }
 
         // Apply cost reduction from power_surge (能量激增)
@@ -512,11 +511,100 @@ const UI = {
             cardDiv.classList.remove('unplayable');
             cardDiv.style.cursor = 'pointer';
             cardDiv.onclick = () => {
-                Cards.upgradeCard(card);
-                Game.continueAfterRest();
+                this.showUpgradePreview(card);
             };
             container.appendChild(cardDiv);
         });
+    },
+
+    showUpgradePreview(card) {
+        const upgradedCard = Cards.createCard(card.id, true);
+
+        const modal = document.createElement('div');
+        modal.className = 'upgrade-preview-modal';
+        modal.innerHTML = `
+            <div class="upgrade-preview-content">
+                <h3>升级预览</h3>
+                <div class="upgrade-preview-cards">
+                    <div class="upgrade-preview-card before">
+                        <div class="upgrade-preview-label">当前</div>
+                        ${this.createCardHTML(card)}
+                    </div>
+                    <div class="upgrade-preview-arrow">→</div>
+                    <div class="upgrade-preview-card after">
+                        <div class="upgrade-preview-label">升级后</div>
+                        ${this.createCardHTML(upgradedCard)}
+                    </div>
+                </div>
+                <div class="upgrade-preview-diff">
+                    ${this.getUpgradeDiff(card, upgradedCard)}
+                </div>
+                <div class="upgrade-preview-buttons">
+                    <button class="btn btn-confirm" id="upgrade-confirm">确认升级</button>
+                    <button class="btn btn-cancel" id="upgrade-cancel">取消</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        document.getElementById('upgrade-confirm').onclick = () => {
+            Cards.upgradeCard(card);
+            modal.remove();
+            Game.continueAfterRest();
+        };
+
+        document.getElementById('upgrade-cancel').onclick = () => {
+            modal.remove();
+        };
+
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        };
+    },
+
+    createCardHTML(card) {
+        let cost = card.cost;
+        const isHEnergyCard = card.cost === -1;
+        if (isHEnergyCard) cost = 'X';
+        const costClass = isHEnergyCard ? 'card-cost h-cost' : 'card-cost';
+        const costDisplay = isHEnergyCard ? 'X' : cost;
+
+        return `
+            <div class="card ${card.type}${card.upgraded ? ' upgraded' : ''}">
+                <div class="${costClass}">${costDisplay}</div>
+                <div class="card-icon">${card.icon}</div>
+                <div class="card-name">${card.name}</div>
+                <div class="card-desc">${card.description}</div>
+                <div class="card-type">${this.getCardTypeName(card.type)}</div>
+            </div>
+        `;
+    },
+
+    getUpgradeDiff(card, upgradedCard) {
+        const diffs = [];
+        if (card.damage !== upgradedCard.damage) diffs.push(`<span class="diff-up">伤害: ${card.damage || '-'} → ${upgradedCard.damage}</span>`);
+        if (card.minDamage !== upgradedCard.minDamage) diffs.push(`<span class="diff-up">最小伤害: ${card.minDamage || '-'} → ${upgradedCard.minDamage}</span>`);
+        if (card.maxDamage !== upgradedCard.maxDamage) diffs.push(`<span class="diff-up">最大伤害: ${card.maxDamage || '-'} → ${upgradedCard.maxDamage}</span>`);
+        if (card.block !== upgradedCard.block) diffs.push(`<span class="diff-up">护甲: ${card.block || '-'} → ${upgradedCard.block}</span>`);
+        if (card.heal !== upgradedCard.heal) diffs.push(`<span class="diff-up">治疗: ${card.heal || '-'} → ${upgradedCard.heal}</span>`);
+        if (card.draw !== upgradedCard.draw) diffs.push(`<span class="diff-up">抽牌: ${card.draw || '-'} → ${upgradedCard.draw}</span>`);
+        if (card.poison !== upgradedCard.poison) diffs.push(`<span class="diff-up">腐蚀: ${card.poison || '-'} → ${upgradedCard.poison}</span>`);
+        if (card.weak !== upgradedCard.weak) diffs.push(`<span class="diff-up">虚弱: ${card.weak || '-'} → ${upgradedCard.weak}</span>`);
+        if (card.strength !== upgradedCard.strength) diffs.push(`<span class="diff-up">力量: ${card.strength || '-'} → ${upgradedCard.strength}</span>`);
+        if (card.hits !== upgradedCard.hits) diffs.push(`<span class="diff-up">连击: ${card.hits || '-'} → ${upgradedCard.hits}</span>`);
+        if (card.energy !== upgradedCard.energy) diffs.push(`<span class="diff-up">能量: ${card.energy || '-'} → ${upgradedCard.energy}</span>`);
+        if (card.blockPerTurn !== upgradedCard.blockPerTurn) diffs.push(`<span class="diff-up">每回合护甲: ${card.blockPerTurn || '-'} → ${upgradedCard.blockPerTurn}</span>`);
+        if (card.damagePerTurn !== upgradedCard.damagePerTurn) diffs.push(`<span class="diff-up">每回合伤害: ${card.damagePerTurn || '-'} → ${upgradedCard.damagePerTurn}</span>`);
+        if (card.thorns !== upgradedCard.thorns) diffs.push(`<span class="diff-up">荆棘: ${card.thorns || '-'} → ${upgradedCard.thorns}</span>`);
+        if (card.attackBonus !== upgradedCard.attackBonus) diffs.push(`<span class="diff-up">攻击加成: ${card.attackBonus || '-'} → ${upgradedCard.attackBonus}</span>`);
+        if (card.aoeDamage !== upgradedCard.aoeDamage) diffs.push(`<span class="diff-up">AOE伤害: ${card.aoeDamage || '-'} → ${upgradedCard.aoeDamage}</span>`);
+        if (card.poisonAll !== upgradedCard.poisonAll) diffs.push(`<span class="diff-up">全体腐蚀: ${card.poisonAll || '-'} → ${upgradedCard.poisonAll}</span>`);
+        if (card.weakAll !== upgradedCard.weakAll) diffs.push(`<span class="diff-up">全体虚弱: ${card.weakAll || '-'} → ${upgradedCard.weakAll}</span>`);
+        if (card.selfDamage !== upgradedCard.selfDamage) diffs.push(`<span class="diff-up">自伤: ${card.selfDamage || '-'} → ${upgradedCard.selfDamage}</span>`);
+        return diffs.length > 0 ? diffs.join('<br>') : '<span style="color:#888">无变化</span>';
     },
 
     openModal(title, cards) {

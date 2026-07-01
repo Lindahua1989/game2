@@ -211,6 +211,10 @@ const Combat = {
         let cost = card.cost;
         if (cost === -1) cost = 0;
         
+        if (card.tempCostZero) {
+            cost = 0;
+        }
+        
         if (this.state.firstCardDiscount && cost > 0) {
             cost = Math.max(0, cost - 1);
             this.state.firstCardDiscount = false;
@@ -247,6 +251,7 @@ const Combat = {
         this.state.animating = true;
         this.state.targetingCard = null;
         this.state.energy -= cost;
+        card.tempCostZero = false;
         this.state.hand.splice(cardIndex, 1);
         this.state.cardsPlayedThisTurn++;
 
