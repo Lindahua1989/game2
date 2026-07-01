@@ -126,6 +126,10 @@ const Skins = {
         if (combatScreen) {
             combatScreen.style.background = skin.colors.background;
         }
+
+        if (typeof AssetManager !== 'undefined') {
+            AssetManager.updatePlayerSprite();
+        }
     },
 
     selectSkin(skinId) {

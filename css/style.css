@@ -107,6 +107,20 @@ body {
 
 /* ===== TITLE SCREEN ===== */
 #screen-title {
+    background: radial-gradient(ellipse at center, rgba(26, 26, 62, 0.6) 0%, rgba(10, 10, 26, 0.85) 70%);
+}
+
+#screen-title.has-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#screen-title.has-bg .title-bg {
+    background: radial-gradient(ellipse at center, rgba(26, 26, 62, 0.3) 0%, rgba(10, 10, 26, 0.6) 70%);
+}
+
+#screen-title:not(.has-bg) {
     background: radial-gradient(ellipse at center, #1a1a3e 0%, #0a0a1a 70%);
 }
 
@@ -422,6 +436,39 @@ body {
     justify-content: flex-start;
     padding: 0;
     position: relative;
+    overflow: hidden;
+    min-height: 100%;
+}
+
+#screen-combat.combat-bg-engine,
+#screen-combat.combat-bg-core,
+#screen-combat.combat-bg-bridge {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#screen-combat.combat-bg-engine::before,
+#screen-combat.combat-bg-core::before,
+#screen-combat.combat-bg-bridge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#screen-combat > * {
+    position: relative;
+    z-index: 1;
+}
+
+#screen-combat > .targeting-svg {
+    z-index: 50;
 }
 
 .combat-top {
@@ -445,8 +492,10 @@ body {
     display: flex;
     flex: 1;
     width: 100%;
+    min-height: 0;
     overflow: hidden;
     position: relative;
+    z-index: 1;
 }
 
 #combat-log {
@@ -514,6 +563,8 @@ body {
     box-shadow: 0 0 20px rgba(255, 68, 102, 0.6);
 }
 
+/* ===== RESPONSIVE SCALING ===== */
+/* 基础尺寸适用于 1920x1080 */
 .enemy-sprite {
     width: 100px;
     height: 100px;
@@ -526,6 +577,91 @@ body {
     border: 2px solid rgba(255, 68, 102, 0.3);
     transition: all 0.3s;
     position: relative;
+    overflow: hidden;
+}
+
+.player-sprite-container {
+    width: 80px;
+    height: 80px;
+}
+
+/* 2560x1440 及以上 */
+@media (min-width: 2400px) {
+    .enemy-sprite {
+        width: 140px;
+        height: 140px;
+        font-size: 80px;
+    }
+
+    .player-sprite-container {
+        width: 110px;
+        height: 110px;
+    }
+
+    .game-title {
+        font-size: 96px;
+    }
+
+    .game-subtitle {
+        font-size: 32px;
+    }
+
+    .btn-large {
+        padding: 20px 60px;
+        font-size: 24px;
+    }
+}
+
+/* 1920x1080 标准 */
+@media (min-width: 1600px) and (max-width: 2399px) {
+    .enemy-sprite {
+        width: 120px;
+        height: 120px;
+        font-size: 68px;
+    }
+
+    .player-sprite-container {
+        width: 96px;
+        height: 96px;
+    }
+}
+
+/* 1280x720 及以下 */
+@media (max-width: 1280px) {
+    .enemy-sprite {
+        width: 80px;
+        height: 80px;
+        font-size: 46px;
+    }
+
+    .player-sprite-container {
+        width: 64px;
+        height: 64px;
+    }
+
+    .game-title {
+        font-size: 56px;
+    }
+
+    .btn-large {
+        padding: 12px 36px;
+        font-size: 18px;
+    }
+}
+
+.enemy-sprite img.enemy-sprite-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.enemy-sprite.has-sprite-img {
+    font-size: 0;
+    background: transparent;
+    border-color: rgba(255, 68, 102, 0.4);
 }
 
 .enemy-sprite.hit {
@@ -856,6 +992,25 @@ body {
     background: rgba(0, 0, 0, 0.3);
     border-top: 1px solid rgba(0, 212, 255, 0.1);
     border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.player-sprite-container {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.08);
+    border: 2px solid rgba(0, 212, 255, 0.3);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.player-sprite-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .player-block-display {
@@ -2153,7 +2308,6 @@ body {
     .card-icon { font-size: 28px; }
     .card-name { font-size: 11px; }
     .card-desc { font-size: 9px; }
-    .enemy-sprite { width: 72px; height: 72px; font-size: 40px; }
     #hand-area { gap: 4px; padding: 8px; }
     .map-node { width: 44px; height: 44px; font-size: 20px; }
     .combat-main { flex-direction: column; }

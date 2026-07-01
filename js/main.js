@@ -196,6 +196,9 @@ const Game = {
 
     init() {
         SaveManager.deleteOldSave();
+        if (typeof AssetManager !== 'undefined') {
+            AssetManager.setTitleBackground();
+        }
     },
 
     startNewRun() {
@@ -369,18 +372,21 @@ const Game = {
     handleNodeEvent(node) {
         switch (node.type) {
             case 'combat':
+                if (typeof AssetManager !== 'undefined') { AssetManager.setCombatBackground(this.state.currentFloor); AssetManager.updatePlayerSprite(); }
                 const enemies = Enemies.getEncounter(this.state.currentFloor, 'normal');
                 this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(enemies);
                 break;
 
             case 'elite':
+                if (typeof AssetManager !== 'undefined') { AssetManager.setCombatBackground(this.state.currentFloor); AssetManager.updatePlayerSprite(); }
                 const eliteEnemies = Enemies.getEncounter(this.state.currentFloor, 'elite');
                 this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(eliteEnemies);
                 break;
 
             case 'boss':
+                if (typeof AssetManager !== 'undefined') { AssetManager.setCombatBackground(this.state.currentFloor); AssetManager.updatePlayerSprite(); }
                 const boss = Enemies.getEncounter(this.state.currentFloor, 'boss');
                 this.showScreen('screen-combat', 'slide-left');
                 Combat.startCombat(boss);

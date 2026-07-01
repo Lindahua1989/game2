@@ -50,10 +50,15 @@ const UI = {
                 affixHtml = `<div class="enemy-affix">${ENEMY_AFFIXES[enemy.affix].name}</div>`;
             }
 
+            const spriteBasePath = (typeof AssetManager !== 'undefined') ? AssetManager.enemySprites[enemy.id] : null;
+            const spriteImgHtml = spriteBasePath ? `<img class="enemy-sprite-img" src="" data-sprite-base="${spriteBasePath}" alt="${enemy.name}" onerror="this.style.display='none';this.parentElement.classList.remove('has-sprite-img');this.parentElement.textContent='${enemy.icon}';">` : '';
+            const spriteClass = spriteBasePath ? ' has-sprite-img' : '';
+
             div.innerHTML = `
                 <div class="enemy-intent">${intentText}</div>
-                <div class="enemy-sprite${spriteAura}">
-                    ${enemy.icon}
+                <div class="enemy-sprite${spriteAura}${spriteClass}">
+                    ${spriteImgHtml}
+                    ${!spriteBasePath ? enemy.icon : ''}
                     ${enemy.block > 0 ? `<span class="enemy-block">${enemy.block}</span>` : ''}
                     ${enemy.stealthTurns > 0 ? '<span class="enemy-stealth-icon">👁️</span>' : ''}
                 </div>
@@ -67,6 +72,19 @@ const UI = {
             `;
 
             enemyArea.appendChild(div);
+
+            if (spriteBasePath && typeof AssetManager !== 'undefined') {
+                const imgEl = div.querySelector('.enemy-sprite-img');
+                AssetManager.resolveImageAsync(spriteBasePath).then(path => {
+                    if (path && imgEl) {
+                        imgEl.src = path;
+                    } else if (imgEl) {
+                        imgEl.style.display = 'none';
+                        imgEl.parentElement.classList.remove('has-sprite-img');
+                        imgEl.parentElement.textContent = enemy.icon;
+                    }
+                });
+            }
         });
 
         document.getElementById('player-block').textContent = state.playerBlock;
